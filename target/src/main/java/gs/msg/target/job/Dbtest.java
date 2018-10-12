@@ -40,17 +40,18 @@ public class Dbtest {
                // .processor((Function<? super Object, ?>) processor())
                 .writer(writer())
                 .taskExecutor(config1.executor())
+                .throttleLimit(1)
                 .build();
     }
 
     @Bean
     public MyBatisCursorItemReader reder() throws Exception {
         MyBatisCursorItemReader reader = new MyBatisCursorItemReader();
-        Map<String, Object> parameterValues = new HashMap<String, Object>();
-        parameterValues.put("status","A");
+        //Map<String, Object> parameterValues = new HashMap<String, Object>();
+        //parameterValues.put("status","A");
         //reader.setPageSize(1000);
         reader.setSqlSessionFactory(config1.sqlSessionFactory());
-        reader.setParameterValues(parameterValues);
+        //reader.setParameterValues(parameterValues);
         reader.setQueryId("dbaccess.mybatis.SampleMapper.select1");
         return reader;
     }

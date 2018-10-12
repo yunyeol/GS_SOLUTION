@@ -13,6 +13,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
@@ -32,6 +33,7 @@ public class Config {
      * MyBatis연동으로인한 SqlSessionFactory, SqlSessionTemplate 선언
      */
 	@Bean(destroyMethod = "close")
+    @Lazy
 	@ConfigurationProperties("spring.datasource")
 	public HikariDataSource dataSource(){
 		return DataSourceBuilder.create().type(HikariDataSource.class).build();
