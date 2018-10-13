@@ -2,7 +2,6 @@ package gs.msg.target.job;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.*;
-import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.support.SimpleJobLauncher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
@@ -12,6 +11,9 @@ import org.springframework.scheduling.annotation.Scheduled;
 @Configuration
 public class JobScheduling {
 
+    /**
+     * 실제 실행되는 런처 선언
+     */
     @Autowired public SimpleJobLauncher simpleJobLauncher;
 
     /**

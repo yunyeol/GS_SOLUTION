@@ -2,6 +2,7 @@ package gs.msg.send.job;
 
 import gs.msg.send.config.Config;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.mybatis.spring.batch.MyBatisBatchItemWriter;
 import org.mybatis.spring.batch.MyBatisCursorItemReader;
@@ -9,9 +10,11 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.Async;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -19,8 +22,7 @@ import java.util.Map;
 @Slf4j
 @Configuration
 public class Dbtest {
-    @Autowired public SqlSessionTemplate sqlSessionTemplate;
-    @Autowired public Config config1;
+    @Autowired private SqlSessionFactory sqlSessionFactory;
 
     @Autowired private JobBuilderFactory jobBuilderFactory;
     @Autowired private StepBuilderFactory stepBuilderFactory;
@@ -39,17 +41,18 @@ public class Dbtest {
                 .reader(reder())
                // .processor((Function<? super Object, ?>) processor())
                 .writer(writer())
-                .taskExecutor(config1.executor())
+                .throttleLimit(8)
                 .build();
     }
 
     @Bean
+    @StepScope
     public MyBatisCursorItemReader reder() throws Exception {
         MyBatisCursorItemReader reader = new MyBatisCursorItemReader();
         Map<String, Object> parameterValues = new HashMap<String, Object>();
         parameterValues.put("status","A");
         //reader.setPageSize(1000);
-        reader.setSqlSessionFactory(config1.sqlSessionFactory());
+        reader.setSqlSessionFactory(sqlSessionFactory);
         reader.setParameterValues(parameterValues);
         reader.setQueryId("dbaccess.mybatis.SampleMapper.select1");
         return reader;
@@ -68,9 +71,10 @@ public class Dbtest {
 //    }
 
     @Bean
+    @StepScope
     public MyBatisBatchItemWriter writer() throws Exception {
         MyBatisBatchItemWriter writer = new MyBatisBatchItemWriter();
-        writer.setSqlSessionFactory(config1.sqlSessionFactory());
+        writer.setSqlSessionFactory(sqlSessionFactory);
         writer.setStatementId("dbaccess.mybatis.SampleMapper.select2");
         return  writer;
     }
