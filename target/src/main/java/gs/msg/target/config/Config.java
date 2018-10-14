@@ -1,9 +1,16 @@
 package gs.msg.target.config;
 
+
 import com.zaxxer.hikari.HikariDataSource;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.SqlSessionTemplate;
+import org.springframework.amqp.core.*;
+import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
+import org.springframework.amqp.rabbit.connection.ConnectionFactory;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
+import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.batch.core.explore.support.JobExplorerFactoryBean;
 import org.springframework.batch.core.launch.support.SimpleJobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
@@ -108,4 +115,70 @@ public class Config {
         simpleJobLauncher.setTaskExecutor(executor());
         return simpleJobLauncher;
     }
+
+    /**
+     * RABBITMQ CONFIG
+     * 래빗엠큐 설정
+     */
+    public static final String TOPIC_EXCHANGE = "amp.topic";
+    public static final String MAIL_QUEUE_NAME = "mail.send.queue";
+
+    @Value("${spring.rabbitmq.host}") private String rabbitmqHost;
+    @Value("${spring.rabbitmq.port}") private int rabbitmqPort;
+    @Value("${spring.rabbitmq.username}") private String rabbitmqUsername;
+    @Value("${spring.rabbitmq.password}") private String rabbitmqPwd;
+
+
+    @Bean
+    public RabbitTemplate rabbitTemplate(){
+        RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory());
+        rabbitTemplate.setRoutingKey(MAIL_QUEUE_NAME);
+        rabbitTemplate.setMessageConverter(jsonMessageConverter());
+        return rabbitTemplate;
+    }
+
+    @Bean
+    public ConnectionFactory connectionFactory(){
+        CachingConnectionFactory connectionFactory = new CachingConnectionFactory();
+        connectionFactory.setHost(rabbitmqHost);
+        connectionFactory.setUsername(rabbitmqUsername);
+        connectionFactory.setPassword(rabbitmqPwd);
+        connectionFactory.setPort(rabbitmqPort);
+        return connectionFactory;
+    }
+
+    @Bean
+    public Jackson2JsonMessageConverter jsonMessageConverter() {
+        return new Jackson2JsonMessageConverter();
+    }
+
+    @Bean
+    public Queue queue(){
+        return new Queue(MAIL_QUEUE_NAME);
+    }
+
+    @Bean
+    public TopicExchange exchange() {
+        return new TopicExchange(TOPIC_EXCHANGE);
+    }
+
+    @Bean
+    public Binding binding(Queue queue, TopicExchange exchange) {
+        return BindingBuilder.bind(queue).to(exchange).with(MAIL_QUEUE_NAME);
+    }
+
+    @Bean
+    public SimpleMessageListenerContainer container() {
+        SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
+        container.setConnectionFactory(connectionFactory());
+        container.setQueueNames(MAIL_QUEUE_NAME);
+//        container.setMessageListener(new MessageListenerAdapter(new MessageListener() {
+//            @Override
+//            public void onMessage(Message message) {
+//                log.info("receiver :::: >" + message);
+//            }
+//        }));
+        return container;
+    }
+
 }
