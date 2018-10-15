@@ -120,7 +120,7 @@ public class Config {
      * RABBITMQ CONFIG
      * 래빗엠큐 설정
      */
-    public static final String TOPIC_EXCHANGE = "amp.topic";
+    public static final String TOPIC_EXCHANGE = "amq.topic";
     public static final String MAIL_QUEUE_NAME = "mail.send.queue";
 
     @Value("${spring.rabbitmq.host}") private String rabbitmqHost;
@@ -132,7 +132,9 @@ public class Config {
     @Bean
     public RabbitTemplate rabbitTemplate(){
         RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory());
+        rabbitTemplate.setExchange(TOPIC_EXCHANGE);
         rabbitTemplate.setRoutingKey(MAIL_QUEUE_NAME);
+        rabbitTemplate.setEncoding("UTF-8");
         rabbitTemplate.setMessageConverter(jsonMessageConverter());
         return rabbitTemplate;
     }
@@ -172,12 +174,6 @@ public class Config {
         SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
         container.setConnectionFactory(connectionFactory());
         container.setQueueNames(MAIL_QUEUE_NAME);
-//        container.setMessageListener(new MessageListenerAdapter(new MessageListener() {
-//            @Override
-//            public void onMessage(Message message) {
-//                log.info("receiver :::: >" + message);
-//            }
-//        }));
         return container;
     }
 
