@@ -169,12 +169,12 @@ public class Config {
         return BindingBuilder.bind(queue).to(exchange).with(MAIL_QUEUE_NAME);
     }
 
-    @Bean
-    public SimpleMessageListenerContainer container() {
-        SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
-        container.setConnectionFactory(connectionFactory());
-        container.setQueueNames(MAIL_QUEUE_NAME);
-        return container;
-    }
+//    @Bean
+//    public SimpleMessageListenerContainer container() {
+//        SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
+//        container.setConnectionFactory(connectionFactory());
+//        container.setQueueNames(MAIL_QUEUE_NAME);
+//        return container;
+//    }
 
 }

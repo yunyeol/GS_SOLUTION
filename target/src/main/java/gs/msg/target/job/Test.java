@@ -25,7 +25,7 @@ public class Test {
     @Autowired private StepBuilderFactory stepBuilderFactory;
 
     @Autowired private RabbitTemplate rabbitTemplate;
-    @Autowired private SimpleMessageListenerContainer rabbitListener;
+    //@Autowired private SimpleMessageListenerContainer rabbitListener;
 
     @Bean
     public Job simpleJob() {
