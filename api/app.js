@@ -1,23 +1,47 @@
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
+const PORT = 80
+const DEF_URL = '/api'
 
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
-var testRouter = require('./routes/test');
+const HttpStatus = require('http-status-codes');
+const dotEnv = require('dotenv');
+const express = require('express');
+const cors = require('cors');
+const app = express();
+const indexRouter = require('./routes/test');
+const usersRouter = require('./routes/users');
+const utilFactory = require('./classes/utilFactory');
 
+//static variable
+global.HttpStatus = HttpStatus;
+global.utilFactory = utilFactory;
 
-var app = express();
+// app.use(require('connect-history-api-fallback')())
 
-app.use(logger('dev'));
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+//production vue set
+app.use(express.static('public/vue_production'));
 
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
-app.use('/test', testRouter);
+//cors
+app.use(cors());
 
-module.exports = app;
+//router set
+app.use(DEF_URL, indexRouter);
+app.use(DEF_URL, usersRouter);
+app.use((req, res, next) => {
+    console.error('404 not Found');
+    res.status(HttpStatus.NOT_FOUND).send('404 not Found');
+});
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(HttpStatus.INTERNAL_SERVER_ERROR).send('Something broke!');
+});
+
+// NODE_ENV (production or develpment)
+process.env.NODE_ENV = ( process.env.NODE_ENV && process.env.NODE_ENV.trim().toLowerCase() == 'production' ) ? 'production' : 'development';
+if (process.env.NODE_ENV == 'production') {
+    dotEnv.config({path: __dirname + '/env/prod.env'});
+    console.log("Production Mode");
+} else if (process.env.NODE_ENV == 'development') {
+    dotEnv.config({path: __dirname + '/env/dev.env'});
+    console.log("Development Mode");
+}
+
+app.listen(PORT, () => console.log(`Example app listening on port ${PORT}!`));
