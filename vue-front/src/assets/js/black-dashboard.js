@@ -1,3 +1,22 @@
+"use strict";
+
+/*!
+
+ =========================================================
+ * Black Dashboard PRO - v1.0.0
+ =========================================================
+
+ * Product Page: https://demos.creative-tim.com/marketplace/black-dashboard-pro/examples/dashboard.html
+ * Copyright 2018 Creative Tim (http://www.creative-tim.com)
+
+ * Coded by www.creative-tim.com
+
+ =========================================================
+
+ * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+ */
+
 var transparent = true;
 var transparentDemo = true;
 var fixedTop = false;
@@ -27,22 +46,24 @@ var seq2 = 0,
   delays2 = 80,
   durations2 = 500;
 
-/*!
+// Returns a function, that, as long as it continues to be invoked, will not
+// be triggered. The function will be called after it stops being called for
+// N milliseconds. If `immediate` is passed, trigger the function on the
+// leading edge, instead of the trailing.
 
- =========================================================
- * Black Dashboard - v1.0.0
- =========================================================
-
- * Product Page: https://www.creative-tim.com/product/black-dashboard
- * Copyright 2018 Creative Tim (http://www.creative-tim.com)
-
- * Coded by www.creative-tim.com
-
- =========================================================
-
- * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
- */
+function debounce(func, wait, immediate) {
+  var timeout;
+  return function() {
+    var context = this,
+      args = arguments;
+    clearTimeout(timeout);
+    timeout = setTimeout(function() {
+      timeout = null;
+      if (!immediate) func.apply(context, args);
+    }, wait);
+    if (immediate && !timeout) func.apply(context, args);
+  };
+};
 
 (function() {
   var isWindows = navigator.platform.indexOf('Win') > -1 ? true : false;
@@ -85,41 +106,83 @@ $(document).ready(function() {
     scroll_start = $(this).scrollTop();
 
     if (scroll_start > 50) {
-      $(".navbar-minimize-fixed").css('opacity', '1');
+      $navbar_minimize_fixed.css('opacity', '1');
     } else {
-      $(".navbar-minimize-fixed").css('opacity', '0');
+      $navbar_minimize_fixed.css('opacity', '0');
     }
   });
 
+  // hide the siblings opened collapse
 
-  $(document).scroll(function() {
-    scroll_start = $(this).scrollTop();
-    if (scroll_start > offset.top) {
-      $(".navbar-minimize-fixed").css('opacity', '1');
-    } else {
-      $(".navbar-minimize-fixed").css('opacity', '0');
-    }
+  $collapse.on('show.bs.collapse', function() {
+    $(this).parent().siblings().children('.collapse').each(function() {
+      $(this).collapse('hide');
+    });
   });
 
-  if ($('.full-screen-map').length == 0 && $('.bd-docs').length == 0) {
-    // On click navbar-collapse the menu will be white not transparent
-    $('.collapse').on('show.bs.collapse', function() {
-      $(this).closest('.navbar').removeClass('navbar-transparent').addClass('bg-white');
-    }).on('hide.bs.collapse', function() {
-      $(this).closest('.navbar').addClass('navbar-transparent').removeClass('bg-white');
+  //  Activate the Tooltips
+  $('[data-toggle="tooltip"], [rel="tooltip"]').tooltip();
+
+  // Activate Popovers and set color for popovers
+  $('[data-toggle="popover"]').each(function() {
+    color_class = $(this).data('color');
+    $(this).popover({
+      template: '<div class="popover popover-' + color_class + '" role="tooltip"><div class="arrow"></div><h3 class="popover-header"></h3><div class="popover-body"></div></div>'
+    });
+  });
+
+  var tagClass = $tagsinput.data('color');
+
+  if ($tagsinput.length != 0) {
+    $tagsinput.tagsinput();
+  }
+
+  $('.bootstrap-tagsinput').find('.tag').addClass('badge-' + tagClass);
+
+  //    Activate bootstrap-select
+  if ($selectpicker.length != 0) {
+    $selectpicker.selectpicker({
+      iconBase: "tim-icons",
+      tickIcon: "icon-check-2"
     });
   }
 
+  //when you click the modal search button the navbar will not be collapsed
+  $("#search-button").click(function() {
+    $(this).closest('.navbar-collapse').removeClass('show');
+    $navbar.addClass('navbar-transparent').removeClass('bg-white');
+
+  });
+
+
+
   blackDashboard.initMinimizeSidebar();
 
-  $navbar = $('.navbar[color-on-scroll]');
-  scroll_distance = $navbar.attr('color-on-scroll') || 500;
+  var scroll_distance = $navbar_color.attr('color-on-scroll') || 500;
 
   // Check if we have the class "navbar-color-on-scroll" then add the function to remove the class "navbar-transparent" so it will transform to a plain color.
-  if ($('.navbar[color-on-scroll]').length != 0) {
+  if ($navbar_color.length != 0) {
     blackDashboard.checkScrollForTransparentNavbar();
     $(window).on('scroll', blackDashboard.checkScrollForTransparentNavbar)
   }
+
+  if ($full_screen_map.length == 0 && $('.bd-docs').length == 0) {
+    // On click navbar-collapse the menu will be white not transparent
+    $('.navbar-toggler').click(function() {
+      $collapse.on('show.bs.collapse', function() {
+        $(this).closest('.navbar').removeClass('navbar-transparent').addClass('bg-white');
+      }).on('hide.bs.collapse', function() {
+        $(this).closest('.navbar').addClass('navbar-transparent').removeClass('bg-white');
+      });
+      $navbar.css('transition', '');
+
+    });
+  }
+
+  $navbar.css({
+    'top': '0',
+    'transition': 'all .5s linear'
+  });
 
   $('.form-control').on("focus", function() {
     $(this).parent('.input-group').addClass("input-group-focus");
@@ -129,11 +192,10 @@ $(document).ready(function() {
 
   // Activate bootstrapSwitch
   $('.bootstrap-switch').each(function() {
-    $this = $(this);
-    data_on_label = $this.data('on-label') || '';
-    data_off_label = $this.data('off-label') || '';
+    var data_on_label = $(this).data('on-label') || '';
+    var data_off_label = $(this).data('off-label') || '';
 
-    $this.bootstrapSwitch({
+    $(this).bootstrapSwitch({
       onText: data_on_label,
       offText: data_off_label
     });
@@ -185,9 +247,81 @@ $(window).resize(function() {
   }
 });
 
-blackDashboard = {
+var blackDashboard = {
   misc: {
     navbar_menu_visible: 0
+  },
+
+  checkScrollForTransparentNavbar: debounce(function() {
+    if ($(document).scrollTop() > scroll_distance) {
+      if (transparent) {
+        transparent = false;
+        $navbar_color.removeClass('navbar-transparent');
+      }
+    } else {
+      if (!transparent) {
+        transparent = true;
+        $navbar_color.addClass('navbar-transparent');
+      }
+    }
+  }, 17),
+
+
+
+  // Activate DateTimePicker
+
+  initDateTimePicker: function() {
+    if ($datetimepicker.length != 0) {
+      $datetimepicker.datetimepicker({
+        icons: {
+          time: "tim-icons icon-watch-time",
+          date: "tim-icons icon-calendar-60",
+          up: "fa fa-chevron-up",
+          down: "fa fa-chevron-down",
+          previous: 'tim-icons icon-minimal-left',
+          next: 'tim-icons icon-minimal-right',
+          today: 'fa fa-screenshot',
+          clear: 'fa fa-trash',
+          close: 'fa fa-remove'
+        }
+
+      });
+    }
+
+    if ($datepicker.length != 0) {
+      $datepicker.datetimepicker({
+        format: 'MM/DD/YYYY',
+        icons: {
+          time: "tim-icons icon-watch-time",
+          date: "tim-icons icon-calendar-60",
+          up: "fa fa-chevron-up",
+          down: "fa fa-chevron-down",
+          previous: 'tim-icons icon-minimal-left',
+          next: 'tim-icons icon-minimal-right',
+          today: 'fa fa-screenshot',
+          clear: 'fa fa-trash',
+          close: 'fa fa-remove'
+        }
+      });
+    }
+
+    if ($timepicker.length != 0) {
+      $timepicker.datetimepicker({
+        // format: 'H:mm',    // use this format if you want the 24hours timepicker
+        format: 'h:mm A', //use this format if you want the 12hours timpiecker with AM/PM toggle
+        icons: {
+          time: "tim-icons icon-watch-time",
+          date: "tim-icons icon-calendar-60",
+          up: "fa fa-chevron-up",
+          down: "fa fa-chevron-down",
+          previous: 'tim-icons icon-minimal-left',
+          next: 'tim-icons icon-minimal-right',
+          today: 'fa fa-screenshot',
+          clear: 'fa fa-trash',
+          close: 'fa fa-remove'
+        }
+      });
+    }
   },
 
   initMinimizeSidebar: function() {
@@ -195,15 +329,14 @@ blackDashboard = {
       sidebar_mini_active = true;
     }
 
-    $('#minimizeSidebar').click(function() {
-      var $btn = $(this);
+    $('.minimize-sidebar').click(function() {
 
       if (sidebar_mini_active == true) {
-        $('body').removeClass('sidebar-mini');
+        $body.removeClass('sidebar-mini');
         sidebar_mini_active = false;
         blackDashboard.showSidebarMessage('Sidebar mini deactivated...');
       } else {
-        $('body').addClass('sidebar-mini');
+        $body.addClass('sidebar-mini');
         sidebar_mini_active = true;
         blackDashboard.showSidebarMessage('Sidebar mini activated...');
       }
@@ -220,13 +353,60 @@ blackDashboard = {
     });
   },
 
+  startAnimationForLineChart: function(chart) {
+    chart.on('draw', function(data) {
+      if (data.type === 'line' || data.type === 'area') {
+        data.element.animate({
+          d: {
+            begin: 600,
+            dur: 700,
+            from: data.path.clone().scale(1, 0).translate(0, data.chartRect.height()).stringify(),
+            to: data.path.clone().stringify(),
+            easing: Chartist.Svg.Easing.easeOutQuint
+          }
+        });
+      } else if (data.type === 'point') {
+        seq++;
+        data.element.animate({
+          opacity: {
+            begin: seq * delays,
+            dur: durations,
+            from: 0,
+            to: 1,
+            easing: 'ease'
+          }
+        });
+      }
+    });
+
+    seq = 0;
+  },
+  startAnimationForBarChart: function(chart) {
+
+    chart.on('draw', function(data) {
+      if (data.type === 'bar') {
+        seq2++;
+        data.element.animate({
+          opacity: {
+            begin: seq2 * delays2,
+            dur: durations2,
+            from: 0,
+            to: 1,
+            easing: 'ease'
+          }
+        });
+      }
+    });
+
+    seq2 = 0;
+  },
   showSidebarMessage: function(message) {
     try {
       $.notify({
-        icon: "tim-icons ui-1_bell-53",
+        icon: "tim-icons icon-bell-55",
         message: message
       }, {
-        type: 'info',
+        type: 'primary',
         timer: 4000,
         placement: {
           from: 'top',
@@ -238,7 +418,6 @@ blackDashboard = {
     }
 
   }
-
 };
 
 function hexToRGB(hex, alpha) {

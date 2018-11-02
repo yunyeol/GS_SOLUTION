@@ -131,3 +131,16 @@
     color: $danger-states;
   }
 }
+
+
+@include media-breakpoint-down(xs){
+  .form-horizontal .col-form-label,
+  .form-horizontal .label-on-right {
+    text-align: inherit;
+    padding-top: 0;
+    code {
+      padding: 0 10px;
+    }
+  }
+
+}

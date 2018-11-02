@@ -348,7 +348,6 @@ $box-shadow-lg:               0 1rem 3rem rgba($black, .175);
 $dropdown-shadow:          1px 2px 3px 0px rgba(0, 0, 0, 0.125);
 $box-shadow-raised:        0px 10px 25px 0px rgba(0, 0, 0, 0.3);
 $box-shadow:               0 1px 20px 0px rgba(0, 0, 0, 0.1);
-$sidebar-box-shadow:       0px 2px 22px 0 rgba(0, 0, 0,.20), 0px 2px 30px 0 rgba(0, 0, 0,.35);
 
 $component-active-color:        $white !default;
 $component-active-bg:           theme-color("primary") !default;
@@ -981,6 +980,11 @@ $datepicker-dropdown-border: lighten($gray-400, 40%);
 $datepicker-dropdown-bg: $white !default;
 $datepicker-highlighted-bg: $datepicker-active-background !default;
 
+// Sidebar
+
+$sidebar-width:            260px;
+$sidebar-transition:       .5s cubic-bezier(0.685, 0.0473, 0.346, 1);
+$sidebar-box-shadow:       0px 2px 22px 0 rgba(0, 0, 0,.20), 0px 2px 30px 0 rgba(0, 0, 0,.35);
 
 // Footer
 

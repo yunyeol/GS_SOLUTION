@@ -317,7 +317,6 @@
    box-shadow: none;
  }
 
-
 // Dropown: Sizes
 
 .dropdown-menu-sm {
@@ -335,25 +334,28 @@
     border-radius: $border-radius-lg;
 }
 
-@media screen and (max-width: 991px){
-  .dropdown-toggle:after{
-    display: inline-block;
-    width: 0;
-    height: 0;
-    margin-left: .255em;
-    vertical-align: .255em;
-    content: "";
-    border-top: .3em solid;
-    border-right: .3em solid transparent;
-    border-bottom: 0;
-    border-left: .3em solid transparent;
+@include media-breakpoint-down(md){
+  .button-dropdown{
+      display: none;
   }
+  .dropdown-toggle:after{
+      display: inline-block;
+      width: 0;
+      height: 0;
+      margin-left: .255em;
+      vertical-align: .255em;
+      content: "";
+      border-top: .3em solid;
+      border-right: .3em solid transparent;
+      border-bottom: 0;
+      border-left: .3em solid transparent;
 
+  }
 }
 
 
-@media screen and (min-width: 992px){
+@include media-breakpoint-up(lg){
   .dropdown-menu .dropdown-item{
-      color: $dark-gray;
+    color: $dark-gray;
   }
 }

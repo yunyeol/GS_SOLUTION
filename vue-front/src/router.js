@@ -1,7 +1,14 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Home from './views/Home.vue'
 import Login from './views/Login.vue'
+
+//메일
+import MailDashboard from './views/mail/Dashboard.vue'
+import MailReceiver from './views/mail/Receiver.vue'
+import MailSend from './views/mail/Send.vue'
+
+//세팅
+import Settings from './views/Settings.vue'
 
 Vue.use(Router);
 
@@ -12,14 +19,14 @@ export default new Router({
     { path: '/login', name: 'login', component: Login},
 
     //메일 라우팅
-    { path: '/mail/dashboard', name: 'mail dashboard', component: Home},
-    { path: '/mail/receiver', name: 'mail receiver', component: Home},
-    { path: '/mail/send', name: 'mail receiver', component: Home},
+    { path: '/mail/dashboard', name: 'mail dashboard', component: MailDashboard},
+    { path: '/mail/receiver', name: 'mail receiver', component: MailReceiver},
+    { path: '/mail/send', name: 'mail receiver', component: MailSend},
 
     //푸시 라우팅
 
     //시스템코드 라우팅
-    { path: '/settings', name: 'page settings', component: Home}
+    { path: '/settings', name: 'page settings', component: Settings}
 
 
       // {
@@ -30,15 +37,5 @@ export default new Router({
     //   // which is lazy-loaded when the route is visited.
     //   component: () => import(/* webpackChunkName: "about" */ './views/About.vue')
     // },
-    // {
-    //   path: '/todo',
-    //   name: 'todo',
-    //   component: () => import(/* webpackChunkName: "about" */ './views/TodoPage.vue')
-    // },
-    // {
-    //   path: '/amchart',
-    //   name: 'amchart',
-    //   component: () => import(/* webpackChunkName: "about" */ './components/AmChart.vue')
-    // }
   ]
 })

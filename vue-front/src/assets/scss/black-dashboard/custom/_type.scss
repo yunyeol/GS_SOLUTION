@@ -1,15 +1,7 @@
-body {
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-font-smoothing: antialiased;
-}
-
 h1, h2, h3, h4, h5, h6,
 .h1, .h2, .h3, .h4, .h5, .h6 {
   line-height: $headings-line-height;
 
-}
-p{
-  font-weight: $font-weight-light;
 }
 
 button,

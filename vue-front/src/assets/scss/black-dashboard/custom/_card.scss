@@ -221,12 +221,3 @@
 .card-body{
   padding: $card-spacer-y;
 }
-
-@include media-breakpoint-down(sm) {
-  .card.card-chart .card-header {
-    .btn-group-toggle .tim-icons {
-      font-size: .875rem;
-      top: -1px;
-    }
-  }
-}

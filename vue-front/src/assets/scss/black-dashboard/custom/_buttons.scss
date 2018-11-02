@@ -192,6 +192,11 @@
     transform: translateY(-1px);
     -webkit-transform: translateY(-1px);
   }
+
+  label.btn.active {
+    transform: translateY(0);
+    -webkit-transform: translateY(0);
+  }
 }
 
 
@@ -203,12 +208,6 @@
     top: 50%;
     margin-top: -1px;
     right: 8px;
-}
-
-.btn-group .btn.active {
-    box-shadow: 2px 2px 6px rgba(0,0,0,.4);
-    transform: translateY(-1px);
-    -webkit-transform: translateY(-1px);
 }
 
 .btn-round{
@@ -226,13 +225,57 @@
   }
 }
 
+.btn{
+  // social buttons
+  &.btn-facebook {
+    @include social-buttons-color($facebook, $facebook-states);
+  }
+  &.btn-twitter {
+    @include social-buttons-color($twitter, $twitter-states);
+  }
+  &.btn-pinterest {
+    @include social-buttons-color($pinterest, $pinterest-states);
+  }
+  &.btn-google {
+    @include social-buttons-color($google-plus, $google-plus-states);
+  }
+  &.btn-linkedin {
+    @include social-buttons-color($linkedin, $linkedin-states);
+  }
+  &.btn-dribbble {
+    @include social-buttons-color($dribbble, $dribbble-states);
+  }
+  &.btn-github {
+    @include social-buttons-color($github, $github-states);
+  }
+  &.btn-youtube {
+    @include social-buttons-color($youtube, $youtube-states);
+  }
+  &.btn-instagram {
+    @include social-buttons-color($instagram, $instagram-states);
+  }
+  &.btn-reddit {
+    @include social-buttons-color($reddit, $reddit-states);
+  }
+  &.btn-tumblr {
+    @include social-buttons-color($tumblr, $tumblr-states);
+  }
+  &.btn-behance {
+    @include social-buttons-color($behance, $behance-states);
+  }
+}
+
 .btn-secondary:not(:disabled):not(.disabled):active,
 .btn-secondary:not(:disabled):not(.disabled).active,
 .show > .btn-secondary.dropdown-toggle {
     color: $white;
 }
 
-.btn-group label.btn.active {
-    transform: translateY(0);
-    -webkit-transform: translateY(0);
+
+
+@include media-breakpoint-down(md) {
+  .btn-group .btn {
+    padding-left: $padding-round-horizontal;
+    padding-right: $padding-round-horizontal;
+  }
 }

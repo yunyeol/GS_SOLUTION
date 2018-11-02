@@ -13,11 +13,11 @@
 
 <script>
 // @ is an alias to /src
-import Left from "../components/Left.vue";
-import Top from "../components/Top.vue";
+import Left from "../../components/Left.vue";
+import Top from "../../components/Top.vue";
 
 export default {
-  name: 'home',
+  name: 'receiver',
     components: {
       Left,
       Top

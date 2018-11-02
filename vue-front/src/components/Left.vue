@@ -1,39 +1,39 @@
 <template>
-    <div class="sidebar-wrapper ps">
+    <div class="sidebar-wrapper ps ps--active-x ps--active-y">
         <div class="logo">
             <a href="javascript:void(0)" class="simple-text logo-mini">
-                ct
+                Al
             </a>
             <a href="javascript:void(0)" class="simple-text logo-normal">
-                ctttt
+                Alimi
             </a>
         </div>
         <ul class="nav">
             <li class="active ">
-                <a data-toggle="collapse" href="#pagesExamples" class="" aria-expanded="false">
+                <a data-toggle="collapse" href="#mailPage" class="" aria-expanded="false">
                     <i class="tim-icons icon-email-85"></i>
                     <p>
                         mail
                         <b class="caret"></b>
                     </p>
                 </a>
-                <div class="collapse" id="pagesExamples" style="">
+                <div class="collapse" id="mailPage" style="">
                     <ul class="nav">
-                        <li>
-                            <a href="../examples/pages/pricing.html">
-                                <span class="sidebar-mini-icon">P</span>
+                        <li class="active ">
+                            <a href="/mail/dashboard">
+                                <span class="sidebar-mini-icon">D</span>
                                 <span class="sidebar-normal"> dashboard </span>
                             </a>
                         </li>
                         <li>
-                            <a href="../examples/pages/rtl.html">
-                                <span class="sidebar-mini-icon">RS</span>
+                            <a href="/mail/receiver">
+                                <span class="sidebar-mini-icon">R</span>
                                 <span class="sidebar-normal"> receiver </span>
                             </a>
                         </li>
                         <li>
-                            <a href="../examples/pages/timeline.html">
-                                <span class="sidebar-mini-icon">T</span>
+                            <a href="/mail/send">
+                                <span class="sidebar-mini-icon">S</span>
                                 <span class="sidebar-normal"> send </span>
                             </a>
                         </li>
@@ -42,7 +42,7 @@
             </li>
             <li class="">
                 <a data-toggle="collapse" href="" class="" aria-expanded="false">
-                    <i class="tim-icons icon-bag-16"></i>
+                    <i class="tim-icons icon-tablet-2"></i>
                     <p>
                         push
                         <b class="caret"></b>
@@ -72,8 +72,8 @@
                 <!--</div>-->
             </li>
             <li>
-                <a href="./icons.html">
-                    <i class="tim-icons icon-settings"></i>
+                <a href="/settings">
+                    <i class="tim-icons icon-settings-gear-63"></i>
                     <p>settings</p>
                 </a>
             </li>

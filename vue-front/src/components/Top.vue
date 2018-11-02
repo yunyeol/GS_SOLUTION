@@ -1,7 +1,13 @@
 <template>
-    <nav class="navbar navbar-expand-lg navbar-absolute navbar-transparent">
+    <nav class="navbar navbar-expand-lg navbar-absolute navbar-transparent" style="top: 0px; transition: all 0.5s linear 0s;">
         <div class="container-fluid">
             <div class="navbar-wrapper">
+                <div class="navbar-minimize d-inline">
+                    <button class="minimize-sidebar btn btn-link btn-just-icon" rel="tooltip" data-original-title="Sidebar toggle" data-placement="right" aria-describedby="tooltip716988">
+                        <i class="tim-icons icon-align-center visible-on-sidebar-regular"></i>
+                        <i class="tim-icons icon-bullet-list-67 visible-on-sidebar-mini"></i>
+                    </button>
+                </div>
                 <div class="navbar-toggle d-inline">
                     <button type="button" class="navbar-toggler">
                         <span class="navbar-toggler-bar bar1"></span>
@@ -52,7 +58,7 @@
                     <li class="dropdown nav-item">
                         <a href="#" class="dropdown-toggle nav-link" data-toggle="dropdown">
                             <div class="photo">
-                                <img src="../assets/img/anime3.png" alt="Profile Photo">
+                                <img src="../assets/img/mike.jpg" alt="Profile Photo">
                             </div>
                             <b class="caret d-none d-lg-block d-xl-block"></b>
                             <p class="d-lg-none">

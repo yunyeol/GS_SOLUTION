@@ -160,6 +160,82 @@
     box-shadow: 0 4px 6px rgba(50,50,93,.11), 0 1px 3px rgba(0,0,0,.08);
   }
 
+  .bootstrap-switch.bootstrap-switch-off .bootstrap-switch-label{
+    background: darken($light-bg,10%);
+  }
+
+  .bootstrap-switch-off:before{
+    background: rgba(darken($light-bg,10%),0.5);
+
+  }
+
+  .card:not(.card-white){
+    &.card-pricing, &.card-login, &.card-register{
+      background: $card-black-background;
+    }
+    &.card-login, &.card-register{
+      @include form-control-placeholder(#6c757c, 1);
+
+      .form-control{
+        border-color: lighten($black,5%);
+      }
+
+      .form-group.no-border,
+      .input-group.no-border{
+          .form-control,
+          .form-control + .input-group-prepend .input-group-text,
+          .form-control + .input-group-append .input-group-text{
+
+              background-color: lighten($black,1%);
+              &:focus,
+              &:active,
+              &:active{
+                  background-color: lighten($black,2%);
+              }
+          }
+
+          .form-control{
+              &:focus{
+                  & + .input-group-prepend .input-group-text,
+                  & + .input-group-append .input-group-text{
+                      background-color: lighten($black,2%);
+                  }
+              }
+          }
+
+          .input-group-prepend .input-group-text,
+          .input-group-append .input-group-text{
+              background-color: lighten($black,1%);;
+
+          }
+      }
+
+      .input-group-append .input-group-text,
+      .input-group-prepend .input-group-text {
+          border: 1px solid lighten($black,5%);
+          border-right: none;
+          color: $white;
+    }
+
+    .input-group-focus{
+      .input-group-prepend .input-group-text,
+      .input-group-append .input-group-text,
+      .form-control{
+        border-color: $primary;
+      }
+    }
+
+    .form-control{
+      color: $white;
+    }
+
+    label{
+      color: $opacity-6;
+    }
+  }
+}
+
+
   .card:not(.card-white){
     background: $white;
     box-shadow: 0 1px 15px 0 rgba(123, 123, 123, 0.05);
@@ -184,8 +260,14 @@
       color: $default;
     }
 
+     .pagination .page-item:not(.active) .page-link{
+       color: $black-states;
+        &:hover{
+          background: rgba($dark-gray,0.1);
+        }
+     }
 
-     &.nav-pills .nav-item .nav-link {
+     &:not(.card-wizard).nav-pills .nav-item .nav-link {
         color: $nav-gray;
         background-color: hsla(0,0%,87%,.3);
         &:not(.active):hover{
@@ -206,6 +288,24 @@
       box-shadow: none;
     }
 
+    .card-collapse{
+      .card{
+        .card-body{
+          color: $dark-gray;
+        }
+      }
+    }
+
+    &.card-contributions{
+      span{
+        color: $dark-gray;
+      }
+      .bootstrap-switch-container{
+        span{
+          color: $white;
+        }
+      }
+    }
     &.card-plain{
       background: $transparent-bg;
       box-shadow: none;
@@ -268,6 +368,44 @@
       }
   }
 
+  .bootstrap-select button.dropdown-toggle{
+    border-color: rgba($black-states,0.5);
+    .filter-option{
+      color: $black-states;
+    }
+
+    &:after{
+      color: $black-states;
+    }
+
+  }
+
+  //style for calendar
+
+  .fc-basic-view .fc-day-number, .fc-basic-view .fc-week-number {
+      padding: 2px;
+      color: $default;
+  }
+
+  .fc-unthemed .fc-today{
+    background: darken($light-bg,10%);
+  }
+
+  .fc-unthemed .fc-content, .fc-unthemed .fc-divider, .fc-unthemed .fc-list-heading td, .fc-unthemed .fc-list-view, .fc-unthemed .fc-popover, .fc-unthemed .fc-row, .fc-unthemed tbody, .fc-unthemed td, .fc-unthemed th, .fc-unthemed thead {
+        border-color: $calendar-gray;
+    }
+
+   .fc-prev-button, .fc-next-button{
+     color: $default;
+     &:hover{
+       color: $default;
+     }
+   }
+
+   .fc button.btn-primary:not([data-action]):hover, .fc button:not([data-action]):hover {
+     box-shadow: 0 4px 6px rgba(50,50,93,.11), 0 1px 3px rgba(0,0,0,.08);
+   }
+
    .full-page{
      background: $light-bg;
 
@@ -296,4 +434,58 @@
 
      }
    }
+
+   .card-pricing:not(.card-white){
+     ul li {
+        color: $white;
+     }
+   }
+
+   .card:not(.card-pricing){
+
+     &.card-wizard{
+       .card-body{
+         background: $white;
+       }
+       .card-footer{
+         background-color: $white !important;
+       }
+
+       .nav-pills .nav-item .nav-link p{
+         color: $black-states;
+       }
+     }
+
+     &.card-stats {
+       hr{
+         border-color: rgba($black-states,0.1);
+       }
+       .card-title{
+         color: $black-states;
+       }
+       .card-category, .stats{
+         color: $card-stats-gray;
+       }
+
+     }
+
+   }
+
+   .card-timeline .timeline>li.timeline-inverted>.timeline-panel{
+     background: $white;
+     .timeline-body p{
+       color: $black-states;
+     }
+
+     &:after, &:before{
+       border-right-color: $white;
+       border-left-color: $white;
+     }
+   }
+
+   .card-timeline .timeline:before{
+     background-color: $light-gray;
+   }
+
+
 }

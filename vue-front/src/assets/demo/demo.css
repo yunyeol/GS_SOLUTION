@@ -15,7 +15,6 @@
 }
 
 .typography-line span {
-  bottom: 10px;
   color: #c0c1c2;
   display: block;
   font-weight: 400;
@@ -35,6 +34,11 @@
   margin-top: 0;
 }
 
+.offline-doc .page-header:before {
+  content: "";
+  background: rgba(0, 0, 0, .75);
+}
+
 .offline-doc .page-header {
   display: flex;
   align-items: center;
@@ -49,15 +53,8 @@
   z-index: 1;
 }
 
-@media all and (min-width: 992px) {
-  .sidebar .nav>li.active-pro {
-    position: absolute;
-    width: 100%;
-    bottom: 10px;
-  }
-}
-
-.card.card-upgrade .card-category {
-  max-width: 530px;
-  margin: 0 auto;
+#map {
+  position: relative;
+  width: 100%;
+  height: 100vh;
 }
