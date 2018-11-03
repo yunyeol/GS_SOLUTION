@@ -40,14 +40,14 @@
                     </ul>
                 </div>
             </li>
-            <li class="">
-                <a data-toggle="collapse" href="" class="" aria-expanded="false">
-                    <i class="tim-icons icon-tablet-2"></i>
-                    <p>
-                        push
-                        <b class="caret"></b>
-                    </p>
-                </a>
+            <!--<li class="">-->
+                <!--<a data-toggle="collapse" href="" class="" aria-expanded="false">-->
+                    <!--<i class="tim-icons icon-tablet-2"></i>-->
+                    <!--<p>-->
+                        <!--push-->
+                        <!--<b class="caret"></b>-->
+                    <!--</p>-->
+                <!--</a>-->
                 <!--<div class="collapse" id="" style="">-->
                     <!--<ul class="nav">-->
                         <!--<li>-->
@@ -70,7 +70,7 @@
                         <!--</li>-->
                     <!--</ul>-->
                 <!--</div>-->
-            </li>
+            <!--</li>-->
             <li v-bind:class="settingsMenuActive">
                 <a href="/settings">
                     <i class="tim-icons icon-settings-gear-63"></i>

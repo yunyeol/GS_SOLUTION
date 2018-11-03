@@ -1,6 +1,10 @@
 import Vue from 'vue'
 import Router from 'vue-router'
+
+//로그인
 import Login from './views/Login.vue'
+import Profile from './views/Profile.vue'
+
 
 //메일
 import MailDashboard from './views/mail/Dashboard.vue'
@@ -17,6 +21,7 @@ export default new Router({
   routes: [
     //로그인 라우팅
     { path: '/login', name: 'login', component: Login},
+    { path: '/profile', name: 'profile', component: Profile},
 
     //메일 라우팅
     { path: '/mail/dashboard', name: 'mail dashboard', component: MailDashboard},

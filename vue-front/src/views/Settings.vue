@@ -15,7 +15,111 @@
 
             <div class="content">
                 <div class="row">
-                    settings
+                    <div class="col-md-12 mb-5">
+                        <div class="card">
+                            <div class="card-header">
+                                <h4 class="card-title" style="float:left;"> Settings</h4>
+                                <button style="float:right;" class="btn btn-primary btn-sm" onclick="showSwal('input-field')">데이터 입력</button>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive ps">
+                                    <table class="table tablesorter " id="settings">
+                                        <thead class=" text-primary">
+                                            <tr>
+                                                <th class="text-center header">타입</th>
+                                                <th class="text-center header">구분</th>
+                                                <th class="text-center header">데이터1</th>
+                                                <th class="text-center header">데이터2</th>
+                                                <th class="text-center header">데이터3</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr>
+                                            <td>Dakota Rice</td>
+                                            <td>Niger</td>
+                                            <td>Oud-Turnhout</td>
+                                            <td class="text-center">$36,738</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Minerva Hooper</td>
+                                            <td>Curaçao</td>
+                                            <td>Sinaai-Waas</td>
+                                            <td class="text-center">$23,789</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Sage Rodriguez</td>
+                                            <td>Netherlands</td>
+                                            <td>Baileux</td>
+                                            <td class="text-center">$56,142</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Sage Rodriguez</td>
+                                            <td>Netherlands</td>
+                                            <td>Baileux</td>
+                                            <td class="text-center">$56,142</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Sage Rodriguez</td>
+                                            <td>Netherlands</td>
+                                            <td>Baileux</td>
+                                            <td class="text-center">$56,142</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Sage Rodriguez</td>
+                                            <td>Netherlands</td>
+                                            <td>Baileux</td>
+                                            <td class="text-center">$56,142</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Sage Rodriguez</td>
+                                            <td>Netherlands</td>
+                                            <td>Baileux</td>
+                                            <td class="text-center">$56,142</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Sage Rodriguez</td>
+                                            <td>Netherlands</td>
+                                            <td>Baileux</td>
+                                            <td class="text-center">$56,142</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Sage Rodriguez</td>
+                                            <td>Netherlands</td>
+                                            <td>Baileux</td>
+                                            <td class="text-center">$56,142</td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                    <div class="ps__rail-x" style="left: 0px; bottom: 0px;"><div class="ps__thumb-x" tabindex="0" style="left: 0px; width: 0px;"></div></div><div class="ps__rail-y" style="top: 0px; right: 0px;"><div class="ps__thumb-y" tabindex="0" style="top: 0px; height: 0px;"></div></div></div>
+                            </div>
+
+                            <div class="card-body">
+                                <nav aria-label="Page navigation example">
+                                    <ul class="pagination">
+                                        <li class="page-item">
+                                            <a class="page-link" href="#link" aria-label="Previous">
+                                                <span aria-hidden="true"><i class="tim-icons icon-double-left" aria-hidden="true"></i></span>
+                                            </a>
+                                        </li>
+                                        <li class="page-item">
+                                            <a class="page-link" href="#link">1</a>
+                                        </li>
+                                        <li class="page-item active">
+                                            <a class="page-link" href="#link">2</a>
+                                        </li>
+                                        <li class="page-item">
+                                            <a class="page-link" href="#link">3</a>
+                                        </li>
+                                        <li class="page-item">
+                                            <a class="page-link" href="#link" aria-label="Next">
+                                                <span aria-hidden="true"><i class="tim-icons icon-double-right" aria-hidden="true"></i></span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </nav>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
