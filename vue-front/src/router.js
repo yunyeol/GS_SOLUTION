@@ -21,7 +21,7 @@ export default new Router({
     //메일 라우팅
     { path: '/mail/dashboard', name: 'mail dashboard', component: MailDashboard},
     { path: '/mail/receiver', name: 'mail receiver', component: MailReceiver},
-    { path: '/mail/send', name: 'mail receiver', component: MailSend},
+    { path: '/mail/send', name: 'mail send', component: MailSend},
 
     //푸시 라우팅
 

@@ -1,12 +1,23 @@
 <template>
     <div class="wrapper">
         <div class="sidebar">
-            <Left></Left>
+            <Left v-bind:mail-menu-active="mailMeunActive"
+                  v-bind:mail-sub-menu-active1="mailSubMenuActive1"
+                  v-bind:mail-sub-menu-active2="mailSubMenuActive2"
+                  v-bind:mail-sub-menu-active3="mailSubMenuActive3"
+                  v-bind:mail-menu-expand="mailMenuExpand"
+                  v-bind:mail-menu-show="mailMenuShow"
+                  v-bind:settings-menu-active="settingsMenuActive">
+            </Left>
         </div>
         <div class="main-panel ps ps--active-y">
             <Top></Top>
 
-
+            <div class="content">
+                <div class="row">
+                    settings
+                </div>
+            </div>
         </div>
     </div>
 </template>
@@ -21,6 +32,20 @@ export default {
     components: {
       Left,
       Top
+  },
+  data: function(){
+    var param = {
+        mailMeunActive : '',
+        mailSubMenuActive1 : '',
+        mailSubMenuActive2 : '',
+        mailSubMenuActive3 : '',
+        mailMenuExpand : 'false',
+        mailMenuShow : 'collapse',
+
+        settingsMenuActive : 'active'
+    };
+
+    return param;
   }
 }
 </script>

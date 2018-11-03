@@ -9,29 +9,29 @@
             </a>
         </div>
         <ul class="nav">
-            <li class="active ">
-                <a data-toggle="collapse" href="#mailPage" class="" aria-expanded="false">
+            <li v-bind:class="mailMenuActive">
+                <a data-toggle="collapse" href="#mailPage" class="" v-bind:aria-expanded="mailMenuExpand">
                     <i class="tim-icons icon-email-85"></i>
                     <p>
                         mail
                         <b class="caret"></b>
                     </p>
                 </a>
-                <div class="collapse" id="mailPage" style="">
+                <div v-bind:class="mailMenuShow" id="mailPage" style="">
                     <ul class="nav">
-                        <li class="active ">
+                        <li v-bind:class="mailSubMenuActive1">
                             <a href="/mail/dashboard">
                                 <span class="sidebar-mini-icon">D</span>
                                 <span class="sidebar-normal"> dashboard </span>
                             </a>
                         </li>
-                        <li>
+                        <li v-bind:class="mailSubMenuActive2">
                             <a href="/mail/receiver">
                                 <span class="sidebar-mini-icon">R</span>
                                 <span class="sidebar-normal"> receiver </span>
                             </a>
                         </li>
-                        <li>
+                        <li v-bind:class="mailSubMenuActive3">
                             <a href="/mail/send">
                                 <span class="sidebar-mini-icon">S</span>
                                 <span class="sidebar-normal"> send </span>
@@ -71,7 +71,7 @@
                     <!--</ul>-->
                 <!--</div>-->
             </li>
-            <li>
+            <li v-bind:class="settingsMenuActive">
                 <a href="/settings">
                     <i class="tim-icons icon-settings-gear-63"></i>
                     <p>settings</p>
@@ -138,7 +138,23 @@
 
 <script>
     export default {
-        name: "Left"
+        name: "Left",
+        props:[
+            'mailMenuActive',
+            'mailSubMenuActive1',
+            'mailSubMenuActive2',
+            'mailSubMenuActive3',
+            'mailMenuExpand',
+            'mailMenuShow',
+
+            'settingsMenuActive'
+        ],
+        data: function(){
+            var param = {
+            };
+
+            return param;
+        }
     }
 </script>
 

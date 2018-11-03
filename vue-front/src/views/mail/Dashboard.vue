@@ -1,7 +1,14 @@
 <template>
     <div class="wrapper">
         <div class="sidebar">
-            <Left></Left>
+            <Left v-bind:mail-menu-active="mailMeunActive"
+                  v-bind:mail-sub-menu-active1="mailSubMenuActive1"
+                  v-bind:mail-sub-menu-active2="mailSubMenuActive2"
+                  v-bind:mail-sub-menu-active3="mailSubMenuActive3"
+                  v-bind:mail-menu-expand="mailMenuExpand"
+                  v-bind:mail-menu-show="mailMenuShow"
+                  v-bind:settings-menu-active="settingsMenuActive">
+            </Left>
         </div>
         <div class="main-panel ps ps--active-y">
             <Top></Top>
@@ -9,7 +16,7 @@
             <div class="content">
                 <div class="row">
                     <div class="col-md-12 mb-5">
-                        <div class="card ">
+                        <div class="card">
                             <div class="card-header">
                                 <h4 class="card-title"> Simple Table</h4>
                             </div>
@@ -151,9 +158,23 @@ import Top from "../../components/Top.vue";
 
 export default {
   name: 'dashboard',
-    components: {
+  components: {
       Left,
       Top
+  },
+  data: function(){
+      var param = {
+          mailMeunActive : 'active',
+          mailSubMenuActive1 : 'active',
+          mailSubMenuActive2 : '',
+          mailSubMenuActive3 : '',
+          mailMenuExpand : 'true',
+          mailMenuShow : 'collapse show',
+
+          settingsMenuActive : ''
+      };
+
+      return param;
   }
 }
 </script>
