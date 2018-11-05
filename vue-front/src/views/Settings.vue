@@ -15,7 +15,8 @@
                                 Settings
                             </h4>
                             <div class="col-sm-1">
-                                <button style="float:right;" class="btn btn-primary btn-sm tim-icons icon-simple-add" onclick="showSwal('input-field')"></button>
+                                <button style="float:right;" class="btn btn-primary btn-sm tim-icons icon-simple-add"
+                                        data-toggle="modal" data-target="#settingsModal"></button>
                             </div>
                         </div>
                     </div>
@@ -206,6 +207,8 @@
                 <!--  end card  -->
             </div>
         </div>
+
+        <SettingsModal></SettingsModal>
     </div>
 </template>
 
@@ -213,12 +216,14 @@
 // @ is an alias to /src
 import Left from "../components/Left.vue";
 import Top from "../components/Top.vue";
+import SettingsModal from "../components/settings/modal.vue";
 
 export default {
   name: 'settings',
     components: {
       Left,
-      Top
+      Top,
+      SettingsModal
   },
   data: function(){
       return {
@@ -243,23 +248,23 @@ export default {
             }
         });
     },
-    getAxios: async function(){
-        const rv = await this.$axios({
-            url: this.$API_URL+'/user/settings',
-            method: 'get',
-            timeout: 3000,
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        }).catch (err => console.error(err))
-
-        console.log(rv);
-
-        if(rv && rv['data']) {
-            console.log(rv['data']);
-        }
-        this.settList = rv['data']
-    }
+    // getAxios: async function(){
+    //     const rv = await this.$axios({
+    //         url: this.$API_URL+'/user/settings',
+    //         method: 'get',
+    //         timeout: 3000,
+    //         headers: {
+    //             'Content-Type': 'application/json'
+    //         }
+    //     }).catch (err => console.error(err))
+    //
+    //     console.log(rv);
+    //
+    //     if(rv && rv['data']) {
+    //         console.log(rv['data']);
+    //     }
+    //     this.settList = rv['data']
+    // }
   },
   mounted: function(){
       this.init();

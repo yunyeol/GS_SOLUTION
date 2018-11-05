@@ -34,5 +34,9 @@ dependencies {
     testImplementation('org.springframework.boot:spring-boot-starter-test')
     testImplementation('org.springframework.batch:spring-batch-test')
     compile group: 'com.google.code.gson', name: 'gson', version: '2.7'
+    compile group: 'org.springframework.batch', name: 'spring-batch-integration', version: '4.0.1.RELEASE'
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-data-redis', version: '2.0.6.RELEASE'
+    compile group: 'redis.clients', name: 'jedis', version: '2.9.0'
+
 
 }
