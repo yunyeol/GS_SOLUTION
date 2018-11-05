@@ -1,13 +1,7 @@
 <template>
     <div class="wrapper">
         <div class="sidebar">
-            <Left v-bind:mail-menu-active="mailMeunActive"
-                  v-bind:mail-sub-menu-active1="mailSubMenuActive1"
-                  v-bind:mail-sub-menu-active2="mailSubMenuActive2"
-                  v-bind:mail-sub-menu-active3="mailSubMenuActive3"
-                  v-bind:mail-menu-expand="mailMenuExpand"
-                  v-bind:mail-menu-show="mailMenuShow"
-                  v-bind:settings-menu-active="settingsMenuActive">
+            <Left mail-menu-expand="false" mail-menu-show="collapse" settings-menu-active="active">
             </Left>
         </div>
         <div class="main-panel ps ps--active-y">
@@ -228,15 +222,8 @@ export default {
   },
   data: function(){
       return {
-        mailMeunActive : '',
-        mailSubMenuActive1 : '',
-        mailSubMenuActive2 : '',
-        mailSubMenuActive3 : '',
-        mailMenuExpand : 'false',
-        mailMenuShow : 'collapse',
-
-        settingsMenuActive : 'active'
-    }
+          settList : []
+      }
   },
   methods:{
     init : function () {
@@ -255,10 +242,28 @@ export default {
                 searchPlaceholder: "Search records",
             }
         });
+    },
+    getAxios: async function(){
+        const rv = await this.$axios({
+            url: this.$API_URL+'/user/settings',
+            method: 'get',
+            timeout: 3000,
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).catch (err => console.error(err))
+
+        console.log(rv);
+
+        if(rv && rv['data']) {
+            console.log(rv['data']);
+        }
+        this.settList = rv['data']
     }
   },
   mounted: function(){
       this.init();
+      //this.getAxios();
   }
 }
 </script>
