@@ -18,8 +18,9 @@
                     <div class="col-md-12 mb-5">
                         <div class="card">
                             <div class="card-header">
-                                <h4 class="card-title" style="float:left;"> Settings</h4>
-                                <button style="float:right;" class="btn btn-primary btn-sm" onclick="showSwal('input-field')">데이터 입력</button>
+                                <h4 class="card-title" style="float:left;"> Settings </h4>
+                                <div style="width:20px;float:left;">&nbsp;</div>
+                                <button style="float:left;" class="btn btn-primary btn-sm tim-icons icon-simple-add" onclick="showSwal('input-field')"></button>
                             </div>
                             <div class="card-body">
                                 <div class="table-responsive ps">
@@ -45,48 +46,6 @@
                                             <td>Curaçao</td>
                                             <td>Sinaai-Waas</td>
                                             <td class="text-center">$23,789</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Sage Rodriguez</td>
-                                            <td>Netherlands</td>
-                                            <td>Baileux</td>
-                                            <td class="text-center">$56,142</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Sage Rodriguez</td>
-                                            <td>Netherlands</td>
-                                            <td>Baileux</td>
-                                            <td class="text-center">$56,142</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Sage Rodriguez</td>
-                                            <td>Netherlands</td>
-                                            <td>Baileux</td>
-                                            <td class="text-center">$56,142</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Sage Rodriguez</td>
-                                            <td>Netherlands</td>
-                                            <td>Baileux</td>
-                                            <td class="text-center">$56,142</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Sage Rodriguez</td>
-                                            <td>Netherlands</td>
-                                            <td>Baileux</td>
-                                            <td class="text-center">$56,142</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Sage Rodriguez</td>
-                                            <td>Netherlands</td>
-                                            <td>Baileux</td>
-                                            <td class="text-center">$56,142</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Sage Rodriguez</td>
-                                            <td>Netherlands</td>
-                                            <td>Baileux</td>
-                                            <td class="text-center">$56,142</td>
                                         </tr>
                                         </tbody>
                                     </table>

@@ -5,7 +5,6 @@ import Router from 'vue-router'
 import Login from './views/Login.vue'
 import Profile from './views/Profile.vue'
 
-
 //메일
 import MailDashboard from './views/mail/Dashboard.vue'
 import MailReceiver from './views/mail/Receiver.vue'
