@@ -36,18 +36,15 @@ export default {
       Top
   },
   data: function(){
-    var param = {
-        mailMeunActive : 'active',
-        mailSubMenuActive1 : '',
-        mailSubMenuActive2 : '',
-        mailSubMenuActive3 : 'active',
-        mailMenuExpand : 'true',
-        mailMenuShow : 'collapse show',
-
-        settingsMenuActive : ''
-    };
-
-    return param;
+    return {
+        mailMeunActive : 'active'
+        ,mailSubMenuActive1 : ''
+        ,mailSubMenuActive2 : ''
+        ,mailSubMenuActive3 : 'active'
+        ,mailMenuExpand : 'true'
+        ,mailMenuShow : 'collapse show'
+        ,settingsMenuActive : ''
+    }
   }
 }
 </script>

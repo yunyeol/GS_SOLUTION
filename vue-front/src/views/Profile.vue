@@ -154,18 +154,15 @@
             Top
         },
         data: function(){
-            var param = {
-                mailMeunActive : '',
-                mailSubMenuActive1 : '',
-                mailSubMenuActive2 : '',
-                mailSubMenuActive3 : '',
-                mailMenuExpand : 'false',
-                mailMenuShow : 'collapse',
-
-                settingsMenuActive : ''
-            };
-
-            return param;
+            return {
+                 mailMeunActive : ''
+                ,mailSubMenuActive1 : ''
+                ,mailSubMenuActive2 : ''
+                ,mailSubMenuActive3 : ''
+                ,mailMenuExpand : 'false'
+                ,mailMenuShow : 'collapse'
+                ,settingsMenuActive : ''
+            }
         }
     }
 </script>

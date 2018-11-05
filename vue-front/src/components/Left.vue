@@ -20,22 +20,22 @@
                 <div v-bind:class="mailMenuShow" id="mailPage" style="">
                     <ul class="nav">
                         <li v-bind:class="mailSubMenuActive1">
-                            <a href="/mail/dashboard">
+                            <router-link to="/mail/dashboard">
                                 <span class="sidebar-mini-icon">D</span>
                                 <span class="sidebar-normal"> dashboard </span>
-                            </a>
+                            </router-link>
                         </li>
                         <li v-bind:class="mailSubMenuActive2">
-                            <a href="/mail/receiver">
+                            <router-link to="/mail/receiver">
                                 <span class="sidebar-mini-icon">R</span>
                                 <span class="sidebar-normal"> receiver </span>
-                            </a>
+                            </router-link>
                         </li>
                         <li v-bind:class="mailSubMenuActive3">
-                            <a href="/mail/send">
+                            <router-link to="/mail/send">
                                 <span class="sidebar-mini-icon">S</span>
                                 <span class="sidebar-normal"> send </span>
-                            </a>
+                            </router-link>
                         </li>
                     </ul>
                 </div>
@@ -72,10 +72,10 @@
                 <!--</div>-->
             <!--</li>-->
             <li v-bind:class="settingsMenuActive">
-                <a href="/settings">
+                <router-link to="/settings">
                     <i class="tim-icons icon-settings-gear-63"></i>
                     <p>settings</p>
-                </a>
+                </router-link>
             </li>
 
             <!--<li>-->
@@ -138,22 +138,20 @@
 
 <script>
     export default {
-        name: "Left",
-        props:[
-            'mailMenuActive',
-            'mailSubMenuActive1',
-            'mailSubMenuActive2',
-            'mailSubMenuActive3',
-            'mailMenuExpand',
-            'mailMenuShow',
+        name: "Left"
+        ,props: [
+             'mailMenuActive'
+            ,'mailSubMenuActive1'
+            ,'mailSubMenuActive2'
+            ,'mailSubMenuActive3'
+            ,'mailMenuExpand'
+            ,'mailMenuShow'
+            ,'settingsMenuActive'
+        ]
+        ,data: function(){
+            return {
 
-            'settingsMenuActive'
-        ],
-        data: function(){
-            var param = {
-            };
-
-            return param;
+            }
         }
     }
 </script>
