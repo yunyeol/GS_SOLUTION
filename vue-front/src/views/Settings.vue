@@ -49,25 +49,35 @@
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-sm-12">
-                                    <table id="datatable" class="table table-striped dataTable dtr-inline collapsed" role="grid" aria-describedby="datatable_info" style="width: 1091px;">
+                                <div class="table-responsive ps">
+                                    <table id="datatable" class="table tablesorter" role="grid" aria-describedby="datatable_info" style="width: 1091px;">
                                         <thead>
                                             <tr role="row">
-                                                <th class="sorting_asc text-center header" tabindex="0" aria-controls="datatable" style="width: 50px;" >타입</th>
-                                                <th class="sorting text-center header" tabindex="0" aria-controls="datatable" style="width: 50px;">구분</th>
+                                                <th class="sorting_asc text-center header" tabindex="0" aria-controls="datatable" style="width: 60px;" >타입</th>
+                                                <th class="sorting text-center header" tabindex="0" aria-controls="datatable" style="width: 60px;">구분</th>
                                                 <th class="sorting text-center header" tabindex="0" aria-controls="datatable"  >데이터1</th>
                                                 <th class="sorting text-center header" tabindex="0" aria-controls="datatable"  >데이터2</th>
                                                 <th class="sorting text-center header" tabindex="0" aria-controls="datatable">데이터3</th>
-                                                <th class="sorting text-center header" tabindex="0" aria-controls="datatable"  style="width: 20px;">&nbsp;</th>
+                                                <th class="text-center header" tabindex="0" aria-controls="datatable"  style="width: 20px;">&nbsp;</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             <tr >
-                                                <td tabindex="0" class="sorting_1 text-center">0000</td>
+                                                <td class="sorting_1 text-center">0000</td>
                                                 <td class="text-center">0000</td>
                                                 <td class="text-center">Tokyo</td>
                                                 <td class="text-center">33</td>
                                                 <td class="text-center"></td>
+                                                <td class="text-center">
+                                                    <i class="tim-icons icon-simple-remove"></i>
+                                                </td>
+                                            </tr>
+                                            <tr >
+                                                <td class="sorting_1 text-center">0000</td>
+                                                <td class="text-center">0001</td>
+                                                <td class="text-center">abco</td>
+                                                <td class="text-center">34</td>
+                                                <td class="text-center">1</td>
                                                 <td class="text-center">
                                                     <i class="tim-icons icon-simple-remove"></i>
                                                 </td>
@@ -148,6 +158,14 @@ export default {
 
         settingsMenuActive : 'active'
     }
+  },
+  methods:{
+    init : function () {
+        $("#datatable").tablesorter();
+    }
+  },
+  mounted: function(){
+      this.init();
   }
 }
 </script>
