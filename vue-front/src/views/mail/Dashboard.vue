@@ -50,29 +50,25 @@ import DashBoardList from "../../components/mail/dashboard/DashBoardList.vue";
 export default {
   name: 'dashboard',
   components: {
-      Left,
-      Top,
-
-      TopChart,
-      DailyCountTotal,
-      DailyCountSuccess,
-      DailyCountFail,
-      DailyCountRead,
-      DashBoardList
+       Left
+      ,Top
+      ,TopChart
+      ,DailyCountTotal
+      ,DailyCountSuccess
+      ,DailyCountFail
+      ,DailyCountRead
+      ,DashBoardList
   },
   data: function(){
-      var param = {
-          mailMeunActive : 'active',
-          mailSubMenuActive1 : 'active',
-          mailSubMenuActive2 : '',
-          mailSubMenuActive3 : '',
-          mailMenuExpand : 'true',
-          mailMenuShow : 'collapse show',
-
-          settingsMenuActive : ''
-      };
-
-      return param;
+      return {
+           mailMeunActive : 'active'
+          ,mailSubMenuActive1 : 'active'
+          ,mailSubMenuActive2 : ''
+          ,mailSubMenuActive3 : ''
+          ,mailMenuExpand : 'true'
+          ,mailMenuShow : 'collapse show'
+          ,settingsMenuActive : ''
+      }
   },
   methods: {
 

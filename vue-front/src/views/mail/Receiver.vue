@@ -32,22 +32,19 @@ import Top from "../../components/Top.vue";
 export default {
   name: 'receiver',
   components: {
-      Left,
-      Top
+       Left
+      ,Top
   },
   data: function(){
-    var param = {
-        mailMeunActive : 'active',
-        mailSubMenuActive1 : '',
-        mailSubMenuActive2 : 'active',
-        mailSubMenuActive3 : '',
-        mailMenuExpand : 'true',
-        mailMenuShow : 'collapse show',
-
-        settingsMenuActive : ''
-    };
-
-    return param;
+    return {
+         mailMeunActive : 'active'
+        ,mailSubMenuActive1 : ''
+        ,mailSubMenuActive2 : 'active'
+        ,mailSubMenuActive3 : ''
+        ,mailMenuExpand : 'true'
+        ,mailMenuShow : 'collapse show'
+        ,settingsMenuActive : ''
+    }
   }
 }
 </script>
