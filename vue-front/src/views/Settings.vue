@@ -8,7 +8,7 @@
             <Top></Top>
 
             <div class="content">
-                <div class="card">
+                <div class="card" v-if="settList && settList.length > 0">
                     <div class="card-header">
                         <div class="row">
                             <h4 class="col-sm-11">
@@ -36,162 +36,12 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr >
-                                                <td class="sorting_1 text-center">0000</td>
-                                                <td class="text-center">0000</td>
-                                                <td class="text-center">Tokyo</td>
-                                                <td class="text-center">33</td>
-                                                <td class="text-center"></td>
-                                                <td class="text-center">
-                                                    <i class="tim-icons icon-simple-remove"></i>
-                                                </td>
-                                            </tr>
-                                            <tr >
-                                                <td class="sorting_1 text-center">0001</td>
-                                                <td class="text-center">0001</td>
-                                                <td class="text-center">abco</td>
-                                                <td class="text-center">34</td>
-                                                <td class="text-center">1</td>
-                                                <td class="text-center">
-                                                    <i class="tim-icons icon-simple-remove"></i>
-                                                </td>
-                                            </tr>
-                                            <tr >
-                                                <td class="sorting_1 text-center">0000</td>
-                                                <td class="text-center">0000</td>
-                                                <td class="text-center">Tokyo</td>
-                                                <td class="text-center">33</td>
-                                                <td class="text-center"></td>
-                                                <td class="text-center">
-                                                    <i class="tim-icons icon-simple-remove"></i>
-                                                </td>
-                                            </tr>
-                                            <tr >
-                                                <td class="sorting_1 text-center">0000</td>
-                                                <td class="text-center">0001</td>
-                                                <td class="text-center">abco</td>
-                                                <td class="text-center">34</td>
-                                                <td class="text-center">1</td>
-                                                <td class="text-center">
-                                                    <i class="tim-icons icon-simple-remove"></i>
-                                                </td>
-                                            </tr>
-                                            <tr >
-                                                <td class="sorting_1 text-center">0000</td>
-                                                <td class="text-center">0000</td>
-                                                <td class="text-center">Tokyo</td>
-                                                <td class="text-center">33</td>
-                                                <td class="text-center"></td>
-                                                <td class="text-center">
-                                                    <i class="tim-icons icon-simple-remove"></i>
-                                                </td>
-                                            </tr>
-                                            <tr >
-                                                <td class="sorting_1 text-center">0000</td>
-                                                <td class="text-center">0001</td>
-                                                <td class="text-center">abco</td>
-                                                <td class="text-center">34</td>
-                                                <td class="text-center">1</td>
-                                                <td class="text-center">
-                                                    <i class="tim-icons icon-simple-remove"></i>
-                                                </td>
-                                            </tr>
-                                            <tr >
-                                                <td class="sorting_1 text-center">0000</td>
-                                                <td class="text-center">0000</td>
-                                                <td class="text-center">Tokyo</td>
-                                                <td class="text-center">33</td>
-                                                <td class="text-center"></td>
-                                                <td class="text-center">
-                                                    <i class="tim-icons icon-simple-remove"></i>
-                                                </td>
-                                            </tr>
-                                            <tr >
-                                                <td class="sorting_1 text-center">0000</td>
-                                                <td class="text-center">0001</td>
-                                                <td class="text-center">abco</td>
-                                                <td class="text-center">34</td>
-                                                <td class="text-center">1</td>
-                                                <td class="text-center">
-                                                    <i class="tim-icons icon-simple-remove"></i>
-                                                </td>
-                                            </tr>
-                                            <tr >
-                                                <td class="sorting_1 text-center">0000</td>
-                                                <td class="text-center">0000</td>
-                                                <td class="text-center">Tokyo</td>
-                                                <td class="text-center">33</td>
-                                                <td class="text-center"></td>
-                                                <td class="text-center">
-                                                    <i class="tim-icons icon-simple-remove"></i>
-                                                </td>
-                                            </tr>
-                                            <tr >
-                                                <td class="sorting_1 text-center">0000</td>
-                                                <td class="text-center">0001</td>
-                                                <td class="text-center">abco</td>
-                                                <td class="text-center">34</td>
-                                                <td class="text-center">1</td>
-                                                <td class="text-center">
-                                                    <i class="tim-icons icon-simple-remove"></i>
-                                                </td>
-                                            </tr>
-                                            <tr >
-                                                <td class="sorting_1 text-center">0000</td>
-                                                <td class="text-center">0000</td>
-                                                <td class="text-center">Tokyo</td>
-                                                <td class="text-center">33</td>
-                                                <td class="text-center"></td>
-                                                <td class="text-center">
-                                                    <i class="tim-icons icon-simple-remove"></i>
-                                                </td>
-                                            </tr>
-                                            <tr >
-                                                <td class="sorting_1 text-center">0000</td>
-                                                <td class="text-center">0001</td>
-                                                <td class="text-center">abco</td>
-                                                <td class="text-center">34</td>
-                                                <td class="text-center">1</td>
-                                                <td class="text-center">
-                                                    <i class="tim-icons icon-simple-remove"></i>
-                                                </td>
-                                            </tr>
-                                            <tr >
-                                                <td class="sorting_1 text-center">0000</td>
-                                                <td class="text-center">0000</td>
-                                                <td class="text-center">Tokyo</td>
-                                                <td class="text-center">33</td>
-                                                <td class="text-center"></td>
-                                                <td class="text-center">
-                                                    <i class="tim-icons icon-simple-remove"></i>
-                                                </td>
-                                            </tr>
-                                            <tr >
-                                                <td class="sorting_1 text-center">0000</td>
-                                                <td class="text-center">0001</td>
-                                                <td class="text-center">abco</td>
-                                                <td class="text-center">34</td>
-                                                <td class="text-center">1</td>
-                                                <td class="text-center">
-                                                    <i class="tim-icons icon-simple-remove"></i>
-                                                </td>
-                                            </tr>
-                                            <tr >
-                                                <td class="sorting_1 text-center">0000</td>
-                                                <td class="text-center">0000</td>
-                                                <td class="text-center">Tokyo</td>
-                                                <td class="text-center">33</td>
-                                                <td class="text-center"></td>
-                                                <td class="text-center">
-                                                    <i class="tim-icons icon-simple-remove"></i>
-                                                </td>
-                                            </tr>
-                                            <tr >
-                                                <td class="sorting_1 text-center">0000</td>
-                                                <td class="text-center">0001</td>
-                                                <td class="text-center">abco</td>
-                                                <td class="text-center">34</td>
-                                                <td class="text-center">1</td>
+                                            <tr v-for="(item, index) in settList" :key="index">
+                                                <td class="sorting_1 text-center">{{item.TYPE}}</td>
+                                                <td class="text-center">{{item.TYPE}}</td>
+                                                <td class="text-center">{{item.DATA1}}</td>
+                                                <td class="text-center">{{item.DATA2}}</td>
+                                                <td class="text-center">{{item.DATA3}}</td>
                                                 <td class="text-center">
                                                     <i class="tim-icons icon-simple-remove"></i>
                                                 </td>
@@ -203,6 +53,9 @@
                         </div>
                     </div>
                     <!-- end content-->
+                </div>
+                <div class="card" v-else>
+                    조회된 결과가 없습니다.
                 </div>
                 <!--  end card  -->
             </div>
@@ -220,7 +73,7 @@ import SettingsModal from "../components/settings/modal.vue";
 
 export default {
   name: 'settings',
-    components: {
+  components: {
       Left,
       Top,
       SettingsModal
@@ -248,27 +101,25 @@ export default {
             }
         });
     },
-    // getAxios: async function(){
-    //     const rv = await this.$axios({
-    //         url: this.$API_URL+'/user/settings',
-    //         method: 'get',
-    //         timeout: 3000,
-    //         headers: {
-    //             'Content-Type': 'application/json'
-    //         }
-    //     }).catch (err => console.error(err))
-    //
-    //     console.log(rv);
-    //
-    //     if(rv && rv['data']) {
-    //         console.log(rv['data']);
-    //     }
-    //     this.settList = rv['data']
-    // }
+    getAxios: async function(){
+        console.log(this.$API_URL+'/system/profile');
+        const rv = await this.$axios({
+            url: this.$API_URL+'/system/profile',
+            method: 'get',
+            timeout: 3000,
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).catch (err => console.error(err));
+    
+        if(rv && rv['data']) {
+            this.settList = rv['data'];
+        }
+    }
   },
   mounted: function(){
       this.init();
-      //this.getAxios();
+      this.getAxios();
   }
 }
 </script>

@@ -10,7 +10,7 @@ Vue.config.productionTip = false;
 
 Vue.prototype.$axios = axios;
 //Vue.prototype.$router = router;
-Vue.prototype.$API_URL = 'http://127.0.0.1/api';
+Vue.prototype.$API_URL = 'http://127.0.0.1:10009/api';
 
 new Vue({
   el: '#app',

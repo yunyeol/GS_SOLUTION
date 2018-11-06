@@ -8,6 +8,7 @@ const cors = require('cors');
 const app = express();
 const indexRouter = require('./routes/test');
 const usersRouter = require('./routes/users');
+const systemRouter = require('./routes/system');
 const utilFactory = require('./classes/utilFactory');
 
 //static variable
@@ -24,7 +25,8 @@ app.use(cors());
 
 //router set
 app.use(DEF_URL, indexRouter);
-app.use(DEF_URL, usersRouter);
+app.use(DEF_URL+'/users', usersRouter);
+app.use(DEF_URL+'/system', systemRouter);
 app.use((req, res, next) => {
     console.error('404 not Found');
     res.status(HttpStatus.NOT_FOUND).send('404 not Found');
