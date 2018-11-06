@@ -26,26 +26,26 @@
                                 <div class="col-sm-12">
                                     <table id="datatable" class="table" role="grid" aria-describedby="datatable_info" style="width:100%">
                                         <thead>
-                                        <tr role="row">
-                                            <th class="sorting_asc text-center header" tabindex="0" aria-controls="datatable" style="width:7%" >타입</th>
-                                            <th class="sorting text-center header" tabindex="0" aria-controls="datatable" style="width:7%">구분</th>
-                                            <th class="sorting text-center header" tabindex="0" aria-controls="datatable" style="width:20%">데이터1</th>
-                                            <th class="sorting text-center header" tabindex="0" aria-controls="datatable" style="width:20%">데이터2</th>
-                                            <th class="sorting text-center header" tabindex="0" aria-controls="datatable" style="width:20%">데이터3</th>
-                                            <th class="text-center" tabindex="0" aria-controls="datatable"  style="width:7%">삭제</th>
-                                        </tr>
+                                            <tr role="row">
+                                                <th class="sorting_asc text-center header" tabindex="0" aria-controls="datatable" style="width:7%" >타입</th>
+                                                <th class="sorting text-center header" tabindex="0" aria-controls="datatable" style="width:7%">구분</th>
+                                                <th class="sorting text-center header" tabindex="0" aria-controls="datatable" style="width:20%">데이터1</th>
+                                                <th class="sorting text-center header" tabindex="0" aria-controls="datatable" style="width:20%">데이터2</th>
+                                                <th class="sorting text-center header" tabindex="0" aria-controls="datatable" style="width:20%">데이터3</th>
+                                                <th class="text-center" tabindex="0" aria-controls="datatable"  style="width:7%">삭제</th>
+                                            </tr>
                                         </thead>
                                         <tbody>
-                                        <tr v-for="(item,index) in settList" v-bind:key="index" v-cloak>
-                                            <td class="sorting_1 text-center">{{item.TYPE}}</td>
-                                            <td class="text-center">{{item.GUBUN}}</td>
-                                            <td class="text-center">{{item.DATA1}}</td>
-                                            <td class="text-center">{{item.DATA2}}</td>
-                                            <td class="text-center">{{item.DATA3}}</td>
-                                            <td class="text-center">
-                                                <i class="tim-icons icon-simple-remove"></i>
-                                            </td>
-                                        </tr>
+                                            <!--<tr v-for="(item,index) in settList" v-bind:key="index" v-cloak>-->
+                                                <!--<td class="sorting_1 text-center">{{item.TYPE}}</td>-->
+                                                <!--<td class="text-center">{{item.GUBUN}}</td>-->
+                                                <!--<td class="text-center">{{item.DATA1}}</td>-->
+                                                <!--<td class="text-center">{{item.DATA2}}</td>-->
+                                                <!--<td class="text-center">{{item.DATA3}}</td>-->
+                                                <!--<td class="text-center">-->
+                                                    <!--<i class="tim-icons icon-simple-remove"></i>-->
+                                                <!--</td>-->
+                                            <!--</tr>-->
                                         </tbody>
                                     </table>
                                 </div>
@@ -75,60 +75,45 @@
         },
         data: function(){
             return {
-                settList : [ {} ],
+
             }
         },
         methods:{
             init : function () {
-                this.getAxios();
-                 $("#datatable").tablesorter();
-                 $('#datatable').DataTable({
-                        "pagingType": "full_numbers",
-                        //"scrollY": 300,
-                        "lengthMenu": [
-                            [10, 25, 50, -1],
-                            [10, 25, 50, "All"]
-                        ],
-                        responsive: true,
-                        language: {
-                            search: "_INPUT_",
-                            searchPlaceholder: "Search records",
+                $('#datatable').DataTable({
+                    destroy: true,
+                    ajax: {
+                        url:this.$API_URL+'/system/profile',
+                        type:'GET',
+                        dataSrc:""
+                    },
+                    columns:[
+                        {"data" : "TYPE"},
+                        {"data" : "GUBUN"},
+                        {"data" : "DATA1"},
+                        {"data" : "DATA2"},
+                        {"data" : "DATA3"},
+                        {
+                            "defaultContent":'<i class="tim-icons icon-simple-remove"></i>'
                         }
-                    });
-                setTimeout(function(){
-                   console.log(1);
-                    $("#datatable").tablesorter();
-                    $('#datatable').DataTable({
-                        "pagingType": "full_numbers",
-                        //"scrollY": 300,
-                        "lengthMenu": [
-                            [10, 25, 50, -1],
-                            [10, 25, 50, "All"]
-                        ],
-                        responsive: true,
-                        language: {
-                            search: "_INPUT_",
-                            searchPlaceholder: "Search records",
-                        }
-                    });
-                }, 3000);
-                
-
-            },
-            getAxios: async function(){
-                console.log(this.$API_URL+'/system/profile');
-                const rv = await this.$axios({
-                    url: this.$API_URL+'/system/profile',
-                    method: 'get',
-                    timeout: 3000,
-                    headers: {
-                        'Content-Type': 'application/json'
+                    ],
+                    columnDefs:[
+                        {"className":"text-center", "targets":[0,1,2,3,4,5]}
+                    ],
+                    order:[[0, 'asc']],
+                    pagingType: "full_numbers",
+                    lengthMenu: [
+                        [10, 25, 50, -1],
+                        [10, 25, 50, "All"]
+                    ],
+                    responsive: true,
+                    language: {
+                        search: "_INPUT_",
+                        searchPlaceholder: "Search records",
                     }
-                }).catch (err => console.error(err));
-            
-                if(rv && rv['data']) {
-                    this.settList = rv['data'];
-                }
+                });
+
+                $("#datatable").tablesorter();
             }
         },
         mounted: function(){
