@@ -119,7 +119,7 @@ export default {
   },
   mounted: function(){
       this.init();
-      this.getAxios();
+      this.getAxios(); 
   }
 }
 </script>
