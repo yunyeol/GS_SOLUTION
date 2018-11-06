@@ -15,7 +15,7 @@
                         <span class="navbar-toggler-bar bar3"></span>
                     </button>
                 </div>
-                <router-link to="/mail/dashboard" class="navbar-brand" href="javascript:void(0)">Dashboard</router-link>
+                <router-link to="/mail/dashboard" class="navbar-brand" href="javascript:void(0)">{{title}}</router-link>
             </div>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navigation" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-bar navbar-kebab"></span>
@@ -73,6 +73,10 @@
 <script>
     export default {
         name: "Top"
+        ,props: [
+            'title'
+        ]
+
     }
 </script>
 

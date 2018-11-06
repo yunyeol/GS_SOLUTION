@@ -11,7 +11,7 @@
             </Left>
         </div>
         <div class="main-panel ps ps--active-y">
-            <Top></Top>
+            <Top title="mail send"></Top>
 
             <div class="content">
                 <div class="row">

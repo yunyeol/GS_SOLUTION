@@ -5,7 +5,7 @@
             </Left>
         </div>
         <div class="main-panel ps ps--active-y">
-            <Top></Top>
+            <Top title="Settings"></Top>
 
             <div class="content">
                 <div class="card" v-if="settList && settList.length > 0">
@@ -15,8 +15,8 @@
                                 Settings
                             </h4>
                             <div class="col-sm-1">
-                                <button style="float:right;" class="btn btn-primary btn-sm tim-icons icon-simple-add"
-                                        data-toggle="modal" data-target="#settingsModal"></button>
+                                <button style="float:right;" class="btn btn-primary btn-sm tim-icons icon-simple-add" data-toggle="modal" data-target="#settingsModal">
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -24,21 +24,21 @@
                         <div id="datatable_wrapper" class="dataTables_wrapper dt-bootstrap4">
                             <div class="row">
                                 <div class="col-sm-12">
-                                    <table id="datatable" class="table" role="grid" aria-describedby="datatable_info" style="width: 1091px;">
+                                    <table id="datatable" class="table" role="grid" aria-describedby="datatable_info" style="width:100%">
                                         <thead>
                                             <tr role="row">
-                                                <th class="sorting_asc text-center header" tabindex="0" aria-controls="datatable" style="width: 60px;" >타입</th>
-                                                <th class="sorting text-center header" tabindex="0" aria-controls="datatable" style="width: 60px;">구분</th>
-                                                <th class="sorting text-center header" tabindex="0" aria-controls="datatable"  >데이터1</th>
-                                                <th class="sorting text-center header" tabindex="0" aria-controls="datatable"  >데이터2</th>
-                                                <th class="sorting text-center header" tabindex="0" aria-controls="datatable">데이터3</th>
-                                                <th class="text-center header" tabindex="0" aria-controls="datatable"  style="width: 20px;">&nbsp;</th>
+                                                <th class="sorting_asc text-center header" tabindex="0" aria-controls="datatable" style="width:7%" >타입</th>
+                                                <th class="sorting text-center header" tabindex="0" aria-controls="datatable" style="width:7%">구분</th>
+                                                <th class="sorting text-center header" tabindex="0" aria-controls="datatable" style="width:20%">데이터1</th>
+                                                <th class="sorting text-center header" tabindex="0" aria-controls="datatable" style="width:20%">데이터2</th>
+                                                <th class="sorting text-center header" tabindex="0" aria-controls="datatable" style="width:20%">데이터3</th>
+                                                <th class="text-center" tabindex="0" aria-controls="datatable"  style="width:7%">삭제</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr v-for="(item, index) in settList" :key="index">
+                                            <tr v-for="(item, index) in settList":key="index">
                                                 <td class="sorting_1 text-center">{{item.TYPE}}</td>
-                                                <td class="text-center">{{item.TYPE}}</td>
+                                                <td class="text-center">{{item.GUBUN}}</td>
                                                 <td class="text-center">{{item.DATA1}}</td>
                                                 <td class="text-center">{{item.DATA2}}</td>
                                                 <td class="text-center">{{item.DATA3}}</td>
@@ -46,18 +46,14 @@
                                                     <i class="tim-icons icon-simple-remove"></i>
                                                 </td>
                                             </tr>
+
                                         </tbody>
                                     </table>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <!-- end content-->
                 </div>
-                <div class="card" v-else>
-                    조회된 결과가 없습니다.
-                </div>
-                <!--  end card  -->
             </div>
         </div>
 
@@ -69,7 +65,7 @@
 // @ is an alias to /src
 import Left from "../components/Left.vue";
 import Top from "../components/Top.vue";
-import SettingsModal from "../components/settings/modal.vue";
+import SettingsModal from "../components/settings/Modal.vue";
 
 export default {
   name: 'settings',
@@ -85,8 +81,6 @@ export default {
   },
   methods:{
     init : function () {
-        $("#datatable").tablesorter();
-
         $('#datatable').DataTable({
             "pagingType": "full_numbers",
             "scrollY" : 300,
@@ -100,6 +94,8 @@ export default {
                 searchPlaceholder: "Search records",
             }
         });
+
+        $("#datatable").tablesorter();
     },
     getAxios: async function(){
         console.log(this.$API_URL+'/system/profile');
@@ -111,7 +107,7 @@ export default {
                 'Content-Type': 'application/json'
             }
         }).catch (err => console.error(err));
-    
+
         if(rv && rv['data']) {
             this.settList = rv['data'];
         }
@@ -119,7 +115,7 @@ export default {
   },
   mounted: function(){
       this.init();
-      this.getAxios();   
+      this.getAxios();
   }
 }
 </script>
