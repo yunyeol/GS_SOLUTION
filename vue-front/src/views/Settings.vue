@@ -36,12 +36,12 @@
                                         </tr>
                                         </thead>
                                         <tbody>
-                                        <tr v-for="list in testData">
-                                            <td class="sorting_1 text-center">{{list.type}}</td>
-                                            <td class="text-center">{{list.gubun}}</td>
-                                            <td class="text-center">{{list.data1}}</td>
-                                            <td class="text-center">{{list.data2}}</td>
-                                            <td class="text-center">{{list.data3}}</td>
+                                        <tr v-for="(item,index) in settList" v-bind:key="index" v-cloak>
+                                            <td class="sorting_1 text-center">{{item.TYPE}}</td>
+                                            <td class="text-center">{{item.GUBUN}}</td>
+                                            <td class="text-center">{{item.DATA1}}</td>
+                                            <td class="text-center">{{item.DATA2}}</td>
+                                            <td class="text-center">{{item.DATA3}}</td>
                                             <td class="text-center">
                                                 <i class="tim-icons icon-simple-remove"></i>
                                             </td>
@@ -75,60 +75,64 @@
         },
         data: function(){
             return {
-                settList : [],
-                testData : [
-                    {type:"0000",gubun:"0001",data1:"test1",data2:"",data3:"test"},
-                    {type:"0001",gubun:"0001",data1:"test2",data2:"",data3:"test"},
-                    {type:"0002",gubun:"0001",data1:"test3",data2:"",data3:"test"},
-                    {type:"0003",gubun:"0001",data1:"test4",data2:"",data3:"test"},
-                    {type:"0004",gubun:"0001",data1:"test5",data2:"",data3:"test"},
-                    {type:"0005",gubun:"0001",data1:"test6",data2:"",data3:"test"},
-                    {type:"0006",gubun:"0001",data1:"test7",data2:"",data3:"test"},
-                    {type:"0007",gubun:"0001",data1:"test8",data2:"",data3:"test"},
-                    {type:"0008",gubun:"0001",data1:"test9",data2:"",data3:"test"},
-                    {type:"0009",gubun:"0001",data1:"test10",data2:"",data3:"test"}
-                ]
+                settList : [ {} ],
             }
         },
         methods:{
             init : function () {
-                $("#datatable").tablesorter();
+                this.getAxios();
+                 $("#datatable").tablesorter();
+                 $('#datatable').DataTable({
+                        "pagingType": "full_numbers",
+                        //"scrollY": 300,
+                        "lengthMenu": [
+                            [10, 25, 50, -1],
+                            [10, 25, 50, "All"]
+                        ],
+                        responsive: true,
+                        language: {
+                            search: "_INPUT_",
+                            searchPlaceholder: "Search records",
+                        }
+                    });
+                setTimeout(function(){
+                   console.log(1);
+                    $("#datatable").tablesorter();
+                    $('#datatable').DataTable({
+                        "pagingType": "full_numbers",
+                        //"scrollY": 300,
+                        "lengthMenu": [
+                            [10, 25, 50, -1],
+                            [10, 25, 50, "All"]
+                        ],
+                        responsive: true,
+                        language: {
+                            search: "_INPUT_",
+                            searchPlaceholder: "Search records",
+                        }
+                    });
+                }, 3000);
+                
 
-                $('#datatable').DataTable({
-                    "pagingType": "full_numbers",
-                    //"scrollY": 300,
-                    "lengthMenu": [
-                        [10, 25, 50, -1],
-                        [10, 25, 50, "All"]
-                    ],
-                    responsive: true,
-                    language: {
-                        search: "_INPUT_",
-                        searchPlaceholder: "Search records",
-                    }
-                });
             },
-            // getAxios: async function(){
-            //     const rv = await this.$axios({
-            //         url: this.$API_URL+'/user/settings',
-            //         method: 'get',
-            //         timeout: 3000,
-            //         headers: {
-            //             'Content-Type': 'application/json'
-            //         }
-            //     }).catch (err => console.error(err))
-            //
-            //     console.log(rv);
-            //
-            //     if(rv && rv['data']) {
-            //         console.log(rv['data']);
-            //     }
-            //     this.settList = rv['data']
-            // }
+            getAxios: async function(){
+                console.log(this.$API_URL+'/system/profile');
+                const rv = await this.$axios({
+                    url: this.$API_URL+'/system/profile',
+                    method: 'get',
+                    timeout: 3000,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                }).catch (err => console.error(err));
+            
+                if(rv && rv['data']) {
+                    this.settList = rv['data'];
+                }
+            }
         },
         mounted: function(){
             this.init();
-            //this.getAxios();
         }
     }
 </script>
