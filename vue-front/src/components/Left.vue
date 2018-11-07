@@ -72,10 +72,29 @@
                 <!--</div>-->
             <!--</li>-->
             <li v-bind:class="settingsMenuActive">
-                <router-link to="/settings">
+                <a data-toggle="collapse" href="#settingsPage" class="" v-bind:aria-expanded="settingsMenuExpand">
                     <i class="tim-icons icon-settings-gear-63"></i>
-                    <p>settings</p>
-                </router-link>
+                    <p>
+                        settings
+                        <b class="caret"></b>
+                    </p>
+                </a>
+                <div v-bind:class="settingsMenuShow" id="settingsPage" style="">
+                    <ul class="nav">
+                        <li v-bind:class="settingsSubMenuActive1">
+                            <router-link to="/settings/system">
+                                <span class="sidebar-mini-icon">S</span>
+                                <span class="sidebar-normal"> system </span>
+                            </router-link>
+                        </li>
+                        <li v-bind:class="settingsSubMenuActive2">
+                            <router-link to="/settings/user">
+                                <span class="sidebar-mini-icon">U</span>
+                                <span class="sidebar-normal"> user </span>
+                            </router-link>
+                        </li>
+                    </ul>
+                </div>
             </li>
 
             <!--<li>-->
@@ -146,7 +165,12 @@
             ,'mailSubMenuActive3'
             ,'mailMenuExpand'
             ,'mailMenuShow'
+
             ,'settingsMenuActive'
+            ,'settingsMenuExpand'
+            ,'settingsMenuShow'
+            ,'settingsSubMenuActive1'
+            ,'settingsSubMenuActive2'
         ]
         ,data: function(){
             return {

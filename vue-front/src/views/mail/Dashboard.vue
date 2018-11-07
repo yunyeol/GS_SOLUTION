@@ -7,7 +7,9 @@
                   v-bind:mail-sub-menu-active3="mailSubMenuActive3"
                   v-bind:mail-menu-expand="mailMenuExpand"
                   v-bind:mail-menu-show="mailMenuShow"
-                  v-bind:settings-menu-active="settingsMenuActive">
+                  v-bind:settings-menu-active="settingsMenuActive"
+
+                  settings-menu-active="" settings-menu-expand="false" settings-menu-show="collapse" settings-sub-menu-active1="" settings-sub-menu-active2="">
             </Left>
         </div>
         <div class="main-panel ps ps--active-y">

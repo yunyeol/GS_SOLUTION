@@ -1,7 +1,8 @@
 <template>
     <div class="wrapper">
         <div class="sidebar">
-            <Left mail-menu-expand="false" mail-menu-show="collapse" settings-menu-active="active">
+            <Left mail-menu-expand="false" mail-menu-show="collapse"
+                  settings-menu-active="active" settings-menu-expand="true" settings-menu-show="collapse show" settings-sub-menu-active1="active" settings-sub-menu-active2="">
             </Left>
         </div>
         <div class="main-panel ps ps--active-y">
@@ -36,16 +37,7 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <!--<tr v-for="(item,index) in settList" v-bind:key="index" v-cloak>-->
-                                                <!--<td class="sorting_1 text-center">{{item.TYPE}}</td>-->
-                                                <!--<td class="text-center">{{item.GUBUN}}</td>-->
-                                                <!--<td class="text-center">{{item.DATA1}}</td>-->
-                                                <!--<td class="text-center">{{item.DATA2}}</td>-->
-                                                <!--<td class="text-center">{{item.DATA3}}</td>-->
-                                                <!--<td class="text-center">-->
-                                                    <!--<i class="tim-icons icon-simple-remove"></i>-->
-                                                <!--</td>-->
-                                            <!--</tr>-->
+                                            <tr></tr>
                                         </tbody>
                                     </table>
                                 </div>
@@ -62,9 +54,9 @@
 
 <script>
     // @ is an alias to /src
-    import Left from "../components/Left.vue";
-    import Top from "../components/Top.vue";
-    import SettingsModal from "../components/settings/Modal.vue";
+    import Left from "../../components/Left.vue";
+    import Top from "../../components/Top.vue";
+    import SettingsModal from "../../components/settings/system/Modal.vue";
 
     export default {
         name: 'settings',
@@ -80,6 +72,8 @@
         },
         methods:{
             init : function () {
+                $("#datatable").tablesorter();
+
                 $('#datatable').DataTable({
                     destroy: true,
                     ajax: {
@@ -112,8 +106,6 @@
                         searchPlaceholder: "Search records",
                     }
                 });
-
-                $("#datatable").tablesorter();
             }
         },
         mounted: function(){

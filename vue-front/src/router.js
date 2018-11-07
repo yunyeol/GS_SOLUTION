@@ -11,7 +11,7 @@ import MailReceiver from './views/mail/Receiver.vue'
 import MailSend from './views/mail/Send.vue'
 
 //세팅
-import Settings from './views/Settings.vue'
+import Settings from './views/settings/System.vue'
 
 Vue.use(Router);
 
@@ -30,7 +30,7 @@ export default new Router({
     //푸시 라우팅
 
     //시스템코드 라우팅
-    { path: '/settings', name: 'page settings', component: Settings}
+    { path: '/settings/system', name: 'page settings', component: Settings}
 
 
       // {
