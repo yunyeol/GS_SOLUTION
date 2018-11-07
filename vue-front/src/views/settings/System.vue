@@ -24,6 +24,27 @@
                     <div class="card-body">
                         <div id="datatable_wrapper" class="dataTables_wrapper dt-bootstrap4">
                             <div class="row">
+                                <div class="col-sm-12 col-md-6">
+                                    <div class="dataTables_length" id="datatable_length">
+                                        <label>Show
+                                            <select name="datatable_length" aria-controls="datatable" class="custom-select custom-select-sm form-control form-control-sm">
+                                                <option value="10">10</option>
+                                                <option value="25">25</option>
+                                                <option value="50">50</option>
+                                                <option value="-1">All</option>
+                                            </select> entries</label>
+                                    </div>
+                                </div>
+                                <div class="col-sm-12 col-md-6">
+                                    <div class="dataTables_filter">
+                                        <label>
+                                            <input id="datatable_filter" type="search" class="form-control form-control-md" placeholder="Search records" aria-controls="datatable">
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
                                 <div class="col-sm-12">
                                     <table id="datatable" class="table tablesorter" role="grid" aria-describedby="datatable_info" style="width:100%">
                                         <thead>
@@ -94,6 +115,24 @@
                         }
                     });
                 }, 500);
+
+                $(document).on("keyup", "#datatable_filter", function () {
+                    var value = $(this).val().toLowerCase();
+
+                    $("#datatable tr").filter(function() {
+                        $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+                    });
+                })
+
+                // $("#datatable_filter").on('keyuo', function(){
+                //     var value = $(this).val().toLowerCase();
+                //
+                //     alert(value);
+                //
+                //     $("#datatable tr").filter(function() {
+                //         $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+                //     });
+                // });
 
                 //
                 // var table = $('#datatable').DataTable({
