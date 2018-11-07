@@ -25,7 +25,7 @@
                         <div id="datatable_wrapper" class="dataTables_wrapper dt-bootstrap4">
                             <div class="row">
                                 <div class="col-sm-12">
-                                    <table id="datatable" class="table" role="grid" aria-describedby="datatable_info" style="width:100%">
+                                    <table id="datatable" class="table tablesorter" role="grid" aria-describedby="datatable_info" style="width:100%">
                                         <thead>
                                             <tr role="row">
                                                 <th class="sorting_asc text-center header" tabindex="0" aria-controls="datatable" style="width:7%" >타입</th>
@@ -36,8 +36,8 @@
                                                 <th class="text-center" tabindex="0" aria-controls="datatable"  style="width:7%">삭제</th>
                                             </tr>
                                         </thead>
-                                        <tbody v-if="settList && settList.length > 0">
-                                            <tr v-for="list in settList">
+                                        <tbody >
+                                            <tr v-if="settList && settList.length > 0" v-for="list in settList">
                                                 <td class="text-center">{{list.TYPE}}</td>
                                                 <td class="text-center">{{list.GUBUN}}</td>
                                                 <td class="text-center">{{list.DATA1}}</td>
@@ -45,9 +45,7 @@
                                                 <td class="text-center">{{list.DATA3}}</td>
                                                 <td class="text-center" v-on:click="getDeleteSystemCode(list)"><i class="tim-icons icon-simple-remove"></i></td>
                                             </tr>
-                                        </tbody>
-                                        <tbody v-else>
-                                            <tr>
+                                            <tr v-else>
                                                 <td class="text-center" colspan="6">데이터가 존재하지 않습니다.</td>
                                             </tr>
                                         </tbody>
@@ -84,8 +82,20 @@
         },
         methods:{
             init : function () {
-                $("#datatable").tablesorter();
+                setTimeout(function(){
+                    $("#datatable").tablesorter({
+                        headers:{
+                            0:{sorter:'NumberSort'},
+                            1:{sorter:'NumberSort'},
+                            2:{sorter:'TextSort'},
+                            3:{sorter:'TextSort'},
+                            4:{sorter:'TextSort'},
+                            5:{sorter:false}
+                        }
+                    });
+                }, 500);
 
+                //
                 // var table = $('#datatable').DataTable({
                 //     destroy: true,
                 //     ajax: {
@@ -106,7 +116,6 @@
                 //     columnDefs:[
                 //         {"targets":[0,1,2,3,4,5], "className":"text-center"}
                 //     ],
-                //     order:[[0, 'asc']],
                 //     pagingType: "full_numbers",
                 //     lengthMenu: [
                 //         [10, 25, 50, -1],
@@ -118,8 +127,10 @@
                 //         searchPlaceholder: "Search records",
                 //     }
                 // });
-                //
+
                 // $(document).on('click', '#deleteSystemCode', function () {
+                //     var data = table.row( this ).data();
+                //     alert(data);
                 //     swal({
                 //         title: 'Are you sure?',
                 //         text: "You won't be able to revert this!",
@@ -130,8 +141,6 @@
                 //         confirmButtonText: 'Yes, delete it!',
                 //         buttonsStyling: false
                 //     }).then(function() {
-                //
-                //
                 //         swal({
                 //             title: 'Deleted!',
                 //             text: 'Your file has been deleted.',
