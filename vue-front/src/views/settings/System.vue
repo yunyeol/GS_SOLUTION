@@ -36,8 +36,20 @@
                                                 <th class="text-center" tabindex="0" aria-controls="datatable"  style="width:7%">삭제</th>
                                             </tr>
                                         </thead>
-                                        <tbody>
-                                            <tr></tr>
+                                        <tbody v-if="settList && settList.length > 0">
+                                            <tr v-for="list in settList">
+                                                <td class="text-center">{{list.TYPE}}</td>
+                                                <td class="text-center">{{list.GUBUN}}</td>
+                                                <td class="text-center">{{list.DATA1}}</td>
+                                                <td class="text-center">{{list.DATA2}}</td>
+                                                <td class="text-center">{{list.DATA3}}</td>
+                                                <td class="text-center" v-on:click="getDeleteSystemCode(list)"><i class="tim-icons icon-simple-remove"></i></td>
+                                            </tr>
+                                        </tbody>
+                                        <tbody v-else>
+                                            <tr>
+                                                <td class="text-center" colspan="6">데이터가 존재하지 않습니다.</td>
+                                            </tr>
                                         </tbody>
                                     </table>
                                 </div>
@@ -67,49 +79,125 @@
         },
         data: function(){
             return {
-
+                settList:[]
             }
         },
         methods:{
             init : function () {
                 $("#datatable").tablesorter();
 
-                $('#datatable').DataTable({
-                    destroy: true,
-                    ajax: {
-                        url:this.$API_URL+'/system/profile',
-                        type:'GET',
-                        dataSrc:""
-                    },
-                    columns:[
-                        {"data" : "TYPE"},
-                        {"data" : "GUBUN"},
-                        {"data" : "DATA1"},
-                        {"data" : "DATA2"},
-                        {"data" : "DATA3"},
-                        {
-                            "defaultContent":'<i class="tim-icons icon-simple-remove"></i>'
-                        }
-                    ],
-                    columnDefs:[
-                        {"className":"text-center", "targets":[0,1,2,3,4,5]}
-                    ],
-                    order:[[0, 'asc']],
-                    pagingType: "full_numbers",
-                    lengthMenu: [
-                        [10, 25, 50, -1],
-                        [10, 25, 50, "All"]
-                    ],
-                    responsive: true,
-                    language: {
-                        search: "_INPUT_",
-                        searchPlaceholder: "Search records",
+                // var table = $('#datatable').DataTable({
+                //     destroy: true,
+                //     ajax: {
+                //         url:this.$API_URL+'/system/selectSystemCode',
+                //         type:'GET',
+                //         dataSrc:""
+                //     },
+                //     columns:[
+                //         {"data" : "TYPE"},
+                //         {"data" : "GUBUN"},
+                //         {"data" : "DATA1"},
+                //         {"data" : "DATA2"},
+                //         {"data" : "DATA3"},
+                //         {
+                //             "defaultContent":'<i class="tim-icons icon-simple-remove" id="deleteSystemCode"></i>'
+                //         }
+                //     ],
+                //     columnDefs:[
+                //         {"targets":[0,1,2,3,4,5], "className":"text-center"}
+                //     ],
+                //     order:[[0, 'asc']],
+                //     pagingType: "full_numbers",
+                //     lengthMenu: [
+                //         [10, 25, 50, -1],
+                //         [10, 25, 50, "All"]
+                //     ],
+                //     responsive: true,
+                //     language: {
+                //         search: "_INPUT_",
+                //         searchPlaceholder: "Search records",
+                //     }
+                // });
+                //
+                // $(document).on('click', '#deleteSystemCode', function () {
+                //     swal({
+                //         title: 'Are you sure?',
+                //         text: "You won't be able to revert this!",
+                //         type: 'warning',
+                //         showCancelButton: true,
+                //         confirmButtonClass: 'btn btn-success',
+                //         cancelButtonClass: 'btn btn-danger',
+                //         confirmButtonText: 'Yes, delete it!',
+                //         buttonsStyling: false
+                //     }).then(function() {
+                //
+                //
+                //         swal({
+                //             title: 'Deleted!',
+                //             text: 'Your file has been deleted.',
+                //             type: 'success',
+                //             confirmButtonClass: "btn btn-success",
+                //             buttonsStyling: false
+                //         });
+                //     }).catch(swal.noop);
+                // });
+            },
+            getSelectSystemCode: async function(){
+                const rv = await this.$axios({
+                    url: this.$API_URL+'/system/selectSystemCode',
+                    method: 'get',
+                    timeout: 3000,
+                    headers: {
+                        'Content-Type': 'application/json'
                     }
-                });
+                }).catch (err => console.error(err))
+
+                if(rv && rv['data']) {
+                    this.settList = rv['data'];
+                }
+
+            },
+            getDeleteSystemCode: function(list){
+                var self = this;
+                swal({
+                    title: 'Are you sure?',
+                    text: "You won't be able to revert this!",
+                    type: 'warning',
+                    showCancelButton: true,
+                    confirmButtonClass: 'btn btn-success',
+                    cancelButtonClass: 'btn btn-danger',
+                    confirmButtonText: 'Yes, delete it!',
+                    buttonsStyling: false
+                }).then(function() {
+                    self.callDeleteSystemCodet(list);
+
+                    swal({
+                        title: 'Deleted!',
+                        text: 'Your file has been deleted.',
+                        type: 'success',
+                        confirmButtonClass: "btn btn-success",
+                        buttonsStyling: false
+                    });
+
+                }).catch(swal.noop);
+            },
+            callDeleteSystemCodet:async function (list) {
+                const rv = await this.$axios({
+                    url: this.$API_URL+'/system/deleteSystemCode',
+                    method: 'delete',
+                    timeout: 3000,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    params:{"type":list.TYPE, "gubun":list.GUBUN}
+                }).catch (err => console.error(err));
+
+                this.getSelectSystemCode();
             }
         },
         mounted: function(){
             this.init();
+            this.getSelectSystemCode();
         }
     }
 </script>
