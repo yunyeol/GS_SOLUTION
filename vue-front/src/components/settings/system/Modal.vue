@@ -1,5 +1,5 @@
 <template>
-    <div class="modal modal-black fade" id="settingsModal" tabindex="-1" role="dialog" aria-labelledby="settingsModalLabel" aria-hidden="true">
+    <div class="modal modal-black fade" id="settingsModal" tabindex="-1" role="dialog" aria-labelledby="settingsModalLabel" aria-hidden="true" >
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -104,9 +104,30 @@
                         "data2":this.data2,
                         "data3":this.data3
                     }
-                }).catch (err => console.error(err))
+                }).catch (err => console.error(err));
 
-                return rv['data'];
+                if(rv && rv['data']) {
+                    swal({
+                        title: 'Inserted!',
+                        text: '데이터 입력이 성공하였습니다.',
+                        type: 'success',
+                        confirmButtonClass: "btn btn-success",
+                        buttonsStyling: false
+                    });
+
+                }else{
+                    swal({
+                        title: 'Inserted!',
+                        text: '데이터 입력이 실패하였습니다.',
+                        type: 'error',
+                        confirmButtonClass: "btn btn-success",
+                        buttonsStyling: false
+                    });
+                }
+
+                this.$parent.$emit('selectSystemCode');
+
+                $('#settingsModal').modal('hide');
             }
         }
     }

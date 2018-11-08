@@ -103,6 +103,8 @@
         },
         methods:{
             init : function () {
+                this.$on('selectSystemCode',this.getSelectSystemCode);
+
                 setTimeout(function(){
                     $("#datatable").tablesorter({
                         headers:{
