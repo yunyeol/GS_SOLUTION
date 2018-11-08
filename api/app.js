@@ -5,6 +5,7 @@ const HttpStatus = require('http-status-codes');
 const dotEnv = require('dotenv');
 const express = require('express');
 const cors = require('cors');
+const bodyParser = require('body-parser');
 const app = express();
 const indexRouter = require('./routes/test');
 const usersRouter = require('./routes/users');
@@ -22,6 +23,9 @@ app.use(express.static('public/vue_production'));
 
 //cors
 app.use(cors());
+
+//bodyParser
+app.use(bodyParser.json());
 
 //router set
 app.use(DEF_URL, indexRouter);

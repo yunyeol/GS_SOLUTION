@@ -58,7 +58,7 @@
                                             </tr>
                                         </thead>
                                         <tbody >
-                                            <tr v-if="settList && settList.length > 0" v-for="list in settList">
+                                            <tr v-if="settList && settList.length > 0" v-for="list in settList" >
                                                 <td class="text-center">{{list.TYPE}}</td>
                                                 <td class="text-center">{{list.GUBUN}}</td>
                                                 <td class="text-center">{{list.DATA1}}</td>
@@ -119,7 +119,7 @@
                 $(document).on("keyup", "#datatable_filter", function () {
                     var value = $(this).val().toLowerCase();
 
-                    $("#datatable tr").filter(function() {
+                    $("#datatable tbody tr").filter(function() {
                         $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
                     });
                 })
@@ -197,6 +197,9 @@
                     timeout: 3000,
                     headers: {
                         'Content-Type': 'application/json'
+                    },
+                    params:{
+                        "whereAdd":"N"
                     }
                 }).catch (err => console.error(err))
 
