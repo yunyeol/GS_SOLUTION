@@ -46,6 +46,11 @@
 
                             <div class="row">
                                 <div class="col-sm-12">
+                                    테이블 행(row)을 더블클릭하시면 수정하실수 있습니다.
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12">
                                     <table id="datatable" class="table tablesorter" role="grid" aria-describedby="datatable_info" style="width:100%">
                                         <thead>
                                             <tr role="row">
@@ -54,7 +59,7 @@
                                                 <th class="sorting text-center header" tabindex="0" aria-controls="datatable" style="width:20%">데이터1</th>
                                                 <th class="sorting text-center header" tabindex="0" aria-controls="datatable" style="width:20%">데이터2</th>
                                                 <th class="sorting text-center header" tabindex="0" aria-controls="datatable" style="width:20%">데이터3</th>
-                                                <th class="text-center" tabindex="0" aria-controls="datatable"  style="width:7%">삭제</th>
+                                                <th class="text-center" tabindex="0" aria-controls="datatable"  style="width:9%">삭제</th>
                                             </tr>
                                         </thead>
                                         <tbody >
@@ -125,7 +130,7 @@
                     $("#datatable tbody tr").filter(function() {
                         $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
                     });
-                })
+                });
 
                 // $("#datatable_filter").on('keyuo', function(){
                 //     var value = $(this).val().toLowerCase();
@@ -249,10 +254,19 @@
                 this.getSelectSystemCode();
             },
             postUpdateSystemCode:async function(list, index){
-                alert(index);
-                $("tbody tr:eq("+index+")").hide();
-                //$("tbody tr:eq("+index+")").show();
-
+                var changeTr = "<tr>"+
+                                    "<td><input type='text' class='form-control' placeholder='ex)0000' minlength='4' maxlength='4' v-model='type'></td>"+
+                                    "<td><input type='text' class='form-control' placeholder='ex)0000' minlength='4' maxlength='4' v-model='gubun'></td>"+
+                                    "<td><input type='text' class='form-control' maxlength='256' v-model='data1'></td>"+
+                                    "<td><input type='text' class='form-control' maxlength='256' v-model='data2'></td>"+
+                                    "<td><input type='text' class='form-control' maxlength='256' v-model='data3'></td>"+
+                                    "<td>" +
+                                        "<button type='button' class='btn btn-primary btn-link' v-on:click='selectDuplicateSystemCode'>수정</button>" +
+                                        "/"+
+                                        "<button type='button' class='btn btn-primary btn-link' onclick='test()'>취소</button>" +
+                                    "</td>"+
+                                "</tr>";
+                $("tbody tr:eq("+index+")").replaceWith(changeTr);
             }
         },
         mounted: function(){
