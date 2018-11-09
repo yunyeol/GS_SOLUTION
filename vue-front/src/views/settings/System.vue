@@ -104,6 +104,7 @@
         },
         data: function(){
             return {
+                saveRow:'',
                 settList:[]
             }
         },
@@ -131,6 +132,14 @@
                         $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
                     });
                 });
+
+                $(document).on("click", "#updateCancel", function () {
+                    var index = $(this).attr('data-seq');
+                    //alert(index);
+                    //console.log(this.saveRow);
+                    //$("tbody tr:eq("+index+")").replaceWith(this.saveRow);
+                    location.reload();
+                })
 
                 // $("#datatable_filter").on('keyuo', function(){
                 //     var value = $(this).val().toLowerCase();
@@ -263,10 +272,15 @@
                                     "<td>" +
                                         "<button type='button' class='btn btn-primary btn-link' v-on:click='selectDuplicateSystemCode'>수정</button>" +
                                         "/"+
-                                        "<button type='button' class='btn btn-primary btn-link' onclick='test()'>취소</button>" +
+                                        "<button type='button' class='btn btn-primary btn-link' id='updateCancel' data-seq='"+index+"'>취소</button>" +
                                     "</td>"+
                                 "</tr>";
+                this.saveRow = $("tbody tr:eq("+index+")");
+                console.log($("tbody tr:eq("+index+")"));
+
                 $("tbody tr:eq("+index+")").replaceWith(changeTr);
+
+
             }
         },
         mounted: function(){
