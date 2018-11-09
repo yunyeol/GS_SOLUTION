@@ -64,7 +64,7 @@
                                         </thead>
                                         <tbody >
                                             <tr v-if="settList && settList.length > 0" v-for="(list, index) in settList"
-                                                v-on:dblclick="postUpdateSystemCode(list, index)" >
+                                                v-on:dblclick="modifySystemCode(list, index)" >
                                                 <td class="text-center">{{list.TYPE}}</td>
                                                 <td class="text-center">{{list.GUBUN}}</td>
                                                 <td class="text-center">{{list.DATA1}}</td>
@@ -95,6 +95,8 @@
     import Top from "../../components/Top.vue";
     import SettingsModal from "../../components/settings/system/Modal.vue";
 
+    var doubleCheck = false;
+
     export default {
         name: 'settings',
         components: {
@@ -104,14 +106,11 @@
         },
         data: function(){
             return {
-                saveRow:'',
                 settList:[]
             }
         },
         methods:{
             init : function () {
-                this.$on('selectSystemCode',this.getSelectSystemCode);
-
                 setTimeout(function(){
                     $("#datatable").tablesorter({
                         headers:{
@@ -133,79 +132,17 @@
                     });
                 });
 
-                $(document).on("click", "#updateCancel", function () {
+                $(document).on("click.select", "#updateCancel", function () {
                     var index = $(this).attr('data-seq');
-                    //alert(index);
-                    //console.log(this.saveRow);
-                    //$("tbody tr:eq("+index+")").replaceWith(this.saveRow);
-                    location.reload();
-                })
+                    $("tbody tr:eq("+index+")").show();
+                    $("#addTr").remove();
 
-                // $("#datatable_filter").on('keyuo', function(){
-                //     var value = $(this).val().toLowerCase();
-                //
-                //     alert(value);
-                //
-                //     $("#datatable tr").filter(function() {
-                //         $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
-                //     });
-                // });
+                    doubleCheck = false;
+                });
 
-                //
-                // var table = $('#datatable').DataTable({
-                //     destroy: true,
-                //     ajax: {
-                //         url:this.$API_URL+'/system/selectSystemCode',
-                //         type:'GET',
-                //         dataSrc:""
-                //     },
-                //     columns:[
-                //         {"data" : "TYPE"},
-                //         {"data" : "GUBUN"},
-                //         {"data" : "DATA1"},
-                //         {"data" : "DATA2"},
-                //         {"data" : "DATA3"},
-                //         {
-                //             "defaultContent":'<i class="tim-icons icon-simple-remove" id="deleteSystemCode"></i>'
-                //         }
-                //     ],
-                //     columnDefs:[
-                //         {"targets":[0,1,2,3,4,5], "className":"text-center"}
-                //     ],
-                //     pagingType: "full_numbers",
-                //     lengthMenu: [
-                //         [10, 25, 50, -1],
-                //         [10, 25, 50, "All"]
-                //     ],
-                //     responsive: true,
-                //     language: {
-                //         search: "_INPUT_",
-                //         searchPlaceholder: "Search records",
-                //     }
-                // });
-
-                // $(document).on('click', '#deleteSystemCode', function () {
-                //     var data = table.row( this ).data();
-                //     alert(data);
-                //     swal({
-                //         title: 'Are you sure?',
-                //         text: "You won't be able to revert this!",
-                //         type: 'warning',
-                //         showCancelButton: true,
-                //         confirmButtonClass: 'btn btn-success',
-                //         cancelButtonClass: 'btn btn-danger',
-                //         confirmButtonText: 'Yes, delete it!',
-                //         buttonsStyling: false
-                //     }).then(function() {
-                //         swal({
-                //             title: 'Deleted!',
-                //             text: 'Your file has been deleted.',
-                //             type: 'success',
-                //             confirmButtonClass: "btn btn-success",
-                //             buttonsStyling: false
-                //         });
-                //     }).catch(swal.noop);
-                // });
+                $(document).on("click.update", "#callUpdate", function () {
+                    this.postUpdateSystemCode();
+                });
             },
             getSelectSystemCode: async function(){
                 const rv = await this.$axios({
@@ -262,25 +199,32 @@
 
                 this.getSelectSystemCode();
             },
-            postUpdateSystemCode:async function(list, index){
-                var changeTr = "<tr>"+
-                                    "<td><input type='text' class='form-control' placeholder='ex)0000' minlength='4' maxlength='4' v-model='type'></td>"+
-                                    "<td><input type='text' class='form-control' placeholder='ex)0000' minlength='4' maxlength='4' v-model='gubun'></td>"+
-                                    "<td><input type='text' class='form-control' maxlength='256' v-model='data1'></td>"+
-                                    "<td><input type='text' class='form-control' maxlength='256' v-model='data2'></td>"+
-                                    "<td><input type='text' class='form-control' maxlength='256' v-model='data3'></td>"+
+            modifySystemCode:async function(list, index){
+                if(doubleCheck == true){
+                    return;
+                }
+
+                doubleCheck = true;
+
+                var changeTr = "<tr id='addTr'>"+
+                                    "<td><input type='text' class='form-control text-center' placeholder='ex)0000' minlength='4' maxlength='4' v-model='type' value='"+list.TYPE+"'></td>"+
+                                    "<td><input type='text' class='form-control text-center' placeholder='ex)0000' minlength='4' maxlength='4' v-model='gubun' value='"+list.GUBUN+"'></td>"+
+                                    "<td><input type='text' class='form-control text-center' maxlength='256' v-model='data1'value='"+list.DATA1+"'></td>"+
+                                    "<td><input type='text' class='form-control text-center' maxlength='256' v-model='data2'value='"+list.DATA2+"'></td>"+
+                                    "<td><input type='text' class='form-control text-center' maxlength='256' v-model='data3'value='"+list.DATA3+"'></td>"+
                                     "<td>" +
-                                        "<button type='button' class='btn btn-primary btn-link' v-on:click='selectDuplicateSystemCode'>수정</button>" +
+                                        "<button type='button' class='btn btn-primary btn-link' id='callUpdate'>수정</button>" +
                                         "/"+
                                         "<button type='button' class='btn btn-primary btn-link' id='updateCancel' data-seq='"+index+"'>취소</button>" +
                                     "</td>"+
                                 "</tr>";
-                this.saveRow = $("tbody tr:eq("+index+")");
-                console.log($("tbody tr:eq("+index+")"));
 
-                $("tbody tr:eq("+index+")").replaceWith(changeTr);
-
-
+                $("tbody tr:eq("+index+")").hide();
+                var obj = $("#datatable > tbody > tr");
+                obj.eq(index).after(changeTr);
+            },
+            postUpdateSystemCode:async function () {
+                alert("2");
             }
         },
         mounted: function(){
