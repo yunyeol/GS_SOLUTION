@@ -58,13 +58,14 @@
                                             </tr>
                                         </thead>
                                         <tbody >
-                                            <tr v-if="settList && settList.length > 0" v-for="list in settList" >
+                                            <tr v-if="settList && settList.length > 0" v-for="(list, index) in settList"
+                                                v-on:dblclick="postUpdateSystemCode(list, index)" >
                                                 <td class="text-center">{{list.TYPE}}</td>
                                                 <td class="text-center">{{list.GUBUN}}</td>
                                                 <td class="text-center">{{list.DATA1}}</td>
                                                 <td class="text-center">{{list.DATA2}}</td>
                                                 <td class="text-center">{{list.DATA3}}</td>
-                                                <td class="text-center" v-on:click="getDeleteSystemCode(list)"><i class="tim-icons icon-simple-remove"></i></td>
+                                                <td class="text-center" v-on:click="deleteDeleteSystemCode(list)"><i class="tim-icons icon-simple-remove"></i></td>
                                             </tr>
                                             <tr v-else>
                                                 <td class="text-center" colspan="6">데이터가 존재하지 않습니다.</td>
@@ -210,7 +211,7 @@
                 }
 
             },
-            getDeleteSystemCode: function(list){
+            deleteDeleteSystemCode: function(list){
                 var self = this;
                 swal({
                     title: 'Are you sure?',
@@ -246,6 +247,12 @@
                 }).catch (err => console.error(err));
 
                 this.getSelectSystemCode();
+            },
+            postUpdateSystemCode:async function(list, index){
+                alert(index);
+                $("tbody tr:eq("+index+")").hide();
+                //$("tbody tr:eq("+index+")").show();
+
             }
         },
         mounted: function(){
