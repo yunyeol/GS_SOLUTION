@@ -10,8 +10,9 @@ import MailDashboard from './views/mail/Dashboard.vue'
 import MailReceiver from './views/mail/Receiver.vue'
 import MailSend from './views/mail/Send.vue'
 
-//세팅
-import Settings from './views/settings/System.vue'
+//세팅 ( 페이징 테스트 )
+//import Settings from './views/settings/System.vue'
+import Settings from './views/settings/SystemPage.vue'
 
 Vue.use(Router);
 

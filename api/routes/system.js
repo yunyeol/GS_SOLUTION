@@ -28,6 +28,42 @@ router.get('/selectSystemCode', async function(req, res, next) {
     res.status(HttpStatus.OK).json(rows);
 });
 
+/* SystemCode Select. */
+router.get('/selectSystemCodeTest', async function(req, res, next) {
+    const query = req.query;
+
+    const utilFact = utilFactory(['pageMaker','dbWrap']);
+    const pageMaker = utilFact.PageMaker;
+    pageMaker.setPageOrRow(query.currPage);
+    
+    let searchParams = ( query.searchParams ) ? JSON.parse(query.searchParams) : undefined;
+    
+    let sqlQuery = 'SELECT '
+                    +'TYPE, '
+                    +'GUBUN, '
+                    +'DATA1, '
+                    +'DATA2, '
+                    +'DATA3, '
+                    +'REG_DATE, '
+                    +'UPT_DATE '
+                   +'FROM GS_BASE_CODE '
+    
+    let sqlCntQuery = 'SELECT COUNT(1) CNT FROM GS_BASE_CODE ';
+    if( searchParams && searchParams.keyword ){
+        let keyword = searchParams.keyword;
+        sqlQuery += 'WHERE ( TYPE LIKE "%'+keyword+'%" OR GUBUN LIKE "%'+keyword+'%" OR DATA1 LIKE "%'+keyword+'%" )';
+        sqlCntQuery += 'WHERE ( TYPE LIKE "%'+keyword+'%" OR GUBUN LIKE "%'+keyword+'%" OR DATA1 LIKE "%'+keyword+'%" )';
+    }
+    sqlQuery += 'LIMIT ?,?';
+
+    const cntRows  = await utilFact.dbWrap.query(sqlCntQuery);
+    const rows = await utilFact.dbWrap.query(sqlQuery,[pageMaker.startRow, pageMaker.ROW_GROUP]);
+    
+    const pageObj = pageMaker.getPagingObj(rows, cntRows);
+
+    res.status(HttpStatus.OK).json(pageObj);
+});
+
 router.delete('/deleteSystemCode', async function(req, res, next){
     const params = req.query;
     const utilFact = utilFactory(['dbWrap']);
