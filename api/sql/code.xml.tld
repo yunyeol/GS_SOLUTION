@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<query>
+    <selectCode>
+        SELECT 
+            TYPE,
+            GUBUN,
+            DATA1,
+            DATA2,
+            DATA3,
+            REG_DATE,
+            UPT_DATE
+        FROM GS_BASE_CODE 
+        WHERE 1=1
+    </selectCode>
+</query>
