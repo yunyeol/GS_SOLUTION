@@ -52,13 +52,13 @@
                                         <table id="datatable" class="table tablesorter" role="grid" aria-describedby="datatable_info" style="width:100%">
                                             <thead>
                                                 <tr role="row">
-                                                    <th class="sorting_asc text-center header" tabindex="0" aria-controls="datatable" style="width:20%" >로그인ID</th>
-                                                    <th class="sorting text-center header" tabindex="0" aria-controls="datatable" style="width:15%" >이름</th>
-                                                    <th class="text-center" tabindex="0" aria-controls="datatable" style="width:10%">비밀번호</th>
-                                                    <th class="sorting text-center header" tabindex="0" aria-controls="datatable" style="width:10%">그룹</th>
-                                                    <th class="sorting text-center header" tabindex="0" aria-controls="datatable" style="width:10%">권한</th>
-                                                    <th class="sorting text-center header" tabindex="0" aria-controls="datatable" style="width:9%">활성화</th>
-                                                    <th class="text-center" tabindex="0" aria-controls="datatable"  style="width:7%">삭제</th>
+                                                    <th class=" text-center " tabindex="0" aria-controls="datatable" style="width:20%" >로그인ID</th>
+                                                    <th class=" text-center " tabindex="0" aria-controls="datatable" style="width:15%" >이름</th>
+                                                    <th class=" text-center " tabindex="0" aria-controls="datatable" style="width:10%">비밀번호</th>
+                                                    <th class=" text-center " tabindex="0" aria-controls="datatable" style="width:10%">그룹</th>
+                                                    <th class=" text-center " tabindex="0" aria-controls="datatable" style="width:10%">권한</th>
+                                                    <th class=" text-center " tabindex="0" aria-controls="datatable" style="width:9%">활성화</th>
+                                                    <th class=" text-center " tabindex="0" aria-controls="datatable"  style="width:7%">삭제</th>
                                                 </tr>
                                             </thead>
                                             <tbody >
@@ -80,7 +80,7 @@
                                                             </div>
                                                         </div>
                                                     </td>
-                                                    <td class="text-center">
+                                                    <td class="text-center" v-on:click="deleteUser(list)">
                                                         <i class="tim-icons icon-simple-remove"></i>
                                                     </td>
                                                 </tr>
@@ -91,6 +91,8 @@
                                         </table>
                                     </div>
                                 </div>
+                                <input type="hidden" v-model="totalCntList"/>
+                                <Paging v-bind:total-cnt-list="totalCntList"></Paging>
                             </div>
                         </div>
                     </div>
@@ -104,15 +106,21 @@
 <script>
     import Left from "../../components/Left.vue";
     import Top from "../../components/Top.vue";
+    import Paging from "../../components/Paging.vue";
+
+    var currenPage = 1;
+    var ROW_GROUP = 10;
 
     export default {
         name: "User",
         components: {
             Left,
-            Top
+            Top,
+            Paging
         },
         data : function () {
             return {
+                totalCntList : [],
                 userList : []
             }
         },
@@ -153,12 +161,18 @@
                         'Content-Type': 'application/json'
                     },
                     params:{
-
+                        "currentPage" : currenPage,
+                        "rowGroup" : ROW_GROUP
                     }
-                }).catch (err => console.error(err))
+                }).catch (err => console.error(err));
+
+                console.log(rv['data']);
+                console.log(rv['data'].totalCnt);
+                console.log(rv['data'].rows);
 
                 if(rv && rv['data']) {
-                    this.userList = rv['data'];
+                    this.userList = rv['data'].rows;
+                    this.totalCntList = rv['data'].totalCnt;
                 }
             },
             toggleBtn:function () {
@@ -172,6 +186,41 @@
                     onText: data_on_label,
                     offText: data_off_label
                 });
+            },
+            deleteUser: function (list) {
+                var self = this;
+                swal({
+                    title: 'Are you sure?',
+                    text: "You won't be able to revert this!",
+                    type: 'warning',
+                    showCancelButton: true,
+                    confirmButtonClass: 'btn btn-success',
+                    cancelButtonClass: 'btn btn-danger',
+                    confirmButtonText: 'Yes, delete it!',
+                    buttonsStyling: false
+                }).then(function() {
+                    self.callDeleteUser(list);
+
+                    swal({
+                        title: 'Deleted!',
+                        text: 'Your file has been deleted.',
+                        type: 'success',
+                        confirmButtonClass: "btn btn-success",
+                        buttonsStyling: false
+                    });
+
+                }).catch(swal.noop);
+            },
+            callDeleteUser : async function(list){
+                const rv = await this.$axios({
+                    url: this.$API_URL+'/system/users',
+                    method: 'delete',
+                    timeout: 3000,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    params:{"loginId" : list.LOGIN_ID}
+                }).catch (err => console.error(err));
             }
         },
         mounted:function () {

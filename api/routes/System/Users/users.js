@@ -27,11 +27,45 @@ router.get('/users', async function(req, res, next) {
     const params = req.query;
     const utilFact = utilFactory(['dbWrap']);
     let sqlQuery = queryResult.selectUsers;
+    let sqlCntQuery = queryResult.selectUsersCnt;
+
+    sqlQuery += queryResult.limit;
+    sqlQuery = util.format( sqlQuery , params.currentPage,  params.rowGroup);
 
     const rows = await utilFact.dbWrap.query(sqlQuery);
+    const totalCnt = await utilFact.dbWrap.query(sqlCntQuery);
     console.log(rows);
 
-    res.status(HttpStatus.OK).json(rows);
+    console.log(totalCnt);
+
+    let obj = {};
+    obj.rows = rows;
+    obj.totalCnt = totalCnt;
+
+    console.log(obj);
+
+    res.status(HttpStatus.OK).json(obj);
 });
+
+router.delete('/users', async function(req, res, next){
+    const params = req.query;
+    const utilFact = utilFactory(['dbWrap']);
+
+    let sqlQuery = queryResult.deleteUsers;
+    sqlQuery = util.format( sqlQuery , params.loginId );
+
+    const result = await utilFact.dbWrap.query(sqlQuery);
+    console.log(result);
+
+    var msg;
+    if(result.affectedRows > 0){
+        msg = "success";
+    }else{
+        msg = "fail";
+    }
+
+    res.status(HttpStatus.OK).json(msg);
+});
+
 
 module.exports = router;
