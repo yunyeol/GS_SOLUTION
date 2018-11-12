@@ -1,30 +1,41 @@
 const express = require('express');
+var fs = require('fs');
+var xml_digester = require("xml-digester");
+var util = require('util');
+
+var digester = xml_digester.XmlDigester({});
 const router = express.Router();
+
+var queryResult = '';
+var queryPath = 'sql/code.xml.tld';
+
+fs.readFile(queryPath, "utf-8", function(error, data){
+    if(error){
+        console.log(error);
+    }else{
+        digester.digest(data, function(error, xmlResult) {
+            if (error) {
+                console.log(error);
+            } else {
+                queryResult = xmlResult.query;
+            }
+        });
+    }
+});
 
 /* SystemCode Select. */
 router.get('/code', async function(req, res, next) {
     const params = req.query;
     const utilFact = utilFactory(['dbWrap']);
-    let sqlQuery = 'SELECT '
-                    +'TYPE, '
-                    +'GUBUN, '
-                    +'DATA1, '
-                    +'DATA2, '
-                    +'DATA3, '
-                    +'REG_DATE, '
-                    +'UPT_DATE '
-                +'FROM GS_BASE_CODE ';
+    let sqlQuery = queryResult.selectCode;
 
-    var rows = '';
-    if(params.whereAdd == 'Y'){
-        sqlQuery = sqlQuery + "WHERE TYPE = ? AND GUBUN = ?";
-        rows = await utilFact.dbWrap.query(sqlQuery,[params.type,params.gubun]);
-    }else{
-        rows = await utilFact.dbWrap.query(sqlQuery);
+    if(params.whereTypeGubun == 'Y'){
+        sqlQuery += queryResult.whereTypeGubun;
+        sqlQuery = util.format( sqlQuery , params.type , params.gubun );
     }
 
+    const rows = await utilFact.dbWrap.query(sqlQuery);
     console.log(rows);
-
     res.status(HttpStatus.OK).json(rows);
 });
 
@@ -38,26 +49,22 @@ router.get('/selectSystemCodeTest', async function(req, res, next) {
 
     let searchParams = ( query.searchParams ) ? JSON.parse(query.searchParams) : undefined;
 
-    let sqlQuery = 'SELECT '
-                    +'TYPE, '
-                    +'GUBUN, '
-                    +'DATA1, '
-                    +'DATA2, '
-                    +'DATA3, '
-                    +'REG_DATE, '
-                    +'UPT_DATE '
-                   +'FROM GS_BASE_CODE '
-
-    let sqlCntQuery = 'SELECT COUNT(1) CNT FROM GS_BASE_CODE ';
+    let sqlQuery = queryResult.selectCode;
+    let sqlCntQuery = queryResult.selectCodeCnt;
+    
     if( searchParams && searchParams.keyword ){
-        let keyword = searchParams.keyword;
-        sqlQuery += 'WHERE ( TYPE LIKE "%'+keyword+'%" OR GUBUN LIKE "%'+keyword+'%" OR DATA1 LIKE "%'+keyword+'%" )';
-        sqlCntQuery += 'WHERE ( TYPE LIKE "%'+keyword+'%" OR GUBUN LIKE "%'+keyword+'%" OR DATA1 LIKE "%'+keyword+'%" )';
+        sqlQuery += queryResult.whereSearch;
+        sqlCntQuery += queryResult.whereSearch;
+        sqlQuery = util.format(sqlQuery, searchParams.keyword, searchParams.keyword, searchParams.keyword, searchParams.keyword, searchParams.keyword);
     }
-    sqlQuery += 'LIMIT ?,?';
+    sqlQuery += queryResult.limit;
+    sqlQuery = util.format( sqlQuery , pageMaker.startRow,  pageMaker.ROW_GROUP);
 
     const cntRows  = await utilFact.dbWrap.query(sqlCntQuery);
-    const rows = await utilFact.dbWrap.query(sqlQuery,[pageMaker.startRow, pageMaker.ROW_GROUP]);
+    const rows = await utilFact.dbWrap.query(sqlQuery);
+    console.log(sqlQuery);
+    console.log(pageMaker.startRow);
+    console.log(pageMaker.ROW_GROUP);
 
     const pageObj = pageMaker.getPagingObj(rows, cntRows);
 
@@ -67,9 +74,11 @@ router.get('/selectSystemCodeTest', async function(req, res, next) {
 router.delete('/code', async function(req, res, next){
     const params = req.query;
     const utilFact = utilFactory(['dbWrap']);
-    let sqlQuery = 'DELETE FROM GS_BASE_CODE WHERE TYPE = ? AND GUBUN = ?';
+    let sqlQuery = queryResult.deleteCode;
 
-    const result = await utilFact.dbWrap.query(sqlQuery,[params.type,params.gubun]);
+    sqlQuery = util.format( sqlQuery , params.type , params.gubun );
+
+    const result = await utilFact.dbWrap.query(sqlQuery);
     console.log(result);
 
     var msg;
@@ -86,14 +95,11 @@ router.post('/code', async function(req, res, next){
     const params = req.body;
 
     const utilFact = utilFactory(['dbWrap']);
-    let sqlQuery = 'INSERT INTO GS_BASE_CODE(TYPE, GUBUN, DATA1, DATA2, DATA3, REG_DATE)' +
-                    'VALUES(?, ?, ?, ?, ?, SYSDATE())';
+    let sqlQuery = queryResult.insertCode;
 
-    console.log(params.type+", "+params.gubun+", "+params.data1+", "+params.data2+", "+params.data3);
+    sqlQuery = util.format( sqlQuery , params.type , params.gubun, params.data1, params.data2, params.data3 );
 
-    const result = await utilFact.dbWrap.query(sqlQuery,
-                                                [params.type, params.gubun,
-                                                params.data1, params.data2, params.data3]);
+    const result = await utilFact.dbWrap.query(sqlQuery);
     console.log(result);
 
     var msg;

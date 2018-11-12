@@ -81,8 +81,8 @@ export default {
                     'Content-Type': 'application/json'
                 },
                 params: this.query || searchQuery
-            }).catch (err => console.error(err))
-            
+            }).catch (err => console.error(err));
+
             if(rv && rv['data'] && rv['data'].rows.length > 0) {
                 console.log(rv['data']);
                 this.startPage = rv['data']['startPage'];

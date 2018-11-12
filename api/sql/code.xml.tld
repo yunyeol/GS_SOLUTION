@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <query>
+    <!-- select Query -->
     <selectCode>
-        SELECT 
+        SELECT
             TYPE,
             GUBUN,
             DATA1,
@@ -9,7 +10,48 @@
             DATA3,
             REG_DATE,
             UPT_DATE
-        FROM GS_BASE_CODE 
+        FROM GS_BASE_CODE
         WHERE 1=1
     </selectCode>
+
+    <selectCodeCnt>
+        SELECT
+            COUNT(1) CNT
+        FROM GS_BASE_CODE
+        WHERE 1=1
+    </selectCodeCnt>
+
+    <!-- where params -->
+    <whereTypeGubun>
+        AND TYPE = %s AND GUBUN = %s
+    </whereTypeGubun>
+
+    <whereSearch>
+        AND (
+            TYPE LIKE CONCAT('%','%s','%')
+            OR GUBUN LIKE CONCAT('%','%s','%')
+            OR DATA1 LIKE CONCAT('%','%s','%')
+            OR DATA2 LIKE CONCAT('%','%s','%')
+            OR DATA3 LIKE CONCAT('%','%s','%')
+        )
+    </whereSearch>
+
+    <limit>
+        LIMIT %d, %d
+    </limit>
+
+    <!-- insert Query-->
+    <insertCode>
+        INSERT INTO GS_BASE_CODE(TYPE, GUBUN, DATA1, DATA2, DATA3, REG_DATE)
+        VALUES(%s, %s, %s, %s, %s, SYSDATE())
+    </insertCode>
+
+    <!-- update Query -->
+
+
+    <!-- delete Query -->
+    <deleteCode>
+        DELETE FROM GS_BASE_CODE WHERE TYPE = %s AND GUBUN = %s
+    </deleteCode>
+
 </query>

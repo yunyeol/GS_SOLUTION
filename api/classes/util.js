@@ -1,5 +1,6 @@
-const DbWrap = require('./dbwrap');
-const PageMaker = require('./pagemaker');
+const DbWrap = require('./utils/dbwrap');
+const PageMaker = require('./utils/pagemaker');
+const FileSystem = require('./utils/fileSystem');
 
 class Util {
     constructor(objNames){
@@ -11,6 +12,7 @@ class Util {
         switch(objNames){
             case 'dbWrap' : this.dbWrap = new DbWrap(); break;
             case 'pageMaker' : this.PageMaker = new PageMaker(); break;
+            case 'fs' : this.fs = new FileSystem(); break;
             default : break;
         }
     }

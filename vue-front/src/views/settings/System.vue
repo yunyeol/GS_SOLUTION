@@ -54,11 +54,11 @@
                                     <table id="datatable" class="table tablesorter" role="grid" aria-describedby="datatable_info" style="width:100%">
                                         <thead>
                                             <tr role="row">
-                                                <th class="text-center" tabindex="0" aria-controls="datatable" style="width:7%" >타입</th>
-                                                <th class="text-center" tabindex="0" aria-controls="datatable" style="width:7%">구분</th>
-                                                <th class="text-center" tabindex="0" aria-controls="datatable" style="width:20%">데이터1</th>
-                                                <th class="text-center" tabindex="0" aria-controls="datatable" style="width:20%">데이터2</th>
-                                                <th class="text-center" tabindex="0" aria-controls="datatable" style="width:20%">데이터3</th>
+                                                <th class=" text-center " tabindex="0" aria-controls="datatable" style="width:7%" >타입</th>
+                                                <th class=" text-center " tabindex="0" aria-controls="datatable" style="width:7%">구분</th>
+                                                <th class=" text-center " tabindex="0" aria-controls="datatable" style="width:20%">데이터1</th>
+                                                <th class=" text-center " tabindex="0" aria-controls="datatable" style="width:20%">데이터2</th>
+                                                <th class=" text-center " tabindex="0" aria-controls="datatable" style="width:20%">데이터3</th>
                                                 <th class="text-center" tabindex="0" aria-controls="datatable"  style="width:10%">삭제</th>
                                             </tr>
                                         </thead>
@@ -207,12 +207,12 @@
                 doubleCheck = true;
 
                 var changeTr = "<tr id='addTr'>"+
-                                    "<td><input type='text' class='form-control text-center' placeholder='ex)0000' minlength='4' maxlength='4' v-model='type' value='"+list.TYPE+"'></td>"+
-                                    "<td><input type='text' class='form-control text-center' placeholder='ex)0000' minlength='4' maxlength='4' v-model='gubun' value='"+list.GUBUN+"'></td>"+
-                                    "<td><input type='text' class='form-control text-center' maxlength='256' v-model='data1'value='"+list.DATA1+"'></td>"+
-                                    "<td><input type='text' class='form-control text-center' maxlength='256' v-model='data2'value='"+list.DATA2+"'></td>"+
-                                    "<td><input type='text' class='form-control text-center' maxlength='256' v-model='data3'value='"+list.DATA3+"'></td>"+
-                                    "<td>" +
+                                    "<td class='text-center'><input type='text' class='form-control text-center' placeholder='ex)0000' minlength='4' maxlength='4' v-model='type' value='"+list.TYPE+"'></td>"+
+                                    "<td class='text-center'><input type='text' class='form-control text-center' placeholder='ex)0000' minlength='4' maxlength='4' v-model='gubun' value='"+list.GUBUN+"'></td>"+
+                                    "<td class='text-center'><input type='text' class='form-control text-center' maxlength='256' v-model='data1'value='"+list.DATA1+"'></td>"+
+                                    "<td class='text-center'><input type='text' class='form-control text-center' maxlength='256' v-model='data2'value='"+list.DATA2+"'></td>"+
+                                    "<td class='text-center'><input type='text' class='form-control text-center' maxlength='256' v-model='data3'value='"+list.DATA3+"'></td>"+
+                                    "<td class='text-center'>" +
                                         "<button type='button' class='btn btn-primary btn-link' id='callUpdate'>수정</button>" +
                                         "/"+
                                         "<button type='button' class='btn btn-primary btn-link' id='updateCancel' data-seq='"+index+"'>취소</button>" +
@@ -232,6 +232,7 @@
         },
         mounted: function(){
             this.init();
+            this.getSelectSystemCode();
 
         }
     }

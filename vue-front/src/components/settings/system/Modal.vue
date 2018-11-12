@@ -77,8 +77,7 @@
                         'Content-Type': 'application/json'
                     },
                     params:{
-                        "whereAdd":"Y",
-                        "type":this.type, "gubun":this.gubun
+                        "whereTypeGubun":"Y", "type":this.type, "gubun":this.gubun
                     }
                 }).catch (err => console.error(err))
 
