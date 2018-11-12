@@ -10,7 +10,7 @@
                         <a href="#" aria-controls="datatable" class="page-link">First</a>
                     </li>
                     <li class="paginate_button page-item previous" :class="{'disabled': this.query.currPage == 1}" id="datatable_previous" @click="pageMove('prev')" >
-                        <a href="javascript:;" aria-controls="datatable" class="page-link">Previous</a>
+                        <a href="#" aria-controls="datatable" class="page-link">Previous</a>
                     </li>
                     <li class="paginate_button page-item" :class="{'active': query.currPage == item.startPage}" v-for="(item, index) in pageList" v-bind:key="index" @click="pageMove('',++index)">
                         <a href="#" aria-controls="datatable" class="page-link">{{item.startPage}}</a>

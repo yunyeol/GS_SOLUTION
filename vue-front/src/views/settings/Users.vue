@@ -16,6 +16,10 @@
                                 <h4 class="col-sm-11">
                                     Users
                                 </h4>
+                                <div class="col-sm-1">
+                                    <button style="float:right;" class="btn btn-primary btn-sm tim-icons icon-simple-add"
+                                            data-toggle="modal" data-target="#settingsModal"></button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -45,16 +49,16 @@
 
                                 <div class="row">
                                     <div class="col-sm-12">
-                                        <table id="usertable" class="table tablesorter" role="grid" aria-describedby="usertable_info" style="width:100%">
+                                        <table id="datatable" class="table tablesorter" role="grid" aria-describedby="datatable_info" style="width:100%">
                                             <thead>
                                                 <tr role="row">
-                                                    <th class="sorting_asc text-center header" tabindex="0" aria-controls="usertable" style="width:20%" >로그인ID</th>
-                                                    <th class="sorting text-center header" tabindex="0" aria-controls="usertable" style="width:15%" >이름</th>
-                                                    <th class="text-center" tabindex="0" aria-controls="usertable" style="width:10%">비밀번호</th>
-                                                    <th class="sorting text-center header" tabindex="0" aria-controls="usertable" style="width:10%">그룹</th>
-                                                    <th class="sorting text-center header" tabindex="0" aria-controls="usertable" style="width:10%">권한</th>
-                                                    <th class="sorting text-center header" tabindex="0" aria-controls="usertable" style="width:9%">활성화</th>
-                                                    <th class="text-center" tabindex="0" aria-controls="usertable"  style="width:7%">삭제</th>
+                                                    <th class="sorting_asc text-center header" tabindex="0" aria-controls="datatable" style="width:20%" >로그인ID</th>
+                                                    <th class="sorting text-center header" tabindex="0" aria-controls="datatable" style="width:15%" >이름</th>
+                                                    <th class="text-center" tabindex="0" aria-controls="datatable" style="width:10%">비밀번호</th>
+                                                    <th class="sorting text-center header" tabindex="0" aria-controls="datatable" style="width:10%">그룹</th>
+                                                    <th class="sorting text-center header" tabindex="0" aria-controls="datatable" style="width:10%">권한</th>
+                                                    <th class="sorting text-center header" tabindex="0" aria-controls="datatable" style="width:9%">활성화</th>
+                                                    <th class="text-center" tabindex="0" aria-controls="datatable"  style="width:7%">삭제</th>
                                                 </tr>
                                             </thead>
                                             <tbody >
@@ -67,12 +71,12 @@
                                                     <td class="text-center">{{list.GRP_NAME}}</td>
                                                     <td class="text-center">{{list.AUTH_NAME}}</td>
                                                     <td class="text-center">
-                                                        <div class="bootstrap-switch bootstrap-switch-wrapper bootstrap-switch-animate bootstrap-switch-off" style="width: 68px;">
+                                                        <div class="bootstrap-switch bootstrap-switch-wrapper bootstrap-switch-off bootstrap-switch-animate" style="width: 68px;">
                                                             <div class="bootstrap-switch-container" style="width: 118px; margin-left: -50px;">
                                                                 <span class="bootstrap-switch-handle-on bootstrap-switch-primary" style="width: 50px;">ON</span>
                                                                 <span class="bootstrap-switch-label" style="width: 30px;">&nbsp;</span>
                                                                 <span class="bootstrap-switch-handle-off bootstrap-switch-default" style="width: 50px;">OFF</span>
-                                                                <input type="checkbox" checked="" name="checkbox" class="bootstrap-switch" data-on-label="ON" data-off-label="OFF">
+                                                                <input type="checkbox" name="checkbox" class="bootstrap-switch" data-on-label="ON" data-off-label="OFF" v-on:click="toggleBtn">
                                                             </div>
                                                         </div>
                                                     </td>
@@ -114,19 +118,31 @@
         },
         methods:{
             init:function () {
-                setTimeout(function(){
-                    $("#usertable").tablesorter({
-                        headers:{
-                            0:{sorter:'TextSort'},
-                            1:{sorter:'TextSort'},
-                            2:{sorter:false},
-                            3:{sorter:'TextSort'},
-                            4:{sorter:'TextSort'},
-                            5:{sorter:'TextSort'},
-                            6:{sorter:false}
-                        }
-                    });
-                }, 500);
+
+                // $(document).on("click.active", ".bootstrap-switch", function () {
+                //     var data_on_label = $(this).data('on-label') || '';
+                //     var data_off_label = $(this).data('off-label') || '';
+                //
+                //     $(this).bootstrapSwitch({
+                //         onText: data_on_label,
+                //         offText: data_off_label
+                //     });
+                // });
+
+
+                // setTimeout(function(){
+                //     $("#datatable").tablesorter({
+                //         headers:{
+                //             0:{sorter:'TextSort'},
+                //             1:{sorter:'TextSort'},
+                //             2:{sorter:false},
+                //             3:{sorter:'TextSort'},
+                //             4:{sorter:'TextSort'},
+                //             5:{sorter:'TextSort'},
+                //             6:{sorter:false}
+                //         }
+                //     });
+                // }, 500);
             },
             getUsers: async function () {
                 const rv = await this.$axios({
@@ -144,6 +160,18 @@
                 if(rv && rv['data']) {
                     this.userList = rv['data'];
                 }
+            },
+            toggleBtn:function () {
+                alert("t");
+
+                console.log($(this));
+                var data_on_label = $(this).data('on-label') || '';
+                var data_off_label = $(this).data('off-label') || '';
+
+                $(this).bootstrapSwitch({
+                    onText: data_on_label,
+                    offText: data_off_label
+                });
             }
         },
         mounted:function () {

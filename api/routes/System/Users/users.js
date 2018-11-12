@@ -1,20 +1,32 @@
 const express = require('express');
+var fs = require('fs');
+var xml_digester = require("xml-digester");
+var util = require('util');
+
+var digester = xml_digester.XmlDigester({});
 const router = express.Router();
 
-/* GET users listing. */
+var queryResult = '';
+var queryPath = 'sql/users.xml.tld';
+
+fs.readFile(queryPath, "utf-8", function(error, data){
+    if(error){
+        console.log(error);
+    }else{
+        digester.digest(data, function(error, xmlResult) {
+            if (error) {
+                console.log(error);
+            } else {
+                queryResult = xmlResult.query;
+            }
+        });
+    }
+});
+
 router.get('/users', async function(req, res, next) {
     const params = req.query;
     const utilFact = utilFactory(['dbWrap']);
-    let sqlQuery = 'SELECT ' +
-                        'GM.LOGIN_ID, ' +
-                        'GM.MBR_NAME, ' +
-                        'GM.ACTIVE_YN, ' +
-                        'GG.GRP_NAME, ' +
-                        'GA.AUTH_NAME, ' +
-                        'GM.REG_DATE ' +
-                    'FROM GS_MBR GM '+
-                    'INNER JOIN GS_GRP GG ON (GM.MBR_GRP_ID = GG.MBR_GRP_ID) '+
-                    'INNER JOIN GS_AUTH GA ON (GM.MBR_AUTH_ID = GA.MBR_AUTH_ID) ';
+    let sqlQuery = queryResult.selectUsers;
 
     const rows = await utilFact.dbWrap.query(sqlQuery);
     console.log(rows);

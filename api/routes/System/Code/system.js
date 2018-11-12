@@ -51,7 +51,7 @@ router.get('/selectSystemCodeTest', async function(req, res, next) {
 
     let sqlQuery = queryResult.selectCode;
     let sqlCntQuery = queryResult.selectCodeCnt;
-    
+
     if( searchParams && searchParams.keyword ){
         sqlQuery += queryResult.whereSearch;
         sqlCntQuery += queryResult.whereSearch;
@@ -74,8 +74,8 @@ router.get('/selectSystemCodeTest', async function(req, res, next) {
 router.delete('/code', async function(req, res, next){
     const params = req.query;
     const utilFact = utilFactory(['dbWrap']);
-    let sqlQuery = queryResult.deleteCode;
 
+    let sqlQuery = queryResult.deleteCode;
     sqlQuery = util.format( sqlQuery , params.type , params.gubun );
 
     const result = await utilFact.dbWrap.query(sqlQuery);
