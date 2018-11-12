@@ -38,7 +38,7 @@
                                 <div class="col-sm-12 col-md-6">
                                     <div class="dataTables_filter">
                                         <label>
-                                            <input id="datatable_filter" type="search" class="form-control form-control-md" placeholder="Search records" aria-controls="datatable">
+                                            <input id="datatable_filter" type="search" class="form-control form-control-md" placeholder="Search records" aria-controls="datatable" v-model="query.searchParams.keyword" @keyup.enter="search">
                                         </label>
                                     </div>
                                 </div>
@@ -64,7 +64,7 @@
                                         </thead>
                                         <tbody >
                                             <tr v-if="settList && settList.length > 0" v-for="(list, index) in settList"
-                                                v-on:dblclick="modifySystemCode(list, index)" >
+                                                v-on:dblclick="modifySystemCode(list, index)" v-bind:key="index" >
                                                 <td class="text-center">{{list.TYPE}}</td>
                                                 <td class="text-center">{{list.GUBUN}}</td>
                                                 <td class="text-center">{{list.DATA1}}</td>
@@ -79,6 +79,7 @@
                                     </table>
                                 </div>
                             </div>
+                            <Pagenation url="/system/selectSystemCodeTest" :params="query" @paginated="paginated" ref="systemPagenation"></Pagenation>
                         </div>
                     </div>
                 </div>
@@ -94,6 +95,7 @@
     import Left from "../../components/Left.vue";
     import Top from "../../components/Top.vue";
     import SettingsModal from "../../components/settings/system/Modal.vue";
+    import Pagenation from '../../components/Pagination.vue';
 
     var doubleCheck = false;
 
@@ -102,10 +104,16 @@
         components: {
             Left,
             Top,
-            SettingsModal
+            SettingsModal,
+            Pagenation
         },
         data: function(){
             return {
+                query:{
+                    searchParams:{
+                        keyword : ''
+                    }
+                },
                 settList:[]
             }
         },
@@ -123,14 +131,6 @@
                         }
                     });
                 }, 500);
-
-                $(document).on("keyup", "#datatable_filter", function () {
-                    var value = $(this).val().toLowerCase();
-
-                    $("#datatable tbody tr").filter(function() {
-                        $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
-                    });
-                });
 
                 $(document).on("click.select", "#updateCancel", function () {
                     var index = $(this).attr('data-seq');
@@ -225,11 +225,17 @@
             },
             postUpdateSystemCode:async function () {
                 alert("2");
-            }
+            },
+            paginated(data){
+                this.settList = data || [];
+            },
+            search(){
+                this.$refs.systemPagenation.search();
+            },
         },
         mounted: function(){
             this.init();
-            this.getSelectSystemCode();
+
         }
     }
 </script>

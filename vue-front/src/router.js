@@ -11,8 +11,7 @@ import MailReceiver from './views/mail/Receiver.vue'
 import MailSend from './views/mail/Send.vue'
 
 //세팅 ( 페이징 테스트 )
-//import Settings from './views/settings/System.vue'
-import Settings from './views/settings/SystemPage.vue'
+import Settings from './views/settings/System.vue'
 
 Vue.use(Router);
 
