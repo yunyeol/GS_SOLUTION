@@ -234,7 +234,7 @@
             },
         },
         mounted: function(){
-            this.init();
+            this.init(); 
 
         }
     }
