@@ -88,7 +88,7 @@
                             </router-link>
                         </li>
                         <li v-bind:class="settingsSubMenuActive2">
-                            <router-link to="/settings/user">
+                            <router-link to="/settings/users">
                                 <span class="sidebar-mini-icon">U</span>
                                 <span class="sidebar-normal"> user </span>
                             </router-link>

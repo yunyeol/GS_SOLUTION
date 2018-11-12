@@ -12,6 +12,7 @@ import MailSend from './views/mail/Send.vue'
 
 //세팅 ( 페이징 테스트 )
 import Settings from './views/settings/System.vue'
+import Users from './views/settings/Users.vue'
 
 Vue.use(Router);
 
@@ -30,7 +31,8 @@ export default new Router({
     //푸시 라우팅
 
     //시스템코드 라우팅
-    { path: '/settings/system', name: 'page settings', component: Settings}
+    { path: '/settings/system', name: 'page settings', component: Settings},
+    { path: '/settings/users', name: 'page users', component: Users}
 
 
       // {

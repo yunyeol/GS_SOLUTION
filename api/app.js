@@ -8,8 +8,8 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const app = express();
 const indexRouter = require('./routes/test');
-const usersRouter = require('./routes/users');
-const systemRouter = require('./routes/system');
+const usersRouter = require('./routes/System/Users/users');
+const systemRouter = require('./routes/System/Code/system');
 const utilFactory = require('./classes/utilFactory');
 
 //static variable
