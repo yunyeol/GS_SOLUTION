@@ -112,4 +112,27 @@ router.post('/code', async function(req, res, next){
     res.status(HttpStatus.OK).json(msg);
 });
 
+router.put('/code', async function(req, res, next) {
+    const params = req.body;
+
+    const utilFact = utilFactory(['dbWrap']);
+    let sqlQuery = queryResult.updateCode;
+
+    sqlQuery = util.format( sqlQuery , params.type , params.gubun, params.data1, params.data2, params.data3,
+                            params.type, params.gubun);
+
+
+    const result = await utilFact.dbWrap.query(sqlQuery);
+    console.log(result);
+
+    var msg;
+    if(result.affectedRows > 0){
+        msg = "success";
+    }else{
+        msg = "fail";
+    }
+
+    res.status(HttpStatus.OK).json(msg);
+});
+
 module.exports = router;

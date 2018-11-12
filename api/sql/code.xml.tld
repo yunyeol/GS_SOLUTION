@@ -43,15 +43,19 @@
     <!-- insert Query-->
     <insertCode>
         INSERT INTO GS_BASE_CODE(TYPE, GUBUN, DATA1, DATA2, DATA3, REG_DATE)
-        VALUES(%s, %s, %s, %s, %s, SYSDATE())
+        VALUES('%s', '%s', '%s', '%s', '%s', SYSDATE())
     </insertCode>
 
     <!-- update Query -->
-
+    <updateCode>
+        UPDATE GS_BASE_CODE
+        SET TYPE = '%s', GUBUN = '%s', DATA1 = '%s', DATA2 = '%s', DATA3 = '%s'
+        WHERE TYPE = '%s' AND GUBUN = '%s'
+    </updateCode>
 
     <!-- delete Query -->
     <deleteCode>
-        DELETE FROM GS_BASE_CODE WHERE TYPE = %s AND GUBUN = %s
+        DELETE FROM GS_BASE_CODE WHERE TYPE = '%s' AND GUBUN = '%s'
     </deleteCode>
 
 </query>

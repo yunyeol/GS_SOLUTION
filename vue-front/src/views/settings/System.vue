@@ -140,8 +140,32 @@
                     doubleCheck = false;
                 });
 
-                $(document).on("click.update", "#callUpdate", function () {
+                $(document).on("click.update", "#callUpdate", async function () {
+                    var index = $(this).attr('data-seq');
 
+                    var data = {
+                        "type" : $('#type').val(),
+                        "gubun" : $('#gubun').val(),
+                        "data1" : $('#data1').val(),
+                        "data2" : $('#data2').val(),
+                        "data3" : $('#data3').val()
+                    };
+
+                    $.ajax({
+                        method: "put",
+                        url: "http://127.0.0.1:10009/api/system/code",
+                        data: JSON.stringify(data),
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                        success: function(data) {
+                            // $("#addTr").remove();
+                            // $("tbody tr:eq("+index+")").show();
+                            location.reload();
+                        },
+                        error: function(jqXHR, textStatus, errorThrown) {
+
+                        }
+                    });
                 });
             },
             getSelectSystemCode: async function(){
@@ -153,7 +177,7 @@
                         'Content-Type': 'application/json'
                     },
                     params:{
-                        "whereAdd":"N"
+
                     }
                 }).catch (err => console.error(err));
 
@@ -207,13 +231,13 @@
                 doubleCheck = true;
 
                 var changeTr = "<tr id='addTr'>"+
-                                    "<td class='text-center'><input type='text' class='form-control text-center' placeholder='ex)0000' minlength='4' maxlength='4' v-model='type' value='"+list.TYPE+"'></td>"+
-                                    "<td class='text-center'><input type='text' class='form-control text-center' placeholder='ex)0000' minlength='4' maxlength='4' v-model='gubun' value='"+list.GUBUN+"'></td>"+
-                                    "<td class='text-center'><input type='text' class='form-control text-center' maxlength='256' v-model='data1'value='"+list.DATA1+"'></td>"+
-                                    "<td class='text-center'><input type='text' class='form-control text-center' maxlength='256' v-model='data2'value='"+list.DATA2+"'></td>"+
-                                    "<td class='text-center'><input type='text' class='form-control text-center' maxlength='256' v-model='data3'value='"+list.DATA3+"'></td>"+
+                                    "<td class='text-center'><input type='text' class='form-control text-center' placeholder='ex)0000' minlength='4' maxlength='4' id='type' value='"+list.TYPE+"'></td>"+
+                                    "<td class='text-center'><input type='text' class='form-control text-center' placeholder='ex)0000' minlength='4' maxlength='4' id='gubun' value='"+list.GUBUN+"'></td>"+
+                                    "<td class='text-center'><input type='text' class='form-control text-center' maxlength='256' id='data1'value='"+list.DATA1+"'></td>"+
+                                    "<td class='text-center'><input type='text' class='form-control text-center' maxlength='256' id='data2'value='"+list.DATA2+"'></td>"+
+                                    "<td class='text-center'><input type='text' class='form-control text-center' maxlength='256' id='data3'value='"+list.DATA3+"'></td>"+
                                     "<td class='text-center'>" +
-                                        "<button type='button' class='btn btn-primary btn-link' id='callUpdate'>수정</button>" +
+                                        "<button type='button' class='btn btn-primary btn-link' id='callUpdate' data-seq='"+index+"'>수정</button>" +
                                         "/"+
                                         "<button type='button' class='btn btn-primary btn-link' id='updateCancel' data-seq='"+index+"'>취소</button>" +
                                     "</td>"+
