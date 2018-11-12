@@ -54,12 +54,12 @@
                                     <table id="datatable" class="table tablesorter" role="grid" aria-describedby="datatable_info" style="width:100%">
                                         <thead>
                                             <tr role="row">
-                                                <th class="sorting_asc text-center header" tabindex="0" aria-controls="datatable" style="width:7%" >타입</th>
-                                                <th class="sorting text-center header" tabindex="0" aria-controls="datatable" style="width:7%">구분</th>
-                                                <th class="sorting text-center header" tabindex="0" aria-controls="datatable" style="width:20%">데이터1</th>
-                                                <th class="sorting text-center header" tabindex="0" aria-controls="datatable" style="width:20%">데이터2</th>
-                                                <th class="sorting text-center header" tabindex="0" aria-controls="datatable" style="width:20%">데이터3</th>
-                                                <th class="text-center" tabindex="0" aria-controls="datatable"  style="width:9%">삭제</th>
+                                                <th class="text-center" tabindex="0" aria-controls="datatable" style="width:7%" >타입</th>
+                                                <th class="text-center" tabindex="0" aria-controls="datatable" style="width:7%">구분</th>
+                                                <th class="text-center" tabindex="0" aria-controls="datatable" style="width:20%">데이터1</th>
+                                                <th class="text-center" tabindex="0" aria-controls="datatable" style="width:20%">데이터2</th>
+                                                <th class="text-center" tabindex="0" aria-controls="datatable" style="width:20%">데이터3</th>
+                                                <th class="text-center" tabindex="0" aria-controls="datatable"  style="width:10%">삭제</th>
                                             </tr>
                                         </thead>
                                         <tbody >
@@ -119,18 +119,18 @@
         },
         methods:{
             init : function () {
-                setTimeout(function(){
-                    $("#datatable").tablesorter({
-                        headers:{
-                            0:{sorter:'NumberSort'},
-                            1:{sorter:'NumberSort'},
-                            2:{sorter:'TextSort'},
-                            3:{sorter:'TextSort'},
-                            4:{sorter:'TextSort'},
-                            5:{sorter:false}
-                        }
-                    });
-                }, 500);
+                // setTimeout(function(){
+                //     $("#datatable").tablesorter({
+                //         headers:{
+                //             0:{sorter:'NumberSort'},
+                //             1:{sorter:'NumberSort'},
+                //             2:{sorter:'TextSort'},
+                //             3:{sorter:'TextSort'},
+                //             4:{sorter:'TextSort'},
+                //             5:{sorter:false}
+                //         }
+                //     });
+                // }, 500);
 
                 $(document).on("click.select", "#updateCancel", function () {
                     var index = $(this).attr('data-seq');
@@ -141,12 +141,12 @@
                 });
 
                 $(document).on("click.update", "#callUpdate", function () {
-                    this.postUpdateSystemCode();
+
                 });
             },
             getSelectSystemCode: async function(){
                 const rv = await this.$axios({
-                    url: this.$API_URL+'/system/selectSystemCode',
+                    url: this.$API_URL+'/system/code',
                     method: 'get',
                     timeout: 3000,
                     headers: {
@@ -155,7 +155,7 @@
                     params:{
                         "whereAdd":"N"
                     }
-                }).catch (err => console.error(err))
+                }).catch (err => console.error(err));
 
                 if(rv && rv['data']) {
                     this.settList = rv['data'];
@@ -188,7 +188,7 @@
             },
             callDeleteSystemCodet:async function (list) {
                 const rv = await this.$axios({
-                    url: this.$API_URL+'/system/deleteSystemCode',
+                    url: this.$API_URL+'/system/code',
                     method: 'delete',
                     timeout: 3000,
                     headers: {
@@ -197,7 +197,7 @@
                     params:{"type":list.TYPE, "gubun":list.GUBUN}
                 }).catch (err => console.error(err));
 
-                this.getSelectSystemCode();
+                this.$refs.systemPagenation.search();
             },
             modifySystemCode:async function(list, index){
                 if(doubleCheck == true){
@@ -223,9 +223,6 @@
                 var obj = $("#datatable > tbody > tr");
                 obj.eq(index).after(changeTr);
             },
-            postUpdateSystemCode:async function () {
-                alert("2");
-            },
             paginated(data){
                 this.settList = data || [];
             },
@@ -234,7 +231,7 @@
             },
         },
         mounted: function(){
-            this.init(); 
+            this.init();
 
         }
     }

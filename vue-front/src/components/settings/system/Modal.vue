@@ -70,7 +70,7 @@
             },
             getSelectSystemCode: async function () {
                 const rv = await this.$axios({
-                    url: this.$API_URL+'/system/selectSystemCode',
+                    url: this.$API_URL+'/system/code',
                     method: 'get',
                     timeout: 3000,
                     headers: {
@@ -91,7 +91,7 @@
                 }
 
                 const rv = await this.$axios({
-                    url: this.$API_URL+'/system/insertSystemCode',
+                    url: this.$API_URL+'/system/code',
                     method: 'post',
                     timeout: 3000,
                     headers: {

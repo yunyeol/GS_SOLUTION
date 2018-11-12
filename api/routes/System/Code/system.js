@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 /* SystemCode Select. */
-router.get('/selectSystemCode', async function(req, res, next) {
+router.get('/code', async function(req, res, next) {
     const params = req.query;
     const utilFact = utilFactory(['dbWrap']);
     let sqlQuery = 'SELECT '
@@ -35,9 +35,9 @@ router.get('/selectSystemCodeTest', async function(req, res, next) {
     const utilFact = utilFactory(['pageMaker','dbWrap']);
     const pageMaker = utilFact.PageMaker;
     pageMaker.setPageOrRow(query.currPage);
-    
+
     let searchParams = ( query.searchParams ) ? JSON.parse(query.searchParams) : undefined;
-    
+
     let sqlQuery = 'SELECT '
                     +'TYPE, '
                     +'GUBUN, '
@@ -47,7 +47,7 @@ router.get('/selectSystemCodeTest', async function(req, res, next) {
                     +'REG_DATE, '
                     +'UPT_DATE '
                    +'FROM GS_BASE_CODE '
-    
+
     let sqlCntQuery = 'SELECT COUNT(1) CNT FROM GS_BASE_CODE ';
     if( searchParams && searchParams.keyword ){
         let keyword = searchParams.keyword;
@@ -58,13 +58,13 @@ router.get('/selectSystemCodeTest', async function(req, res, next) {
 
     const cntRows  = await utilFact.dbWrap.query(sqlCntQuery);
     const rows = await utilFact.dbWrap.query(sqlQuery,[pageMaker.startRow, pageMaker.ROW_GROUP]);
-    
+
     const pageObj = pageMaker.getPagingObj(rows, cntRows);
 
     res.status(HttpStatus.OK).json(pageObj);
 });
 
-router.delete('/deleteSystemCode', async function(req, res, next){
+router.delete('/code', async function(req, res, next){
     const params = req.query;
     const utilFact = utilFactory(['dbWrap']);
     let sqlQuery = 'DELETE FROM GS_BASE_CODE WHERE TYPE = ? AND GUBUN = ?';
@@ -82,7 +82,7 @@ router.delete('/deleteSystemCode', async function(req, res, next){
     res.status(HttpStatus.OK).json(msg);
 });
 
-router.post('/insertSystemCode', async function(req, res, next){
+router.post('/code', async function(req, res, next){
     const params = req.body;
 
     const utilFact = utilFactory(['dbWrap']);

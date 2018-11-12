@@ -29,7 +29,7 @@ app.use(bodyParser.json());
 
 //router set
 app.use(DEF_URL, indexRouter);
-app.use(DEF_URL+'/users', usersRouter);
+app.use(DEF_URL+'/system', usersRouter);
 app.use(DEF_URL+'/system', systemRouter);
 app.use((req, res, next) => {
     console.error('404 not Found');

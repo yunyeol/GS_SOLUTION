@@ -26,7 +26,7 @@
                                     <div class="col-sm-12 col-md-6">
                                         <div class="dataTables_length" id="datatable_length">
                                             <label>Show
-                                                <select  name="datatable_length" aria-controls="datatable" class="custom-select custom-select-sm form-control form-control-sm">
+                                                <select  name="datatable_length" aria-controls="datatable" class="custom-select custom-select-sm form-control form-control-sm" >
                                                     <option value="10">10</option>
                                                     <option value="25">25</option>
                                                     <option value="50">50</option>
@@ -58,8 +58,30 @@
                                                 </tr>
                                             </thead>
                                             <tbody >
-                                                <tr>
-
+                                                <tr v-if="userList && userList.length > 0" v-for="(list, index) in userList" v-bind:key="index" >
+                                                    <td class="text-center">{{list.LOGIN_ID}}</td>
+                                                    <td class="text-center">{{list.MBR_NAME}}</td>
+                                                    <td class="text-center">
+                                                        <a href="#" class="badge badge-primary">변경</a>
+                                                    </td>
+                                                    <td class="text-center">{{list.GRP_NAME}}</td>
+                                                    <td class="text-center">{{list.AUTH_NAME}}</td>
+                                                    <td class="text-center">
+                                                        <div class="bootstrap-switch bootstrap-switch-wrapper bootstrap-switch-animate bootstrap-switch-off" style="width: 68px;">
+                                                            <div class="bootstrap-switch-container" style="width: 118px; margin-left: -50px;">
+                                                                <span class="bootstrap-switch-handle-on bootstrap-switch-primary" style="width: 50px;">ON</span>
+                                                                <span class="bootstrap-switch-label" style="width: 30px;">&nbsp;</span>
+                                                                <span class="bootstrap-switch-handle-off bootstrap-switch-default" style="width: 50px;">OFF</span>
+                                                                <input type="checkbox" checked="" name="checkbox" class="bootstrap-switch" data-on-label="ON" data-off-label="OFF">
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <i class="tim-icons icon-simple-remove"></i>
+                                                    </td>
+                                                </tr>
+                                                <tr v-else>
+                                                    <td class="text-center" colspan="7">데이터가 존재하지 않습니다.</td>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -85,6 +107,11 @@
             Left,
             Top
         },
+        data : function () {
+            return {
+                userList : []
+            }
+        },
         methods:{
             init:function () {
                 setTimeout(function(){
@@ -100,10 +127,28 @@
                         }
                     });
                 }, 500);
+            },
+            getUsers: async function () {
+                const rv = await this.$axios({
+                    url: this.$API_URL+'/system/users',
+                    method: 'get',
+                    timeout: 3000,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    params:{
+
+                    }
+                }).catch (err => console.error(err))
+
+                if(rv && rv['data']) {
+                    this.userList = rv['data'];
+                }
             }
         },
         mounted:function () {
             this.init();
+            this.getUsers();
         }
     }
 </script>
