@@ -62,7 +62,7 @@
                                                 </tr>
                                             </thead>
                                             <tbody >
-                                                <tr v-if="userList && userList.length > 0" v-for="(list, index) in userList" v-bind:key="index" >
+                                                <tr v-if="userList && userList.length > 0" v-for="(list, index) in userList" v-bind:key="index"  >
                                                     <td class="text-center">{{list.LOGIN_ID}}</td>
                                                     <td class="text-center">{{list.MBR_NAME}}</td>
                                                     <td class="text-center">
@@ -91,8 +91,8 @@
                                         </table>
                                     </div>
                                 </div>
-                                <input type="hidden" v-model="totalCntList"/>
-                                <Paging v-bind:total-cnt-list="totalCntList"></Paging>
+
+                                <Paging url="/system/users/page" :row-group="rowGroup" :list-method-name="listMethodName" @getUsers="getUsers"></Paging>
                             </div>
                         </div>
                     </div>
@@ -108,7 +108,7 @@
     import Top from "../../components/Top.vue";
     import Paging from "../../components/Paging.vue";
 
-    var currenPage = 1;
+    var CURRENT_PAGE = 0;
     var ROW_GROUP = 10;
 
     export default {
@@ -120,8 +120,9 @@
         },
         data : function () {
             return {
-                totalCntList : [],
-                userList : []
+                userList : [],
+                rowGroup : ROW_GROUP,
+                listMethodName : 'getUsers'
             }
         },
         methods:{
@@ -136,23 +137,8 @@
                 //         offText: data_off_label
                 //     });
                 // });
-
-
-                // setTimeout(function(){
-                //     $("#datatable").tablesorter({
-                //         headers:{
-                //             0:{sorter:'TextSort'},
-                //             1:{sorter:'TextSort'},
-                //             2:{sorter:false},
-                //             3:{sorter:'TextSort'},
-                //             4:{sorter:'TextSort'},
-                //             5:{sorter:'TextSort'},
-                //             6:{sorter:false}
-                //         }
-                //     });
-                // }, 500);
             },
-            getUsers: async function () {
+            getUsers: async function (rowGroup, startPage) {
                 const rv = await this.$axios({
                     url: this.$API_URL+'/system/users',
                     method: 'get',
@@ -161,18 +147,13 @@
                         'Content-Type': 'application/json'
                     },
                     params:{
-                        "currentPage" : currenPage,
-                        "rowGroup" : ROW_GROUP
+                        "startPage" : startPage,
+                        "rowGroup" : rowGroup
                     }
                 }).catch (err => console.error(err));
 
-                console.log(rv['data']);
-                console.log(rv['data'].totalCnt);
-                console.log(rv['data'].rows);
-
                 if(rv && rv['data']) {
-                    this.userList = rv['data'].rows;
-                    this.totalCntList = rv['data'].totalCnt;
+                    this.userList = rv['data'];
                 }
             },
             toggleBtn:function () {
@@ -223,9 +204,12 @@
                 }).catch (err => console.error(err));
             }
         },
+        created:function(){
+
+        },
         mounted:function () {
             this.init();
-            this.getUsers();
+            this.getUsers(ROW_GROUP, CURRENT_PAGE);
         }
     }
 </script>

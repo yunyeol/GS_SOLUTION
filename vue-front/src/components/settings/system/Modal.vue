@@ -124,8 +124,6 @@
                     });
                 }
 
-                this.$parent.$emit('selectSystemCode');
-
                 $('#settingsModal').modal('hide');
             }
         }

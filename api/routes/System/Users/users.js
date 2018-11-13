@@ -27,23 +27,24 @@ router.get('/users', async function(req, res, next) {
     const params = req.query;
     const utilFact = utilFactory(['dbWrap']);
     let sqlQuery = queryResult.selectUsers;
-    let sqlCntQuery = queryResult.selectUsersCnt;
 
     sqlQuery += queryResult.limit;
-    sqlQuery = util.format( sqlQuery , params.currentPage,  params.rowGroup);
+    sqlQuery = util.format( sqlQuery , params.startPage,  params.rowGroup);
 
     const rows = await utilFact.dbWrap.query(sqlQuery);
-    const totalCnt = await utilFact.dbWrap.query(sqlCntQuery);
     console.log(rows);
 
-    console.log(totalCnt);
+    res.status(HttpStatus.OK).json(rows);
+});
 
-    let obj = {};
-    obj.rows = rows;
-    obj.totalCnt = totalCnt;
+router.get('/users/page', async function(req, res, next) {
+    const params = req.query;
+    const utilFact = utilFactory(['dbWrap']);
+    let sqlCntQuery = queryResult.selectUsersCnt;
 
-    console.log(obj);
+    const totalCnt = await utilFact.dbWrap.query(sqlCntQuery);
 
+    var obj = totalCnt[0].CNT;
     res.status(HttpStatus.OK).json(obj);
 });
 
