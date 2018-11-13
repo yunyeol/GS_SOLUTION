@@ -32,8 +32,9 @@
         name: "paging",
         props:[
             'url',
-            'rowGroup',
-            'listMethodName'
+            'listMethodName',
+            'keyWord',
+            'option'
         ],
         data:function(){
             return {
@@ -41,9 +42,9 @@
                 totalPage:[],
                 pageList:[],
 
-                currentPage : 0,
-                startPage:1,
-                endPage:this.rowGroup
+                currentPage:0,
+                startPage:0,
+                endPage:this.option
             }
         },
         methods:{
@@ -55,15 +56,23 @@
                     timeout: 3000,
                     headers: {
                         'Content-Type': 'application/json'
+                    },
+                    params:{
+                        "keyWord" : this.keyWord
                     }
                 }).catch (err => console.error(err));
 
                 if(rv && rv['data']) {
                     this.totalCnt = rv['data'];
-                    this.totalPage = rv['data'] % this.rowGroup == 0 ? parseInt(rv['data']/this.rowGroup) : parseInt(rv['data']/this.rowGroup) + 1;
+                    this.totalPage = rv['data'] % this.option == 0 ? parseInt(rv['data']/this.option) : parseInt(rv['data']/this.option) + 1;
+                }else{
+                    this.totalCnt = 0;
+                    this.totalPage = 1;
                 }
 
                 this.setPageList(this.totalPage);
+                this.$emit('startPage', this.startPage);
+                this.setStartEndPage();
             },
             setPageList(totalPage){
                 var pageList = [];
@@ -76,60 +85,67 @@
                 this.pageList = pageList || [];
             },
             setStartEndPage(){
-                if(this.currentPage +1 < this.totalPage){
-                    this.startPage = this.currentPage * this.rowGroup +1;
-                    this.endPage = (this.currentPage +1)* this.rowGroup;
+                console.log("1 " + this.currentPage);
+                console.log("2 " + this.totalPage);
+
+                if(this.totalCnt < this.option){
+                    this.startPage = 1;
+                    this.endPage = this.totalCnt % this.option;
+                    this.currentPage = 0;
+                }else if(this.currentPage +1 < this.totalPage){
+                    this.startPage = this.currentPage * this.option +1;
+                    this.endPage = (this.currentPage +1)* this.option;
                 }else{
-                    
+                    this.startPage = this.currentPage * this.option +1;
+                    this.endPage = (this.currentPage)* this.option + this.totalCnt%this.option;
                 }
-
-
             },
             pageMove(gubun, item){
                 var startPage = 0;
 
                 if(gubun == 'page'){
-                    startPage = (item.page -1) * this.rowGroup;
+                    startPage = (item.page -1) * this.option;
                     this.currentPage = item.page -1;
 
-                    this.$emit(this.listMethodName, this.rowGroup, startPage);
+                    this.$emit(this.listMethodName, this.option, startPage);
                 }else if(gubun == 'first'){
                     startPage = 0;
                     this.currentPage = 0;
 
-                    this.$emit(this.listMethodName, this.rowGroup, startPage);
+                    this.$emit(this.listMethodName, this.option, startPage);
                 }else if(gubun == 'previous'){
                     var page = --this.currentPage;
                     if(page > 0){
-                        startPage = (page) * this.rowGroup;
+                        startPage = (page) * this.option;
 
-                        this.$emit(this.listMethodName, this.rowGroup, startPage);
+                        this.$emit(this.listMethodName, this.option, startPage);
                     }else{
                         startPage = 0;
                         this.currentPage = 0;
 
-                        this.$emit(this.listMethodName, this.rowGroup, startPage);
+                        this.$emit(this.listMethodName, this.option, startPage);
                     }
                 }else if(gubun == 'next'){
                     var page = ++this.currentPage;
 
                     if(page < this.totalPage){
-                        startPage = (page) * this.rowGroup;
+                        startPage = (page) * this.option;
 
-                        this.$emit(this.listMethodName, this.rowGroup, startPage);
+                        this.$emit(this.listMethodName, this.option, startPage);
                     }else{
-                        startPage = (this.totalPage -1) * this.rowGroup;
+                        startPage = (this.totalPage -1) * this.option;
                         this.currentPage = this.totalPage -1;
 
-                        this.$emit(this.listMethodName, this.rowGroup, startPage);
+                        this.$emit(this.listMethodName, this.option, startPage);
                     }
                 }else if(gubun == 'last'){
-                    startPage = (this.totalPage -1) * this.rowGroup;
+                    startPage = (this.totalPage -1) * this.option;
                     this.currentPage = this.totalPage -1;
 
-                    this.$emit(this.listMethodName, this.rowGroup, startPage);
+                    this.$emit(this.listMethodName, this.option, startPage);
                 }
 
+                this.$emit('getStartPage', startPage);
                 this.setStartEndPage();
             }
         },

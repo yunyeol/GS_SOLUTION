@@ -24,6 +24,15 @@
         WHERE 1=1
     </selectUsersCnt>
 
+    <whereAddSearch>
+        AND (
+            GM.LOGIN_ID LIKE CONCAT('%','%s','%')
+            OR GM.MBR_NAME LIKE CONCAT('%','%s','%')
+            OR GG.GRP_NAME LIKE CONCAT('%','%s','%')
+            OR GA.AUTH_NAME LIKE CONCAT('%','%s','%')
+        )
+    </whereAddSearch>
+
     <limit>
         LIMIT %d, %d
     </limit>

@@ -28,6 +28,11 @@ router.get('/users', async function(req, res, next) {
     const utilFact = utilFactory(['dbWrap']);
     let sqlQuery = queryResult.selectUsers;
 
+    if(params && params.keyWord){
+        sqlQuery += queryResult.whereAddSearch;
+        sqlQuery = util.format( sqlQuery , params.keyWord,  params.keyWord, params.keyWord, params.keyWord);
+    }
+
     sqlQuery += queryResult.limit;
     sqlQuery = util.format( sqlQuery , params.startPage,  params.rowGroup);
 
@@ -42,7 +47,14 @@ router.get('/users/page', async function(req, res, next) {
     const utilFact = utilFactory(['dbWrap']);
     let sqlCntQuery = queryResult.selectUsersCnt;
 
+    if(params && params.keyWord){
+        sqlCntQuery += queryResult.whereAddSearch;
+        sqlCntQuery = util.format( sqlCntQuery , params.keyWord,  params.keyWord, params.keyWord, params.keyWord);
+    }
+
     const totalCnt = await utilFact.dbWrap.query(sqlCntQuery);
+
+    console.log(totalCnt);
 
     var obj = totalCnt[0].CNT;
     res.status(HttpStatus.OK).json(obj);

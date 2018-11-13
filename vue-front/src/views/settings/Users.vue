@@ -30,18 +30,18 @@
                                     <div class="col-sm-12 col-md-6">
                                         <div class="dataTables_length" id="datatable_length">
                                             <label>Show
-                                                <select  name="datatable_length" aria-controls="datatable" class="custom-select custom-select-sm form-control form-control-sm" >
-                                                    <option value="10">10</option>
-                                                    <option value="25">25</option>
-                                                    <option value="50">50</option>
-                                                    <option value="-1">All</option>
+                                                <select v-model="option" @change="pageLength" name="datatable_length" aria-controls="datatable" class="custom-select custom-select-sm form-control form-control-sm" >
+                                                    <option :value="10">10</option>
+                                                    <option :value="25">25</option>
+                                                    <option :value="50">50</option>
+                                                    <option :value="-1">All</option>
                                                 </select> entries</label>
                                         </div>
                                     </div>
                                     <div class="col-sm-12 col-md-6">
                                         <div class="dataTables_filter">
                                             <label>
-                                                <input id="datatable_filter" type="search" class="form-control form-control-md" placeholder="Search records" aria-controls="datatable">
+                                                <input id="datatable_filter" v-model="keyWord" @keyup.enter="getUsers(10, 0)" type="search" class="form-control form-control-md" placeholder="Search records" aria-controls="datatable">
                                             </label>
                                         </div>
                                     </div>
@@ -92,7 +92,18 @@
                                     </div>
                                 </div>
 
-                                <Paging url="/system/users/page" :row-group="rowGroup" :list-method-name="listMethodName" @getUsers="getUsers"></Paging>
+                                <!--
+                                페이징 처리 : 페이징 뷰 선언  @getUsers="getUsers" 이부분은 호출한 메소드명으로 대체
+                                            url은 page 추가하여 전체 건수 가져오는 쿼리를 수행
+                                -->
+                                <Paging url="/system/users/page"
+                                        :list-method-name="listMethodName"
+                                        :key-word="keyWord"
+                                        :option="option"
+                                        @getUsers="getUsers"
+                                        @getStartPage="getStartPage"
+                                        ref="paging">
+                                </Paging>
                             </div>
                         </div>
                     </div>
@@ -108,36 +119,35 @@
     import Top from "../../components/Top.vue";
     import Paging from "../../components/Paging.vue";
 
+    //페이징 처리 : 이페이지에 초기 들어왔을때 페이지 세팅값
     var CURRENT_PAGE = 0;
-    var ROW_GROUP = 10;
 
     export default {
         name: "User",
         components: {
             Left,
             Top,
-            Paging
+            Paging //페이징 처리 : 페이징 뷰 추가
         },
         data : function () {
             return {
                 userList : [],
-                rowGroup : ROW_GROUP,
-                listMethodName : 'getUsers'
+                keyWord:'',
+                option : 10,
+
+                //페이징 처리 : 페이징 뷰에 전달할 데이터 선언
+                rowGroup : 10,
+                listMethodName : 'getUsers',
+                startPage:0
             }
         },
         methods:{
             init:function () {
-
-                // $(document).on("click.active", ".bootstrap-switch", function () {
-                //     var data_on_label = $(this).data('on-label') || '';
-                //     var data_off_label = $(this).data('off-label') || '';
-                //
-                //     $(this).bootstrapSwitch({
-                //         onText: data_on_label,
-                //         offText: data_off_label
-                //     });
-                // });
             },
+            pageLength : function(){
+                this.getUsers(this.option, this.startPage);
+            },
+            //파라미터로 시작값과 로우건수를 입력, 초기값 0, 10
             getUsers: async function (rowGroup, startPage) {
                 const rv = await this.$axios({
                     url: this.$API_URL+'/system/users',
@@ -148,13 +158,16 @@
                     },
                     params:{
                         "startPage" : startPage,
-                        "rowGroup" : rowGroup
+                        "rowGroup" : rowGroup,
+                        "keyWord" : this.keyWord
                     }
                 }).catch (err => console.error(err));
 
                 if(rv && rv['data']) {
                     this.userList = rv['data'];
                 }
+
+                this.$refs.paging.getTotalpageData();
             },
             toggleBtn:function () {
                 alert("t");
@@ -202,14 +215,23 @@
                     },
                     params:{"loginId" : list.LOGIN_ID}
                 }).catch (err => console.error(err));
-            }
-        },
-        created:function(){
 
+                //페이징 처리 : 어떠한 처리(insert, delete, update)후 다시 데이터를 가져올때 사용하는 메소드
+                this.reflesh();
+            },
+            getStartPage:function(startPage){
+                this.startPage = startPage || [];
+            },
+            //페이징 처리 : 어떠한 처리(insert, delete, update)후 다시 데이터를 가져올때 사용하는 메소드
+            reflesh() {
+                this.getUsers(this.option, this.startPage);
+                this.$refs.paging.getTotalpageData();
+            }
         },
         mounted:function () {
             this.init();
-            this.getUsers(ROW_GROUP, CURRENT_PAGE);
+            //페이징 처리 : 이페이지 처음 진입시 페이징 처리
+            this.getUsers(this.option, CURRENT_PAGE);
         }
     }
 </script>
