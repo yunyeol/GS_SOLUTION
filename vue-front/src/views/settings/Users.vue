@@ -63,8 +63,8 @@
                                                     <th class=" text-center " tabindex="0" aria-controls="datatable"  style="width:7%">삭제</th>
                                                 </tr>
                                             </thead>
-                                            <tbody >
-                                                <tr v-if="userList && userList.length > 0" v-for="(list, index) in userList" v-bind:key="index"  >
+                                            <tbody v-if="userList && userList.length > 0">
+                                                <tr  v-for="(list, index) in userList" v-bind:key="index"  >
                                                     <td class="text-center">{{list.LOGIN_ID}}</td>
                                                     <td class="text-center">{{list.MBR_NAME}}</td>
                                                     <td class="text-center">
@@ -88,7 +88,9 @@
                                                         <i class="tim-icons icon-simple-remove"></i>
                                                     </td>
                                                 </tr>
-                                                <tr v-else>
+                                            </tbody>
+                                            <tbody v-else>
+                                                <tr >
                                                     <td class="text-center" colspan="7">데이터가 존재하지 않습니다.</td>
                                                 </tr>
                                             </tbody>
