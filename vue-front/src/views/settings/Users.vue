@@ -5,7 +5,8 @@
                   settings-menu-active="active" settings-menu-expand="true" settings-menu-show="collapse show" settings-sub-menu-active1="" settings-sub-menu-active2="active">
             </Left>
         </div>
-        <div class="main-panel ps ps--active-y">
+        <!-- ps ps--active-y -->
+        <div class="main-panel ">
             <Top title="Users"></Top>
 
             <div class="content">
@@ -145,7 +146,7 @@
             init:function () {
             },
             pageLength : function(){
-                this.getUsers(this.option, this.startPage);
+                this.getUsers(this.option, 0);
             },
             //파라미터로 시작값과 로우건수를 입력, 초기값 0, 10
             getUsers: async function (rowGroup, startPage) {
@@ -165,6 +166,7 @@
 
                 if(rv && rv['data']) {
                     this.userList = rv['data'];
+                    console.log(this.userList);
                 }
 
                 this.$refs.paging.getTotalpageData();

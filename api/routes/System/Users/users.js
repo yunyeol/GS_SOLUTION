@@ -33,8 +33,10 @@ router.get('/users', async function(req, res, next) {
         sqlQuery = util.format( sqlQuery , params.keyWord,  params.keyWord, params.keyWord, params.keyWord);
     }
 
-    sqlQuery += queryResult.limit;
-    sqlQuery = util.format( sqlQuery , params.startPage,  params.rowGroup);
+    if(params && params.rowGroup > -1){
+        sqlQuery += queryResult.limit;
+        sqlQuery = util.format( sqlQuery , params.startPage,  params.rowGroup);
+    }
 
     const rows = await utilFact.dbWrap.query(sqlQuery);
     console.log(rows);

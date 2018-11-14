@@ -119,19 +119,6 @@
         },
         methods:{
             init : function () {
-                // setTimeout(function(){
-                //     $("#datatable").tablesorter({
-                //         headers:{
-                //             0:{sorter:'NumberSort'},
-                //             1:{sorter:'NumberSort'},
-                //             2:{sorter:'TextSort'},
-                //             3:{sorter:'TextSort'},
-                //             4:{sorter:'TextSort'},
-                //             5:{sorter:false}
-                //         }
-                //     });
-                // }, 500);
-
                 $(document).on("click.select", "#updateCancel", function () {
                     var index = $(this).attr('data-seq');
                     $("tbody tr:eq("+index+")").show();

@@ -62,11 +62,11 @@
                     }
                 }).catch (err => console.error(err));
 
-                if(rv && rv['data']) {
+                if(rv && rv['data'] && this.option > 0) {
                     this.totalCnt = rv['data'];
                     this.totalPage = rv['data'] % this.option == 0 ? parseInt(rv['data']/this.option) : parseInt(rv['data']/this.option) + 1;
                 }else{
-                    this.totalCnt = 0;
+                    this.totalCnt = rv['data'];
                     this.totalPage = 1;
                 }
 
@@ -85,19 +85,34 @@
                 this.pageList = pageList || [];
             },
             setStartEndPage(){
-                console.log("1 " + this.currentPage);
-                console.log("2 " + this.totalPage);
-
                 if(this.totalCnt < this.option){
                     this.startPage = 1;
                     this.endPage = this.totalCnt % this.option;
                     this.currentPage = 0;
+
                 }else if(this.currentPage +1 < this.totalPage){
                     this.startPage = this.currentPage * this.option +1;
                     this.endPage = (this.currentPage +1)* this.option;
+
+                }else if(this.totalPage <= this.currentPage && this.option > 0){
+                    this.currentPage = 0;
+                    this.startPage = 1;
+                    this.endPage = (this.currentPage +1)* this.option;
+
                 }else{
-                    this.startPage = this.currentPage * this.option +1;
-                    this.endPage = (this.currentPage)* this.option + this.totalCnt%this.option;
+                    if(this.option < 0){
+                        this.currentPage = 0;
+                        this.startPage = 1;
+                        this.endPage = this.totalCnt;
+
+                    }else{
+                        this.startPage = this.currentPage * this.option +1;
+                        if(this.totalCnt%this.option == 0){
+                            this.endPage = (this.currentPage+1)* this.option + this.totalCnt%this.option;
+                        }else{
+                            this.endPage = (this.currentPage)* this.option + this.totalCnt%this.option;
+                        }
+                    }
                 }
             },
             pageMove(gubun, item){
