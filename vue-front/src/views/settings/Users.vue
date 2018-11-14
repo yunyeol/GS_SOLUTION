@@ -75,16 +75,9 @@
                                                     <td class="text-center">{{list.GRP_NAME}}</td>
                                                     <td class="text-center">{{list.AUTH_NAME}}</td>
                                                     <td class="text-center">
-                                                        <div class=" bootstrap-switch bootstrap-switch-wrapper bootstrap-switch-animate"
-                                                             :class="{'bootstrap-switch-off': list.ACTIVE_YN != 'Y', 'bootstrap-switch-on' : list.ACTIVE_YN == 'Y'}"
-                                                             style="width: 68px;" v-on:click="toggleBtn(list)">
-                                                            <div class="bootstrap-switch-container" style="width: 118px; margin-left: 0px;">
-                                                                <span class="bootstrap-switch-handle-on bootstrap-switch-primary" style="width: 50px;">ON</span>
-                                                                <span class="bootstrap-switch-label" style="width: 30px;">&nbsp;</span>
-                                                                <span class="bootstrap-switch-handle-off bootstrap-switch-default" style="width: 50px;">OFF</span>
-                                                                <input type="checkbox" checked="" name="checkbox" class="bootstrap-switch" data-on-label="ON" data-off-label="OFF" >
-                                                            </div>
-                                                        </div>
+                                                        {{list.ACTIVE_YN}}
+                                                        <input type="checkbox" name="checkbox" class="bootstrap-switch" data-on-label="ON" data-off-label="OFF"  >
+
                                                     </td>
                                                     <td class="text-center" v-on:click="deleteUser(list)">
                                                         <i class="tim-icons icon-simple-remove"></i>

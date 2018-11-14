@@ -2,7 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="63b4adb0-68e1-4794-ba64-0ba906bed962" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/../vue-front/webpack.config.js" beforeDir="false" afterPath="$PROJECT_DIR$/../vue-front/webpack.config.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-front/.babelrc" beforeDir="false" afterPath="$PROJECT_DIR$/../vue-front/.babelrc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../vue-front/src/views/settings/Users.vue" beforeDir="false" afterPath="$PROJECT_DIR$/../vue-front/src/views/settings/Users.vue" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
