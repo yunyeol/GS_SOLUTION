@@ -42,4 +42,9 @@
         DELETE FROM GS_MBR WHERE LOGIN_ID = '%s'
     </deleteUsers>
 
+    <!-- update Query -->
+    <updateActiveFlag>
+        UPDATE GS_MBR SET ACTIVE_YN = '%s' WHERE LOGIN_ID = '%s'
+    </updateActiveFlag>
+
 </query>

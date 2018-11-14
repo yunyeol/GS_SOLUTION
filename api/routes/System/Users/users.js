@@ -82,5 +82,28 @@ router.delete('/users', async function(req, res, next){
     res.status(HttpStatus.OK).json(msg);
 });
 
+router.put('/users/active', async function(req, res, next) {
+    const params = req.body;
+
+    const utilFact = utilFactory(['dbWrap']);
+    let sqlQuery = queryResult.updateActiveFlag;
+
+    console.log(params.activeFlag);
+    console.log(params.loginId);
+
+    sqlQuery = util.format( sqlQuery , params.activeFlag, params.loginId );
+
+    const result = await utilFact.dbWrap.query(sqlQuery);
+    console.log(result);
+
+    var msg;
+    if(result.affectedRows > 0){
+        msg = "success";
+    }else{
+        msg = "fail";
+    }
+
+    res.status(HttpStatus.OK).json(msg);
+});
 
 module.exports = router;

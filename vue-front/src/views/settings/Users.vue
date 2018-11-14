@@ -75,12 +75,14 @@
                                                     <td class="text-center">{{list.GRP_NAME}}</td>
                                                     <td class="text-center">{{list.AUTH_NAME}}</td>
                                                     <td class="text-center">
-                                                        <div class="bootstrap-switch bootstrap-switch-wrapper bootstrap-switch-off bootstrap-switch-animate" style="width: 68px;">
-                                                            <div class="bootstrap-switch-container" style="width: 118px; margin-left: -50px;">
+                                                        <div class=" bootstrap-switch bootstrap-switch-wrapper bootstrap-switch-animate"
+                                                             :class="{'bootstrap-switch-off': list.ACTIVE_YN != 'Y', 'bootstrap-switch-on' : list.ACTIVE_YN == 'Y'}"
+                                                             style="width: 68px;" v-on:click="toggleBtn(list)">
+                                                            <div class="bootstrap-switch-container" style="width: 118px; margin-left: 0px;">
                                                                 <span class="bootstrap-switch-handle-on bootstrap-switch-primary" style="width: 50px;">ON</span>
                                                                 <span class="bootstrap-switch-label" style="width: 30px;">&nbsp;</span>
                                                                 <span class="bootstrap-switch-handle-off bootstrap-switch-default" style="width: 50px;">OFF</span>
-                                                                <input type="checkbox" name="checkbox" class="bootstrap-switch" data-on-label="ON" data-off-label="OFF" v-on:click="toggleBtn">
+                                                                <input type="checkbox" checked="" name="checkbox" class="bootstrap-switch" data-on-label="ON" data-off-label="OFF" >
                                                             </div>
                                                         </div>
                                                     </td>
@@ -175,17 +177,39 @@
 
                 this.$refs.paging.getTotalpageData();
             },
-            toggleBtn:function () {
-                alert("t");
-
-                console.log($(this));
-                var data_on_label = $(this).data('on-label') || '';
-                var data_off_label = $(this).data('off-label') || '';
-
-                $(this).bootstrapSwitch({
-                    onText: data_on_label,
-                    offText: data_off_label
-                });
+            toggleBtn:function (list) {
+                var self = this;
+                if(list.ACTIVE_YN == 'Y'){
+                    swal({
+                        title: 'Are you sure?',
+                        text: "활성화를 해제하시겠습니까?",
+                        type: 'warning',
+                        showCancelButton: true,
+                        confirmButtonClass: 'btn btn-success',
+                        cancelButtonClass: 'btn btn-danger',
+                        confirmButtonText: '확인',
+                        cancelButtonText:'취소',
+                        buttonsStyling: false
+                    }).then(function() {
+                        self.callUpdataActiveUser(list.LOGIN_ID, 'N');
+                        self.reflesh();
+                    }).catch(swal.noop);
+                }else{
+                    swal({
+                        title: 'Are you sure?',
+                        text: "활성화 하시겠습니까?",
+                        type: 'warning',
+                        showCancelButton: true,
+                        confirmButtonClass: 'btn btn-success',
+                        cancelButtonClass: 'btn btn-danger',
+                        confirmButtonText: '확인',
+                        cancelButtonText:'취소',
+                        buttonsStyling: false
+                    }).then(function() {
+                        self.callUpdataActiveUser(list.LOGIN_ID, 'Y');
+                        self.reflesh();
+                    }).catch(swal.noop);
+                }
             },
             deleteUser: function (list) {
                 var self = this;
@@ -200,6 +224,8 @@
                     buttonsStyling: false
                 }).then(function() {
                     self.callDeleteUser(list);
+                    //페이징 처리 : 어떠한 처리(insert, delete, update)후 다시 데이터를 가져올때 사용하는 메소드
+                    self.reflesh();
 
                     swal({
                         title: 'Deleted!',
@@ -208,7 +234,6 @@
                         confirmButtonClass: "btn btn-success",
                         buttonsStyling: false
                     });
-
                 }).catch(swal.noop);
             },
             callDeleteUser : async function(list){
@@ -221,9 +246,20 @@
                     },
                     params:{"loginId" : list.LOGIN_ID}
                 }).catch (err => console.error(err));
-
-                //페이징 처리 : 어떠한 처리(insert, delete, update)후 다시 데이터를 가져올때 사용하는 메소드
-                this.reflesh();
+            },
+            callUpdataActiveUser : async function(loginId, activeFlag){
+                const rv = await this.$axios({
+                    url: this.$API_URL+'/system/users/active',
+                    method: 'put',
+                    timeout: 3000,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    params:{
+                        "loginId" : loginId,
+                        "activeFlag" : activeFlag
+                    }
+                }).catch (err => console.error(err));
             },
             getStartPage:function(startPage){
                 this.startPage = startPage || [];
