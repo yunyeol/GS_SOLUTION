@@ -31,12 +31,13 @@
                                     <div class="col-sm-12 col-md-6">
                                         <div class="dataTables_length" id="datatable_length">
                                             <label>Show
-                                                <select v-model="option" @change="pageLength" name="datatable_length" aria-controls="datatable" class="custom-select custom-select-sm form-control form-control-sm" >
+                                                <select v-model="option" @change="pageLength" name="datatable_length" aria-controls="datatable"  class="selectpicker " data-style="select-with-transition" title="10" >
                                                     <option :value="10">10</option>
                                                     <option :value="25">25</option>
                                                     <option :value="50">50</option>
                                                     <option :value="-1">All</option>
-                                                </select> entries</label>
+                                                </select> entries
+                                            </label>
                                         </div>
                                     </div>
                                     <div class="col-sm-12 col-md-6">
@@ -53,7 +54,7 @@
                                         <table id="datatable" class="table tablesorter" role="grid" aria-describedby="datatable_info" style="width:100%">
                                             <thead>
                                                 <tr role="row">
-                                                    <th class=" text-center " tabindex="0" aria-controls="datatable" style="width:20%" >로그인ID</th>
+                                                    <th class=" text-center  " tabindex="0" aria-controls="datatable" style="width:20%" >로그인ID</th>
                                                     <th class=" text-center " tabindex="0" aria-controls="datatable" style="width:15%" >이름</th>
                                                     <th class=" text-center " tabindex="0" aria-controls="datatable" style="width:10%">비밀번호</th>
                                                     <th class=" text-center " tabindex="0" aria-controls="datatable" style="width:10%">그룹</th>
@@ -67,7 +68,9 @@
                                                     <td class="text-center">{{list.LOGIN_ID}}</td>
                                                     <td class="text-center">{{list.MBR_NAME}}</td>
                                                     <td class="text-center">
-                                                        <a href="#" class="badge badge-primary">변경</a>
+                                                        <button class="btn btn-primary btn-simple btn-sm" >
+                                                            변경
+                                                        </button>
                                                     </td>
                                                     <td class="text-center">{{list.GRP_NAME}}</td>
                                                     <td class="text-center">{{list.AUTH_NAME}}</td>
@@ -166,7 +169,6 @@
 
                 if(rv && rv['data']) {
                     this.userList = rv['data'];
-                    console.log(this.userList);
                 }
 
                 this.$refs.paging.getTotalpageData();
