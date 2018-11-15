@@ -47,24 +47,25 @@ router.get('/selectSystemCodeTest', async function(req, res, next) {
     const pageMaker = utilFact.PageMaker;
     pageMaker.setPageOrRow(query.currPage);
 
-    let searchParams = ( query.searchParams ) ? JSON.parse(query.searchParams) : undefined;
-
     let sqlQuery = queryResult.selectCode;
     let sqlCntQuery = queryResult.selectCodeCnt;
 
-    if( searchParams && searchParams.keyword ){
+    let params = ( query.params ) ? JSON.parse(query.params) : undefined;
+
+    if( params && params.keyword ){
+        let keyword = params.keyword;
         sqlQuery += queryResult.whereSearch;
         sqlCntQuery += queryResult.whereSearch;
-        sqlQuery = util.format(sqlQuery, searchParams.keyword, searchParams.keyword, searchParams.keyword, searchParams.keyword, searchParams.keyword);
+        sqlQuery = util.format(sqlQuery, keyword, keyword, keyword, keyword, keyword);
+        sqlCntQuery = util.format(sqlCntQuery, keyword, keyword, keyword, keyword, keyword);
     }
+    pageMaker.ROW_GROUP = (params && params.option) ? parseInt(params.option) : pageMaker.ROW_GROUP;
+
     sqlQuery += queryResult.limit;
     sqlQuery = util.format( sqlQuery , pageMaker.startRow,  pageMaker.ROW_GROUP);
 
     const cntRows  = await utilFact.dbWrap.query(sqlCntQuery);
     const rows = await utilFact.dbWrap.query(sqlQuery);
-    console.log(sqlQuery);
-    console.log(pageMaker.startRow);
-    console.log(pageMaker.ROW_GROUP);
 
     const pageObj = pageMaker.getPagingObj(rows, cntRows);
 

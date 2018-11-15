@@ -27,18 +27,18 @@
                                 <div class="col-sm-12 col-md-6">
                                     <div class="dataTables_length" id="datatable_length">
                                         <label>Show
-                                            <select name="datatable_length" aria-controls="datatable" class="custom-select custom-select-sm form-control form-control-sm">
-                                                <option value="10">10</option>
-                                                <option value="25">25</option>
-                                                <option value="50">50</option>
-                                                <option value="-1">All</option>
-                                            </select> entries</label>
+                                            <select v-model="query.params.option" @change="search" name="datatable_length" aria-controls="datatable"  class="selectpicker " data-style="select-with-transition" title="10" >
+                                                <option :value="10">10</option>
+                                                <option :value="25">25</option>
+                                                <option :value="50">50</option>
+                                            </select> entries
+                                        </label>
                                     </div>
                                 </div>
                                 <div class="col-sm-12 col-md-6">
                                     <div class="dataTables_filter">
                                         <label>
-                                            <input id="datatable_filter" type="search" class="form-control form-control-md" placeholder="Search records" aria-controls="datatable" v-model="query.searchParams.keyword" @keyup.enter="search">
+                                            <input id="datatable_filter" type="search" class="form-control form-control-md" placeholder="Search records" aria-controls="datatable" v-model="query.params.keyword" @keyup.enter="search">
                                         </label>
                                     </div>
                                 </div>
@@ -110,8 +110,9 @@
         data: function(){
             return {
                 query:{
-                    searchParams:{
-                        keyword : ''
+                    params:{
+                        keyword : '',
+                        option:''
                     }
                 },
                 settList:[]
@@ -239,12 +240,10 @@
             },
             search(){
                 this.$refs.systemPagenation.search();
-            },
+            }
         },
         mounted: function(){
             this.init();
-            this.getSelectSystemCode();
-
         }
     }
 </script>
