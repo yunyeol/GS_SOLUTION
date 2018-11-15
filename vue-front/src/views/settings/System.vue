@@ -62,8 +62,8 @@
                                                 <th class="text-center" tabindex="0" aria-controls="datatable"  style="width:10%">삭제</th>
                                             </tr>
                                         </thead>
-                                        <tbody >
-                                            <tr v-if="settList && settList.length > 0" v-for="(list, index) in settList"
+                                        <tbody v-if="settList && settList.length > 0">
+                                            <tr v-for="(list, index) in settList"
                                                 v-on:dblclick="modifySystemCode(list, index)" v-bind:key="index" >
                                                 <td class="text-center">{{list.TYPE}}</td>
                                                 <td class="text-center">{{list.GUBUN}}</td>
@@ -72,7 +72,9 @@
                                                 <td class="text-center">{{list.DATA3}}</td>
                                                 <td class="text-center" v-on:click="deleteDeleteSystemCode(list)"><i class="tim-icons icon-simple-remove"></i></td>
                                             </tr>
-                                            <tr v-else>
+                                        </tbody>
+                                        <tbody v-else>
+                                            <tr >
                                                 <td class="text-center" colspan="6">데이터가 존재하지 않습니다.</td>
                                             </tr>
                                         </tbody>
@@ -120,59 +122,41 @@
         },
         methods:{
             init : function () {
-                $(document).on("click.select", "#updateCancel", function () {
-                    var index = $(this).attr('data-seq');
-                    $("tbody tr:eq("+index+")").show();
-                    $("#addTr").remove();
+                // $(document).on("click.select", "#updateCancel", function () {
+                //     var index = $(this).attr('data-seq');
+                //     $("tbody tr:eq("+index+")").show();
+                //     $("#addTr").remove();
 
-                    doubleCheck = false;
-                });
+                //     doubleCheck = false;
+                // });
 
-                $(document).on("click.update", "#callUpdate", async function () {
-                    var index = $(this).attr('data-seq');
+                // $(document).on("click.update", "#callUpdate", async function () {
+                //     var index = $(this).attr('data-seq');
 
-                    var data = {
-                        "type" : $('#type').val(),
-                        "gubun" : $('#gubun').val(),
-                        "data1" : $('#data1').val(),
-                        "data2" : $('#data2').val(),
-                        "data3" : $('#data3').val()
-                    };
+                //     var data = {
+                //         "type" : $('#type').val(),
+                //         "gubun" : $('#gubun').val(),
+                //         "data1" : $('#data1').val(),
+                //         "data2" : $('#data2').val(),
+                //         "data3" : $('#data3').val()
+                //     };
 
-                    $.ajax({
-                        method: "put",
-                        url: "http://127.0.0.1:10009/api/system/code",
-                        data: JSON.stringify(data),
-                        contentType: "application/json; charset=utf-8",
-                        dataType: "json",
-                        success: function(data) {
-                            // $("#addTr").remove();
-                            // $("tbody tr:eq("+index+")").show();
-                            location.reload();
-                        },
-                        error: function(jqXHR, textStatus, errorThrown) {
+                //     $.ajax({
+                //         method: "put",
+                //         url: "http://127.0.0.1:10009/api/system/code",
+                //         data: JSON.stringify(data),
+                //         contentType: "application/json; charset=utf-8",
+                //         dataType: "json",
+                //         success: function(data) {
+                //             // $("#addTr").remove();
+                //             // $("tbody tr:eq("+index+")").show();
+                //             location.reload();
+                //         },
+                //         error: function(jqXHR, textStatus, errorThrown) {
 
-                        }
-                    });
-                });
-            },
-            getSelectSystemCode: async function(){
-                const rv = await this.$axios({
-                    url: this.$API_URL+'/system/code',
-                    method: 'get',
-                    timeout: 3000,
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    params:{
-
-                    }
-                }).catch (err => console.error(err));
-
-                if(rv && rv['data']) {
-                    this.settList = rv['data'];
-                }
-
+                //         }
+                //     });
+                // });
             },
             deleteDeleteSystemCode: function(list){
                 var self = this;

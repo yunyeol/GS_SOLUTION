@@ -6,19 +6,19 @@
         <div class="col-sm-12 col-md-7">
             <div class="dataTables_paginate paging_full_numbers" id="datatable_paginate">
                 <ul class="pagination" v-if="pageList && pageList.length > 0">
-                    <li class="paginate_button page-item first" :class="{'disabled': this.query.currPage == 1}" id="datatable_first" @click="pageMove('first')" >
+                    <li class="paginate_button page-item first" :class="{'disabled': this.query.currPage == 1}" id="datatable_first" @click="pageMove($event, 'first')" >
                         <a href="#" aria-controls="datatable" class="page-link">First</a>
                     </li>
-                    <li class="paginate_button page-item previous" :class="{'disabled': this.query.currPage == 1}" id="datatable_previous" @click="pageMove('prev')" >
+                    <li class="paginate_button page-item previous" :class="{'disabled': this.query.currPage == 1}" id="datatable_previous" @click="pageMove($event, 'prev')" >
                         <a href="#" aria-controls="datatable" class="page-link">Previous</a>
                     </li>
-                    <li class="paginate_button page-item" :class="{'active': query.currPage == item.startPage}" v-for="(item, index) in pageList" v-bind:key="index" @click="pageMove('',++index)">
+                    <li class="paginate_button page-item" :class="{'active': query.currPage == item.startPage}" v-for="(item, index) in pageList" v-bind:key="index" @click="pageMove($event, '',++index)">
                         <a href="#" aria-controls="datatable" class="page-link">{{item.startPage}}</a>
                     </li>
-                    <li class="paginate_button page-item next" :class="{'disabled': this.query.currPage == totalPage}" id="datatable_next" @click="pageMove('next')">
+                    <li class="paginate_button page-item next" :class="{'disabled': this.query.currPage == totalPage}" id="datatable_next" @click="pageMove($event, 'next')">
                         <a href="#" aria-controls="datatable" class="page-link">Next</a>
                     </li>
-                    <li class="paginate_button page-item last" :class="{'disabled': this.query.currPage == totalPage}" id="datatable_last" @click="pageMove('last')" >
+                    <li class="paginate_button page-item last" :class="{'disabled': this.query.currPage == totalPage}" id="datatable_last" @click="pageMove($event, 'last')" >
                         <a href="#" aria-controls="datatable" class="page-link">Last</a>
                     </li>
                 </ul>
@@ -48,7 +48,10 @@ export default {
 		init(){
 			this.getAxios();
         },
-        pageMove(type, id){
+        pageMove(e, type, id){
+
+            if ( $(e.currentTarget).hasClass('disabled') ) return;
+
             if(type === 'next'){
                 this.query.currPage++;
             }else if(type === 'prev'){
