@@ -3,10 +3,13 @@ import BootstrapVue from "bootstrap-vue"
 import App from './App.vue'
 import router from './router.js'
 import axios from 'axios'
+import VModal from 'vue-js-modal'
 
 Vue.use(BootstrapVue);
 
 Vue.config.productionTip = false;
+
+Vue.use(VModal, { dynamic: true })
 
 Vue.prototype.$axios = axios;
 //Vue.prototype.$router = router;

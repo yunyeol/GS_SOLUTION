@@ -16,8 +16,9 @@
                                 Settings
                             </h4>
                             <div class="col-sm-1">
-                                <button style="float:right;" class="btn btn-primary btn-sm tim-icons icon-simple-add"
-                                        data-toggle="modal" data-target="#settingsModal"></button>
+                                <!-- <button style="float:right;" class="btn btn-primary btn-sm tim-icons icon-simple-add"
+                                        data-toggle="modal" data-target="#settingsModal"></button> -->
+                                <button style="float:right;" class="btn btn-primary btn-sm tim-icons icon-simple-add" @click="popupTest"></button>
                             </div>
                         </div>
                     </div>
@@ -87,17 +88,20 @@
                 </div>
             </div>
         </div>
-
+        <dynamic-modal></dynamic-modal>
         <SettingsModal></SettingsModal>
     </div>
 </template>
 
 <script>
     // @ is an alias to /src
+    import Vue from 'vue'
     import Left from "../../components/Left.vue";
     import Top from "../../components/Top.vue";
     import SettingsModal from "../../components/settings/system/Modal.vue";
     import Pagenation from '../../components/Pagination.vue';
+    import DynamicModal from "../../components/DynamicModal.vue";
+    Vue.component('dynamic-modal',DynamicModal);
 
     var doubleCheck = false;
 
@@ -219,6 +223,13 @@
                 var obj = $("#datatable > tbody > tr");
                 obj.eq(index).after(changeTr);
             },
+            popupTest(){
+               console.log('동적 모달 팝업 파라미터 넘기기용');
+                this.$modal.show('dynamic-modal',{
+                    openType : 'qwe',
+                    todoList : this.todos
+                });
+            },
             paginated(data){
                 this.settList = data || [];
             },
@@ -228,6 +239,7 @@
         },
         mounted: function(){
             this.init();
+            $('#myModal').modal('show');
         }
     }
 </script>
