@@ -1200,25 +1200,25 @@ demo = {
       }).catch(swal.noop);
     } else if (type == 'input-field') {
       swal({
-        title: 'Input something',
-        html: '<div class="form-group">' +
-          '<input id="input-field" type="text" class="form-control" />' +
-          '</div>',
-        showCancelButton: true,
-        confirmButtonClass: 'btn btn-success',
-        cancelButtonClass: 'btn btn-danger',
-        buttonsStyling: false
-      }).then(function(result) {
-        swal({
-          type: 'success',
-          html: 'You entered: <strong>' +
-            $('#input-field').val() +
-            '</strong>',
-          confirmButtonClass: 'btn btn-success',
-          buttonsStyling: false
+            title: 'Input something',
+            html: '<div class="form-group">' +
+                '<input id="input-field" type="text" class="form-control" />' +
+                '</div>',
+            showCancelButton: true,
+            confirmButtonClass: 'btn btn-success',
+            cancelButtonClass: 'btn btn-danger',
+            buttonsStyling: false
+        }).then(function(result) {
+            swal({
+                type: 'success',
+                html: 'You entered: <strong>' +
+                    $('#input-field').val() +
+                    '</strong>',
+                confirmButtonClass: 'btn btn-success',
+                buttonsStyling: false
 
+            }).catch(swal.noop);
         }).catch(swal.noop);
-      }).catch(swal.noop);
     }
   },
 

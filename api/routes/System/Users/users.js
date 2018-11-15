@@ -33,6 +33,8 @@ router.get('/users', async function(req, res, next) {
         sqlQuery = util.format( sqlQuery , params.keyWord,  params.keyWord, params.keyWord, params.keyWord);
     }
 
+    sqlQuery += queryResult.orderByLoginId
+
     if(params && params.rowGroup > -1){
         sqlQuery += queryResult.limit;
         sqlQuery = util.format( sqlQuery , params.startPage,  params.rowGroup);
@@ -62,6 +64,17 @@ router.get('/users/page', async function(req, res, next) {
     res.status(HttpStatus.OK).json(obj);
 });
 
+router.get('/users/auth', async function(req, res, next) {
+    const params = req.query;
+    const utilFact = utilFactory(['dbWrap']);
+    let sqlQuery = queryResult.selectAuth;
+
+    const rows = await utilFact.dbWrap.query(sqlQuery);
+    console.log(rows);
+
+    res.status(HttpStatus.OK).json(rows);
+});
+
 router.delete('/users', async function(req, res, next){
     const params = req.query;
     const utilFact = utilFactory(['dbWrap']);
@@ -88,10 +101,31 @@ router.put('/users/active', async function(req, res, next) {
     const utilFact = utilFactory(['dbWrap']);
     let sqlQuery = queryResult.updateActiveFlag;
 
-    console.log(params.activeFlag);
+    sqlQuery = util.format( sqlQuery , params.activeFlag, params.loginId );
+
+    const result = await utilFact.dbWrap.query(sqlQuery);
+    console.log(result);
+
+    var msg;
+    if(result.affectedRows > 0){
+        msg = "success";
+    }else{
+        msg = "fail";
+    }
+
+    res.status(HttpStatus.OK).json(msg);
+});
+
+router.put('/users/auth', async function(req, res, next) {
+    const params = req.body;
+
+    const utilFact = utilFactory(['dbWrap']);
+    let sqlQuery = queryResult.updateAuth;
+
+    console.log(params.mbrAuthId);
     console.log(params.loginId);
 
-    sqlQuery = util.format( sqlQuery , params.activeFlag, params.loginId );
+    sqlQuery = util.format( sqlQuery , params.mbrAuthId, params.loginId );
 
     const result = await utilFact.dbWrap.query(sqlQuery);
     console.log(result);

@@ -72,14 +72,22 @@
                                                             변경
                                                         </button>
                                                     </td>
-                                                    <td class="text-center">{{list.GRP_NAME}}</td>
-                                                    <td class="text-center">{{list.AUTH_NAME}}</td>
                                                     <td class="text-center">
-                                                        {{list.ACTIVE_YN}}
-                                                        <input type="checkbox" name="checkbox" class="bootstrap-switch" data-on-label="ON" data-off-label="OFF"  >
-
+                                                        <button class="btn btn-primary btn-simple btn-sm" data-toggle="modal" data-target="#grpModal">
+                                                            {{list.GRP_NAME}}
+                                                        </button>
                                                     </td>
-                                                    <td class="text-center" v-on:click="deleteUser(list)">
+                                                    <td class="text-center">
+                                                        <button class="btn btn-primary btn-simple btn-sm" data-toggle="modal" data-target="#authModal" @click="setUpdateAuthParams(list)">
+                                                            {{list.AUTH_NAME}}
+                                                        </button>
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <button class="btn btn-primary btn-simple btn-sm" @click="updateActiveBtn(list)">
+                                                            {{list.ACTIVE_YN}}
+                                                        </button>
+                                                    </td>
+                                                    <td class="text-center" v-on:click="deleteUserBtn(list)">
                                                         <i class="tim-icons icon-simple-remove"></i>
                                                     </td>
                                                 </tr>
@@ -112,6 +120,15 @@
             </div>
         </div>
 
+        <AuthModal :checked-auth-id="checkedAuthId"
+                   :checked-auth-name="checkedAuthName"
+                   :login-id="loginId"
+                    @refresh="refresh">
+        </AuthModal>
+
+        <GrpModal>
+
+        </GrpModal>
     </div>
 </template>
 
@@ -119,16 +136,20 @@
     import Left from "../../components/Left.vue";
     import Top from "../../components/Top.vue";
     import Paging from "../../components/Paging.vue";
+    import AuthModal from "../../components/settings/users/AuthModal.vue";
+    import GrpModal from "../../components/settings/users/GrpModal.vue";
 
     //페이징 처리 : 이페이지에 초기 들어왔을때 페이지 세팅값
     var CURRENT_PAGE = 0;
 
     export default {
-        name: "User",
+        name: "Users",
         components: {
             Left,
             Top,
-            Paging //페이징 처리 : 페이징 뷰 추가
+            Paging, //페이징 처리 : 페이징 뷰 추가
+            AuthModal,
+            GrpModal
         },
         data : function () {
             return {
@@ -139,7 +160,11 @@
                 //페이징 처리 : 페이징 뷰에 전달할 데이터 선언
                 rowGroup : 10,
                 listMethodName : 'getUsers',
-                startPage:0
+                startPage:0,
+
+                checkedAuthId : '',
+                checkedAuthName : '',
+                loginId : ''
             }
         },
         methods:{
@@ -170,41 +195,15 @@
 
                 this.$refs.paging.getTotalpageData();
             },
-            toggleBtn:function (list) {
+            updateActiveBtn:function (list) {
                 var self = this;
                 if(list.ACTIVE_YN == 'Y'){
-                    swal({
-                        title: 'Are you sure?',
-                        text: "활성화를 해제하시겠습니까?",
-                        type: 'warning',
-                        showCancelButton: true,
-                        confirmButtonClass: 'btn btn-success',
-                        cancelButtonClass: 'btn btn-danger',
-                        confirmButtonText: '확인',
-                        cancelButtonText:'취소',
-                        buttonsStyling: false
-                    }).then(function() {
-                        self.callUpdataActiveUser(list.LOGIN_ID, 'N');
-                        self.reflesh();
-                    }).catch(swal.noop);
+                    self.callUpdataActiveUser(list.LOGIN_ID, 'N');
                 }else{
-                    swal({
-                        title: 'Are you sure?',
-                        text: "활성화 하시겠습니까?",
-                        type: 'warning',
-                        showCancelButton: true,
-                        confirmButtonClass: 'btn btn-success',
-                        cancelButtonClass: 'btn btn-danger',
-                        confirmButtonText: '확인',
-                        cancelButtonText:'취소',
-                        buttonsStyling: false
-                    }).then(function() {
-                        self.callUpdataActiveUser(list.LOGIN_ID, 'Y');
-                        self.reflesh();
-                    }).catch(swal.noop);
+                    self.callUpdataActiveUser(list.LOGIN_ID, 'Y');
                 }
             },
-            deleteUser: function (list) {
+            deleteUserBtn: function (list) {
                 var self = this;
                 swal({
                     title: 'Are you sure?',
@@ -217,8 +216,6 @@
                     buttonsStyling: false
                 }).then(function() {
                     self.callDeleteUser(list);
-                    //페이징 처리 : 어떠한 처리(insert, delete, update)후 다시 데이터를 가져올때 사용하는 메소드
-                    self.reflesh();
 
                     swal({
                         title: 'Deleted!',
@@ -230,15 +227,7 @@
                 }).catch(swal.noop);
             },
             callDeleteUser : async function(list){
-                const rv = await this.$axios({
-                    url: this.$API_URL+'/system/users',
-                    method: 'delete',
-                    timeout: 3000,
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    params:{"loginId" : list.LOGIN_ID}
-                }).catch (err => console.error(err));
+
             },
             callUpdataActiveUser : async function(loginId, activeFlag){
                 const rv = await this.$axios({
@@ -248,19 +237,26 @@
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    params:{
+                    data:{
                         "loginId" : loginId,
                         "activeFlag" : activeFlag
                     }
                 }).catch (err => console.error(err));
+
+                this.refresh();
             },
             getStartPage:function(startPage){
                 this.startPage = startPage || [];
             },
             //페이징 처리 : 어떠한 처리(insert, delete, update)후 다시 데이터를 가져올때 사용하는 메소드
-            reflesh() {
+            refresh() {
                 this.getUsers(this.option, this.startPage);
                 this.$refs.paging.getTotalpageData();
+            },
+            setUpdateAuthParams(list){
+                this.checkedAuthId = list.MBR_AUTH_ID;
+                this.loginId = list.LOGIN_ID;
+                this.checkedAuthName = list.AUTH_NAME;
             }
         },
         mounted:function () {
