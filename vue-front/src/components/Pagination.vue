@@ -87,15 +87,10 @@ export default {
                 params: this.query || searchQuery
             }).catch (err => console.error(err));
 
-            console.log(rv['data'].rows);
-
             if(rv && rv['data'] && rv['data'].rows.length > 0) {
-                console.log('11');
-                console.log(rv['data']);
                 this.startPage = rv['data']['startPage'];
                 this.endPage = rv['data']['endPage'];
                 this.totalCnt = parseInt(rv['data'].rows[0].TOTAL_CNT);
-                console.log(this.endPage);
                 this.setTotalPage();
                 this.setPageList([]);
 
@@ -122,7 +117,6 @@ export default {
             }
 
             this.pageList = pageList || [];
-            console.log(this.pageList);
         }
 	},
 	mounted : function(){
