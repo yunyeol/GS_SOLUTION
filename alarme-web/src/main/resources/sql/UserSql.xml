@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.project.alarme.mapper.UserMapper">
+    <select id="getMemberList" resultType="User">
+        <![CDATA[SELECT
+            GM.LOGIN_ID,
+            GM.MBR_NAME,
+            GM.ACTIVE_YN,
+            GG.GRP_NAME,
+            GG.MBR_GRP_ID,
+            GA.AUTH_NAME,
+            GA.MBR_AUTH_ID,
+            GM.REG_DATE
+        FROM GS_MBR GS_MBR
+        INNER JOIN GS_GRP GG ON (GM.MBR_GRP_ID = GG.MBR_GRP_ID)
+        INNER JOIN GS_AUTH GA ON (GM.MBR_AUTH_ID = GA.MBR_AUTH_ID)
+        WHERE 1=1
+	]]>
+    <if test="loginId != null">
+        AND GM.LOGIN_ID = #{loginId}
+    </if>
+        <![CDATA[
+		AND GM.ACTIVE_YN = 'Y'
+	]]>
+    </select>
+
+</mapper>
+
