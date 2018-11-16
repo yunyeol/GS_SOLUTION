@@ -22,6 +22,38 @@
                             </div>
                         </div>
                     </div>
+                    <div class="card-body">
+                        <div id="datatable_wrapper" class="dataTables_wrapper dt-bootstrap4">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <table id="datatable"  class="table tablesorter" role="grid" aria-describedby="datatable_info" style="width:100%">
+                                        <thead>
+                                            <tr role="row">
+                                                 <th class="sorting text-center header" tabindex="0" aria-controls="datatable" style="width:7%" >타입</th>
+                                                <th class="sorting text-center header" tabindex="0" aria-controls="datatable" style="width:7%">구분</th>
+                                                <th class="sorting text-center header" tabindex="0" aria-controls="datatable" style="width:20%">데이터1</th>
+                                                <th class="sorting text-center header" tabindex="0" aria-controls="datatable" style="width:20%">데이터2</th>
+                                                <th class="sorting text-center header" tabindex="0" aria-controls="datatable" style="width:20%">데이터3</th>
+                                                <th class="text-center" tabindex="0" aria-controls="datatable"  style="width:10%">삭제</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {{#codeList}}
+                                                <tr role="row">
+                                                    <td class="text-center">{{type}}</td>
+                                                    <td class="text-center">{{gubun}}</td>
+                                                    <td class="text-center">{{data1}}</td>
+                                                    <td class="text-center">{{data2}}</td>
+                                                    <td class="text-center">{{data3}}</td>
+                                                    <td class="text-center"><i class="tim-icons icon-simple-remove"></i></td>
+                                                </tr>
+                                            {{/codeList}}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

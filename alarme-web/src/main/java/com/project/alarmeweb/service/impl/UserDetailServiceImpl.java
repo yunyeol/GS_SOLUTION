@@ -28,22 +28,22 @@ public class UserDetailServiceImpl implements UserDetailsService {
 	@Override
 	public UserDetails loadUserByUsername(String loginId) throws UsernameNotFoundException {
 		// TODO Auto-generated method stubUserServiceImpl.java
-		User getMemberList = userService.getMemberList(loginId);
+		List<User> getMemberList = userService.getMemberList(loginId);
 
-		logger.info("### {}", getMemberList );
+		logger.info("### {}", getMemberList.get(0) );
 
 		if(getMemberList == null){
 			throw new UsernameNotFoundException("no user");
 		}
 
 		UserSession userSession = new UserSession(
-                                        getMemberList.getLoginId(),
-                                        getMemberList.getPasswd(),
+                                        getMemberList.get(0).getLoginId(),
+                                        getMemberList.get(0).getPasswd(),
 										true,
 										true,
 										true,
 										true,
-										getAuthorities(getMemberList.getMbrAuthId())
+										getAuthorities(getMemberList.get(0).getMbrAuthId())
 									);
 
 		return userSession;

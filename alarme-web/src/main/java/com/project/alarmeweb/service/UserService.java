@@ -3,8 +3,8 @@ package com.project.alarmeweb.service;
 
 import com.project.alarmeweb.dto.User;
 
-public interface UserService {
-	
-	public User getMemberList(String loginId);
+import java.util.List;
 
+public interface UserService {
+	List<User> getMemberList(String loginId);
 }

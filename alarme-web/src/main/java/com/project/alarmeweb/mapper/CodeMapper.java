@@ -1,13 +1,13 @@
 package com.project.alarmeweb.mapper;
 
 
-import com.project.alarmeweb.dto.User;
+import com.project.alarmeweb.dto.Code;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
 @Mapper
-public interface UserMapper {
-    List<User> getMemberList(@Param("loginId") String loginId);
+public interface CodeMapper {
+    List<Code> getSystemCodeList();
 }
