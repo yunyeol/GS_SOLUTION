@@ -21,5 +21,9 @@
     </if>
     </select>
 
+    <delete id="deleteSystemCode">
+        DELETE FROM GS_BASE_CODE WHERE TYPE = #{code.type} AND GUBUN = #{code.gubun}
+    </delete>
+
 </mapper>
 

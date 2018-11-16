@@ -16,4 +16,9 @@ public class CodeServiceImpl implements CodeService {
     public List<Code> getSystemCodeList(String orderParam) {
         return codeMapper.getSystemCodeList(orderParam);
     }
+
+    @Override
+    public int deleteSystemCode(Code code) {
+        return codeMapper.deleteSystemCode(code);
+    }
 }

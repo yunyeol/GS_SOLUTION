@@ -6,4 +6,5 @@ import java.util.List;
 
 public interface CodeService {
     List<Code> getSystemCodeList(String orderParam);
+    int deleteSystemCode(Code code);
 }
