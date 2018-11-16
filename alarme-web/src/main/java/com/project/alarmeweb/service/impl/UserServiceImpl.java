@@ -15,7 +15,7 @@ public class UserServiceImpl implements UserService {
     private UserMapper userMapper;
 
     @Override
-    public List<User> getMemberList(String loginId) {
-        return userMapper.getMemberList(loginId);
+    public List<User> getMemberList(String loginId, String orderParam) {
+        return userMapper.getMemberList(loginId, orderParam);
     }
 }

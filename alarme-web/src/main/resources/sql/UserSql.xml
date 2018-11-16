@@ -22,10 +22,13 @@
 	]]>
     <if test="loginId != null">
         AND GM.LOGIN_ID = #{loginId}
+        AND GM.ACTIVE_YN = 'Y'
     </if>
-        <![CDATA[
-		AND GM.ACTIVE_YN = 'Y'
-	]]>
+
+    <if test="orderParam != null">
+        ORDER BY ${orderParam}
+    </if>
+
     </select>
 
 </mapper>

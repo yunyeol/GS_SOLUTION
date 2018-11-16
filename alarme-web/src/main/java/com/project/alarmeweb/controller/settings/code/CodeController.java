@@ -23,7 +23,7 @@ public class CodeController extends BaseController {
 
 	@GetMapping(value={"/settings/code"}, produces="text/html; charset=UTF-8")
 	public String code(Locale locale, Model model){
-        List<Code> codeList = codeService.getSystemCodeList();
+        List<Code> codeList = codeService.getSystemCodeList("TYPE ASC");
 
 	    model.addAttribute("codeList", codeList);
 		return "settings/code/code";

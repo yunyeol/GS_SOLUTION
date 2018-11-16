@@ -13,7 +13,7 @@ public class CodeServiceImpl implements CodeService {
     @Autowired private CodeMapper codeMapper;
 
     @Override
-    public List<Code> getSystemCodeList() {
-        return codeMapper.getSystemCodeList();
+    public List<Code> getSystemCodeList(String orderParam) {
+        return codeMapper.getSystemCodeList(orderParam);
     }
 }

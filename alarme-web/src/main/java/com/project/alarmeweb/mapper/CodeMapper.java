@@ -9,5 +9,5 @@ import java.util.List;
 
 @Mapper
 public interface CodeMapper {
-    List<Code> getSystemCodeList();
+    List<Code> getSystemCodeList(@Param("orderParam") String orderParam);
 }

@@ -9,5 +9,6 @@ import java.util.List;
 
 @Mapper
 public interface UserMapper {
-    List<User> getMemberList(@Param("loginId") String loginId);
+    List<User> getMemberList(@Param("loginId") String loginId,
+                             @Param("orderParam") String orderParam);
 }

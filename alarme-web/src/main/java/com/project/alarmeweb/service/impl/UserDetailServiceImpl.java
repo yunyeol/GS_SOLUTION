@@ -28,7 +28,7 @@ public class UserDetailServiceImpl implements UserDetailsService {
 	@Override
 	public UserDetails loadUserByUsername(String loginId) throws UsernameNotFoundException {
 		// TODO Auto-generated method stubUserServiceImpl.java
-		List<User> getMemberList = userService.getMemberList(loginId);
+		List<User> getMemberList = userService.getMemberList(loginId, null);
 
 		logger.info("### {}", getMemberList.get(0) );
 
