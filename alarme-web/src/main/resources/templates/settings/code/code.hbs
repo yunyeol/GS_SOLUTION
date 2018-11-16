@@ -5,8 +5,28 @@
 </head>
 
 <body class="sidebar-mini">
-    {{> left }}
+    <div class="wrapper">
+        {{> left }}
+        <div class="main-panel ps ps--active-y">
+            {{> top }}
 
-    
+            <div class="content">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="row">
+                            <h4 class="col-sm-11">
+                                Settings
+                            </h4>
+                            <div class="col-sm-1">
+                                <button style="float:right;" class="btn btn-primary btn-sm tim-icons icon-simple-add"></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{> footer }}
 </body>
 </html>
