@@ -15,35 +15,35 @@
             </a>
         </div>
         <ul class="nav">
-            <li>
-                <a data-toggle="collapse" href="#mailMenu">
+            <li class="{{mailActive}}">
+                <a data-toggle="collapse" href="#mailMenu" aria-expanded="{{menuExpand}}">
                     <i class="tim-icons icon-email-85"></i>
                     <p>
                         Mail
                         <b class="caret"></b>
                     </p>
                 </a>
-                <div class="collapse" id="mailMenu">
+                <div class="collapse {{mailMenuShow}}" id="mailMenu">
                     <ul class="nav">
-                        <li>
+                        <li class="{{mailDashboardMenuActive}}">
                             <a href="/mail/dashboard">
                                 <span class="sidebar-mini-icon">D</span>
                                 <span class="sidebar-normal"> Dashboard </span>
                             </a>
                         </li>
-                        <li>
+                        <li class="{{mailReceiverMenuActive}}">
                             <a href="/mail/receiver">
                                 <span class="sidebar-mini-icon">R</span>
                                 <span class="sidebar-normal"> Receiver </span>
                             </a>
                         </li>
-                        <li>
-                            <a href="/mail/compaign">
+                        <li class="{{mailCampaignMenuActive}}">
+                            <a href="/mail/campaign">
                                 <span class="sidebar-mini-icon">C</span>
                                 <span class="sidebar-normal"> Campaign </span>
                             </a>
                         </li>
-                        <li>
+                        <li class="{{mailRealtimeMenuActive}}">
                             <a href="/mail/realtime">
                                 <span class="sidebar-mini-icon">R</span>
                                 <span class="sidebar-normal"> Realtime </span>
@@ -52,23 +52,23 @@
                     </ul>
                 </div>
             </li>
-            <li>
-                <a data-toggle="collapse" href="#settingsMenu">
+            <li class="{{codeActive}}">
+                <a data-toggle="collapse" href="#settingsMenu" aria-expanded="{{codeExpand}}">
                     <i class="tim-icons icon-settings-gear-63"></i>
                     <p>
                         Settings
                         <b class="caret"></b>
                     </p>
                 </a>
-                <div class="collapse" id="settingsMenu">
+                <div class="collapse {{codeMenuShow}}" id="settingsMenu">
                     <ul class="nav">
-                        <li>
+                        <li class="{{codeMenuActive}}">
                             <a href="/settings/code">
                                 <span class="sidebar-mini-icon">C</span>
                                 <span class="sidebar-normal"> Code </span>
                             </a>
                         </li>
-                        <li>
+                        <li class="{{userMenuActive}}">
                             <a href="/settings/users">
                                 <span class="sidebar-mini-icon">U</span>
                                 <span class="sidebar-normal"> Users </span>
