@@ -4,6 +4,7 @@ package com.project.alarmeweb.controller.settings.code;
 import com.project.alarmeweb.controller.BaseController;
 import com.project.alarmeweb.dto.Code;
 import com.project.alarmeweb.service.CodeService;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -19,10 +20,22 @@ public class CodeController extends BaseController {
 
 	@GetMapping(value={"/settings/code"}, produces="text/html; charset=UTF-8")
     public String code(Locale locale, Model model){
+//        List<Code> codeList = codeService.getSystemCodeList("TYPE ASC");
+//
+//        model.addAttribute("codeList", codeList);
+        return "settings/code/code";
+    }
+
+    @GetMapping(value={"/settings/code/ajax"}, produces="text/html; charset=UTF-8")
+    @ResponseBody
+    public String codeAjax(Locale locale, Model model){
         List<Code> codeList = codeService.getSystemCodeList("TYPE ASC");
 
-        model.addAttribute("codeList", codeList);
-        return "settings/code/code";
+        JSONObject result = new JSONObject();
+        result.put("data", codeList);
+
+        logger.info(result.toString());
+        return result.toString();
     }
 
 	@DeleteMapping(value={"/settings/code"})

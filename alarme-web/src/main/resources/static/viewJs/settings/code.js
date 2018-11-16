@@ -4,9 +4,12 @@
         $('#codeListtable').DataTable({
             destroy: true,
             ajax: {
-                url:'/system/code',
+                url:'http://localhost:8080/settings/code/ajax',
                 type:'GET',
-                dataSrc:""
+                dataSrc : function (json) {
+                    console.log(json);
+                    return json.data;
+                }
             },
             "pagingType": "full_numbers",
             "lengthMenu": [
