@@ -20,20 +20,20 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableTransactionManagement
 @MapperScan(basePackages={"com.project.alarmeweb.mapper"})
 public class DbConfig {
-	
+
 	@Bean(destroyMethod = "close")
 	@ConfigurationProperties("spring.datasource")
 	public HikariDataSource dataSource(){
 		return DataSourceBuilder.create().type(HikariDataSource.class).build();
 	}
-	
+
 	@Bean
 	public PlatformTransactionManager transactionManager() {
         DataSourceTransactionManager transactionManager = new DataSourceTransactionManager(dataSource());
         transactionManager.setGlobalRollbackOnParticipationFailure(false);
         return transactionManager;
     }
-	
+
 	@Bean
 	public SqlSessionFactory sqlSessionFactory() throws Exception {
         SqlSessionFactoryBean sessionFactory = new SqlSessionFactoryBean();
@@ -42,5 +42,5 @@ public class DbConfig {
         sessionFactory.setMapperLocations(new PathMatchingResourcePatternResolver().getResources("classpath*:/sql/**/*.xml"));
         return sessionFactory.getObject();
     }
-	
+
 }

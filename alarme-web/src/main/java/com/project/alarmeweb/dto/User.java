@@ -9,10 +9,12 @@ public class User {
     private String loginId;
     private String passwd;
     private int mbrGrpId;
+    private String mbrGrpName;
     private int mbrAuthId;
+    private String mbrAuthName;
     private String mbrName;
     private String activeYn;
     private String regDate;
     private String uptDate;
-	
+
 }
