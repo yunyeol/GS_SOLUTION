@@ -16,6 +16,9 @@
         FROM GS_BASE_CODE
         WHERE 1=1
 	]]>
+    <if test="code != null">
+        AND TYPE = #{code.type} AND GUBUN = #{code.gubun}
+    </if>
     <if test="orderParam != null">
         ORDER BY ${orderParam}
     </if>
@@ -25,5 +28,9 @@
         DELETE FROM GS_BASE_CODE WHERE TYPE = #{code.type} AND GUBUN = #{code.gubun}
     </delete>
 
+    <insert id="insertSystemCode" parameterType="Code">
+        INSERT INTO GS_BASE_CODE(TYPE, GUBUN, DATA1, DATA2, DATA3, REG_DATE)
+        VALUES(#{code.type}, #{code.gubun}, #{code.data1}, #{code.data2}, #{code.data3}, SYSDATE())
+    </insert>
 </mapper>
 

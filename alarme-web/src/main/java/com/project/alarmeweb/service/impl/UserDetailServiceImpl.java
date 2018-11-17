@@ -30,7 +30,7 @@ public class UserDetailServiceImpl implements UserDetailsService {
 		// TODO Auto-generated method stubUserServiceImpl.java
 		List<User> getMemberList = userService.getMemberList(loginId, null);
 
-		logger.info("### {}", getMemberList.get(0) );
+		logger.info("getMemberList login Data : {}", getMemberList.get(0) );
 
 		if(getMemberList == null){
 			throw new UsernameNotFoundException("no user");

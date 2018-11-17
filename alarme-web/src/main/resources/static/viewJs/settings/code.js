@@ -4,42 +4,41 @@
         $('#codeListtable').DataTable({
             destroy: true,
             ajax: {
-                url:'http://localhost:8080/settings/code/ajax',
-                type:'GET',
-                dataSrc : function (json) {
-                    console.log(json);
-                    return json.data;
-                }
+                url:'/settings/code/table',
+                type:'GET'
             },
-            "pagingType": "full_numbers",
-            "lengthMenu": [
+            order: [[ 0, "asc" ]],
+            searching: true,
+            ordering:  true,
+            paging:  true,
+            pagingType: "full_numbers",
+            language: {
+                search: "_INPUT_",
+                searchPlaceholder: "Search records",
+            },
+            lengthMenu: [
                 [10, 25, 50, -1],
                 [10, 25, 50, "All"]
             ],
             columns:[
-                {"data" : "TYPE"},
-                {"data" : "GUBUN"},
-                {"data" : "DATA1"},
-                {"data" : "DATA2"},
-                {"data" : "DATA3"},
+                {"data" : "type"},
+                {"data" : "gubun"},
+                {"data" : "data1"},
+                {"data" : "data2"},
+                {"data" : "data3"},
                 {
-                    "defaultContent":'<i class="tim-icons icon-simple-remove"></i>'
+                    "defaultContent":'<i class="delete tim-icons icon-simple-remove"></i>'
                 }
-            ]
+            ],
+            columnDefs:[
+                { className: 'text-center', targets: [0, 1, 2, 3, 4, 5] }
+            ],
+            initComplete: function () {
+                $('.dataTables_filter input[type="search"]').removeClass().addClass('form-control');
+                // $('select[name="codeListtable_length"]').removeClass().addClass('selectpicker');
+                // $('select[name="codeListtable_length"]').attr('data-style', 'select-with-transition');
+            }
         });
-
-        // $('#codeListtable').DataTable({
-        //     "pagingType": "full_numbers",
-        //     "lengthMenu": [
-        //         [10, 25, 50, -1],
-        //         [10, 25, 50, "All"]
-        //     ],
-        //     responsive: true,
-        //     language: {
-        //         search: "_INPUT_",
-        //         searchPlaceholder: "Search records",
-        //     }
-        // });
 
         var codeTable = $('#codeListtable').DataTable();
 
@@ -47,29 +46,34 @@
     }
 
     code.setEvent = function(codeTable){
-        codeTable.on('click.delete', '.delete', function(){
+        codeTable.on('click.delete', '.delete', function (){
             $tr = $(this).closest('tr');
             var columnData = codeTable.row($tr).data();
 
             var data = {
-                "type" : columnData[0],
-                "gubun" : columnData[1]
+                "type" : columnData.type,
+                "gubun" : columnData.gubun
             };
 
-            $.ajax({
-                method: "delete",
-                url: "/settings/code",
-                data: JSON.stringify(data),
-                contentType: "application/json; charset=utf-8",
-                //dataType: "json",
-                success: function(data) {
-                    console.log(data);
-                    codeTable.ajax.reload();
-                },
-                error: function(jqXHR, textStatus, errorThrown) {
-                    console.log(jqXHR);
-                }
-            });
+            if(confirm("정말 삭제하시겠습니까??") == true){
+                $.ajax({
+                    method: "delete",
+                    url: "/settings/code",
+                    data: JSON.stringify(data),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function(data) {
+                        if(data.code == "success"){
+                            codeTable.ajax.reload();
+                        }
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        console.log(jqXHR);
+                    }
+                });
+            }else{
+                return;
+            }
         });
     }
 

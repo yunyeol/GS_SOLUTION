@@ -9,6 +9,8 @@ import java.util.List;
 
 @Mapper
 public interface CodeMapper {
-    List<Code> getSystemCodeList(@Param("orderParam") String orderParam);
+    List<Code> getSystemCodeList(@Param("orderParam") String orderParam,
+                                 @Param("code") Code code);
     int deleteSystemCode(@Param("code") Code code);
+    int insertSystemCode(@Param("code") Code code);
 }

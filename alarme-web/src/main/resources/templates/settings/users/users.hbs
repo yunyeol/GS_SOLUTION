@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" class="perfect-scrollbar-on">
+<head>
+    {{> header }}
+</head>
+
+<body class="sidebar-mini">
+    <div class="wrapper">
+        {{> left codeActive="active" codeExpand="true" userMenuActive="active" codeMenuShow="show"}}
+        <div class="main-panel ps ps--active-y">
+            {{> top title="users"}}
+
+            <div class="content">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="row">
+                            <h4 class="col-sm-11">
+                                Users
+                            </h4>
+                            <div class="col-sm-1">
+                                <button style="float:right;" class="btn btn-primary btn-sm tim-icons icon-simple-add"></button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="col-sm-12">
+                            <table id="userListtable"  class="table" role="grid" aria-describedby="datatable_info" style="width:100%">
+                                <thead>
+                                    <tr role="row">
+                                        <th class="text-center" tabindex="0" aria-controls="datatable" style="width:20%" >로그인ID</th>
+                                        <th class="text-center" tabindex="0" aria-controls="datatable" style="width:15%" >이름</th>
+                                        <th class="text-center" tabindex="0" aria-controls="datatable" style="width:10%">비밀번호</th>
+                                        <th class="text-center" tabindex="0" aria-controls="datatable" style="width:10%">그룹</th>
+                                        <th class="text-center" tabindex="0" aria-controls="datatable" style="width:10%">권한</th>
+                                        <th class="text-center" tabindex="0" aria-controls="datatable" style="width:9%">활성화</th>
+                                        <th class="text-center" tabindex="0" aria-controls="datatable"  style="width:7%">삭제</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {{#userList}}
+                                        <tr >
+                                            <td class="text-center">{{loginId}}</td>
+                                            <td class="text-center">{{mbrName}}</td>
+                                            <td class="text-center">
+                                                <button class="btn btn-primary btn-simple btn-sm" >
+                                                    변경
+                                                </button>
+                                            </td>
+                                            <td class="text-center">
+                                                <button class="btn btn-primary btn-simple btn-sm" data-toggle="modal" data-target="#grpModal">
+                                                    {{mbrGrpName}}
+                                                </button>
+                                            </td>
+                                            <td class="text-center">
+                                                <button class="btn btn-primary btn-simple btn-sm" data-toggle="modal" data-target="#authModal">
+                                                    {{mbrAuthName}}
+                                                </button>
+                                            </td>
+                                            <td class="text-center">
+                                                <button class="btn btn-primary btn-simple btn-sm">
+                                                    {{activeYn}}
+                                                </button>
+                                            </td>
+                                            <td class="text-center">
+                                                <i class="tim-icons icon-simple-remove"></i>
+                                            </td>
+                                        </tr>
+                                    {{/userList}}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{> footer }}
+
+<script>
+$(document).ready(function() {
+    $('#userListtable').DataTable({
+        "pagingType": "full_numbers",
+        "lengthMenu": [
+            [10, 25, 50, -1],
+            [10, 25, 50, "All"]
+        ],
+        responsive: true,
+        language: {
+            search: "_INPUT_",
+            searchPlaceholder: "Search records",
+        }
+
+    });
+});
+</script>
+</body>
+</html>
