@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" class="perfect-scrollbar-on">
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" class="perfect-scrollbar-off">
 <head>
     {{> header }}
 </head>
@@ -13,14 +13,9 @@
             <div class="content">
                 <div class="card">
                     <div class="card-header">
-                        <div class="row">
-                            <h4 class="col-sm-11">
-                                Users
-                            </h4>
-                            <div class="col-sm-1">
-                                <button style="float:right;" class="btn btn-primary btn-sm tim-icons icon-simple-add"></button>
-                            </div>
-                        </div>
+                        <h4 >Users</h4>
+
+                        {{> settings/users/userInsert}}
                     </div>
                     <div class="card-body">
                         <div class="col-sm-12">
@@ -37,62 +32,22 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {{#userList}}
-                                        <tr >
-                                            <td class="text-center">{{loginId}}</td>
-                                            <td class="text-center">{{mbrName}}</td>
-                                            <td class="text-center">
-                                                <button class="btn btn-primary btn-simple btn-sm" >
-                                                    변경
-                                                </button>
-                                            </td>
-                                            <td class="text-center">
-                                                <button class="btn btn-primary btn-simple btn-sm" data-toggle="modal" data-target="#grpModal">
-                                                    {{mbrGrpName}}
-                                                </button>
-                                            </td>
-                                            <td class="text-center">
-                                                <button class="btn btn-primary btn-simple btn-sm" data-toggle="modal" data-target="#authModal">
-                                                    {{mbrAuthName}}
-                                                </button>
-                                            </td>
-                                            <td class="text-center">
-                                                <button class="btn btn-primary btn-simple btn-sm">
-                                                    {{activeYn}}
-                                                </button>
-                                            </td>
-                                            <td class="text-center">
-                                                <i class="tim-icons icon-simple-remove"></i>
-                                            </td>
-                                        </tr>
-                                    {{/userList}}
+
                                 </tbody>
                             </table>
                         </div>
                     </div>
                 </div>
             </div>
+
+            {{> settings/users/usersModal}}
         </div>
     </div>
 
     {{> footer }}
 
-<script>
-$(document).ready(function() {
-    $('#userListtable').DataTable({
-        "pagingType": "full_numbers",
-        "lengthMenu": [
-            [10, 25, 50, -1],
-            [10, 25, 50, "All"]
-        ],
-        responsive: true,
-        language: {
-            search: "_INPUT_",
-            searchPlaceholder: "Search records",
-        }
-
-    });
-});
-</script>
+    <script type="text/javascript" src="/viewJs/settings/users/users.js"></script>
+    <script type="text/javascript" src="/viewJs/settings/users/usersModal.js"></script>
+    <script type="text/javascript" src="/viewJs/settings/users/usersInsert.js"></script>
 </body>
 </html>

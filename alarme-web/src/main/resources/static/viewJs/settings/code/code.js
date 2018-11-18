@@ -31,12 +31,11 @@
                 }
             ],
             columnDefs:[
-                { className: 'text-center', targets: [0, 1, 2, 3, 4, 5] }
+                {className:'text-center', targets:[0,1,2,3,4,5]},
+                {sortable:false, targets:[5]}
             ],
             initComplete: function () {
                 $('.dataTables_filter input[type="search"]').removeClass().addClass('form-control');
-                // $('select[name="codeListtable_length"]').removeClass().addClass('selectpicker');
-                // $('select[name="codeListtable_length"]').attr('data-style', 'select-with-transition');
             }
         });
 
@@ -75,7 +74,20 @@
                 return;
             }
         });
-    }
+
+        codeTable.on('click.tr', 'tbody > tr', function(){
+            $tr = $(this).closest('tr');
+            var columnData = codeTable.row($tr).data();
+
+            $('input[name="type"]').val(columnData.type);
+            $('input[name="gubun"]').val(columnData.gubun);
+            $('input[name="data1"]').val(columnData.data1);
+            $('input[name="data2"]').val(columnData.data2);
+            $('input[name="data3"]').val(columnData.data3);
+
+            $(':submit').html('수정');
+        });
+    };
 
     code.init();
 })(jQuery, {});

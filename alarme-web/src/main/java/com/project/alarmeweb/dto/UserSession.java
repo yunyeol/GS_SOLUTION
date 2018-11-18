@@ -20,4 +20,13 @@ public class UserSession extends User {
 		// TODO Auto-generated constructor stub
 	}
 
+    public int authId;
+
+    public int getAuthId() {
+        return authId;
+    }
+    public void setAuthId(int authId) {
+        this.authId = authId;
+    }
+
 }

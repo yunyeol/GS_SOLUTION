@@ -1,0 +1,61 @@
+<div class="col-sm-12">
+    <form id="insertUsersValidation" novalidate="novalidate" method="post" action="/settings/users">
+        <div class="row">
+            <div class="col-sm-3">
+                <div class="form-group has-label">
+                    <label>
+                        <strong>로그인 아이디 *</strong>
+                    </label>
+                    <input class="form-control" type="text" name="loginId" maxlength="32" required="" >
+                </div>
+            </div>
+
+            <div class="col-sm-3">
+                <div class="form-group has-label">
+                    <label>
+                        <strong>비밀번호 *</strong>
+                    </label>
+                    <input type="password" required="" name="passwd" id="registerPasswd" class="form-control validate-equalTo-blur" maxlength="256" >
+                </div>
+            </div>
+
+            <div class="col-sm-3">
+                <div class="form-group has-label">
+                    <label>
+                        <strong>비밀번호 확인 *</strong>
+                    </label>
+                    <input type="password" required="" name="passwordConfirm" class="form-control" maxlength="256" equalto="#registerPasswd">
+                </div>
+            </div>
+
+            <div class="col-sm-1"></div>
+            <div class="col-sm-1"><button type="button" id="dupUsersBtn" class="btn btn-primary btn-simple btn-sm" >중복체크</button></div>
+        </div>
+        <div class="row">
+            <div class="col-sm-1">이름 *</div>
+            <div class="col-sm-2"><input type="text" name="name" class="form-control" maxlength="10" ></div>
+
+            <div class="col-sm-1">그룹</div>
+            <div class="col-sm-2">
+                <select class="selectpicker" name="insertSelectGrp" data-style="select-with-transition" >
+                    {{#grpList}}
+                    <option value="{{mbrGrpId}}">{{mbrGrpName}}</option>
+                    {{/grpList}}
+                </select>
+            </div>
+
+            <div class="col-sm-1">권한</div>
+            <div class="col-sm-2">
+                <select class="selectpicker" name="insertSelectAuth" data-style="select-with-transition" >
+                    {{#authList}}
+                    <option value="{{mbrAuthId}}">{{mbrAuthName}}</option>
+                    {{/authList}}
+                </select>
+            </div>
+
+            <div class="col-sm-1"></div>
+            <div class="col-sm-1"><button type="submit" class="btn btn-primary btn-sm" >입력</button></div>
+            <div class="col-sm-1"><button type="button" class="btn btn-primary btn-sm" id="init">초기화</button></div>
+        </div>
+    </form>
+</div>

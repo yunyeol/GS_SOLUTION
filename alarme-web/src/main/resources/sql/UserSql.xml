@@ -31,5 +31,53 @@
 
     </select>
 
+    <select id="getAuthList" resultType="User">
+    <![CDATA[
+        SELECT
+            MBR_AUTH_ID mbrAuthId,
+            AUTH_NAME mbrAuthName,
+            REG_DATE regDate
+        FROM GS_AUTH
+        WHERE 1=1
+    ]]>
+    </select>
+
+    <select id="getGrpList" resultType="User">
+    <![CDATA[
+        SELECT
+            MBR_GRP_ID mbrGrpId,
+            GRP_NAME mbrGrpName,
+            REG_DATE regDate
+        FROM GS_GRP
+        WHERE 1=1
+    ]]>
+    </select>
+
+    <insert id="insertUsers">
+        INSERT INTO GS_MBR(LOGIN_ID, PASSWD, MBR_GRP_ID, MBR_AUTH_ID, MBR_NAME, ACTIVE_YN, REG_DATE)
+        VALUES(#{user.loginId}, #{user.passwd}, #{user.mbrGrpId}, #{user.mbrAuthId}, #{user.mbrName}, 'Y', SYSDATE())
+        ON DUPLICATE KEY UPDATE REG_DATE = SYSDATE()
+    </insert>
+
+    <delete id="deleteUsers">
+        DELETE FROM GS_MBR WHERE LOGIN_ID = #{user.loginId}
+    </delete>
+
+    <update id="updateActiveUsers">
+        UPDATE GS_MBR SET ACTIVE_YN = #{user.activeYn} WHERE LOGIN_ID = #{user.loginId}
+    </update>
+
+    <update id="updateAuthUsers">
+        UPDATE GS_MBR SET MBR_AUTH_ID = #{user.mbrAuthId} WHERE LOGIN_ID = #{user.loginId}
+    </update>
+
+    <update id="updateGrpUsers">
+        UPDATE GS_MBR SET MBR_GRP_ID = #{user.mbrGrpId} WHERE LOGIN_ID = #{user.loginId}
+    </update>
+
+    <update id="updatePwdUsers">
+        UPDATE GS_MBR SET PASSWD = #{user.passwd} WHERE LOGIN_ID = #{user.loginId}
+    </update>
+
 </mapper>
 

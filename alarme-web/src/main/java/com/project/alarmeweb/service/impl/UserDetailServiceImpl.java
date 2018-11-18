@@ -46,6 +46,10 @@ public class UserDetailServiceImpl implements UserDetailsService {
 										getAuthorities(getMemberList.get(0).getMbrAuthId())
 									);
 
+		logger.info("{}",getMemberList.get(0).getMbrAuthId());
+
+		userSession.setAuthId(getMemberList.get(0).getMbrAuthId());
+
 		return userSession;
 	}
 

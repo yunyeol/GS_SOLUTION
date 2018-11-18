@@ -23,7 +23,7 @@ public class CodeController extends BaseController {
         return new ModelAndView("settings/code/code");
     }
 
-    @GetMapping(value={"/settings/code/table"}, produces="text/html; charset=UTF-8")
+    @RequestMapping(value={"/settings/code/table"}, produces="text/html; charset=UTF-8", method = RequestMethod.GET)
     @ResponseBody
     public String tableCode(@RequestParam Map<String, String> params){
         List<Code> codeList = codeService.getSystemCodeList("TYPE ASC", null);
@@ -34,7 +34,7 @@ public class CodeController extends BaseController {
         return result.toString();
     }
 
-    @GetMapping(value={"settings/code/condition"}, produces="application/json; charset=UTF-8")
+    @RequestMapping(value={"settings/code/condition"}, produces="application/json; charset=UTF-8", method = RequestMethod.GET)
     @ResponseBody
     public String selectCode(@RequestParam Map<String, String> params){
         String type = params.get("type");

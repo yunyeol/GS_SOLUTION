@@ -31,6 +31,13 @@
     <insert id="insertSystemCode" parameterType="Code">
         INSERT INTO GS_BASE_CODE(TYPE, GUBUN, DATA1, DATA2, DATA3, REG_DATE)
         VALUES(#{code.type}, #{code.gubun}, #{code.data1}, #{code.data2}, #{code.data3}, SYSDATE())
+        ON DUPLICATE KEY UPDATE
+          TYPE = #{code.type},
+          GUBUN = #{code.gubun},
+          DATA1 = #{code.data1},
+          DATA2 = #{code.data2},
+          DATA3 = #{code.data3},
+          UPT_DATE = SYSDATE()
     </insert>
 </mapper>
 

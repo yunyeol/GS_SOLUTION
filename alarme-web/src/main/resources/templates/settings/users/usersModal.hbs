@@ -1,0 +1,91 @@
+<div class="modal modal-black fade" id="authModal" tabindex="-1" role="dialog" aria-labelledby="authModalLabel" aria-hidden="true" >
+    <div class="modal-dialog  modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="authModalLabel">권한 수정</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                    <i class="tim-icons icon-simple-remove"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-4">권한</div>
+                    <div class="col-sm-8" id="modalSelectAuth">
+                        <select class="selectpicker" name="updateSelectAuth" data-style="select-with-transition" >
+                            {{#authList}}
+                            <option value="{{mbrAuthId}}">{{mbrAuthName}}</option>
+                            {{/authList}}
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="modal modal-black fade" id="grpModal" tabindex="-1" role="dialog" aria-labelledby="grpModalLabel" aria-hidden="true" >
+    <div class="modal-dialog  modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="grpModalLabel">그룹 수정</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                    <i class="tim-icons icon-simple-remove"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-4">그룹</div>
+                    <div class="col-sm-8" id="modalSelectGrp">
+                        <select class="selectpicker" name="updateSelectGrp" data-style="select-with-transition" >
+                            {{#grpList}}
+                            <option value="{{mbrGrpId}}">{{mbrGrpName}}</option>
+                            {{/grpList}}
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="modal modal-black fade" id="pwdModal" tabindex="-1" role="dialog" aria-labelledby="pwdModalLabel" aria-hidden="true" >
+    <div class="modal-dialog  modal-sm" role="document">
+        <div class="modal-content">
+            <form id="updatePwdValidation" novalidate="novalidate" method="post" action="/settings/users/pwd">
+                <input type="hidden" id="loginId" name="loginId"/>
+
+                <div class="modal-header">
+                    <h4 class="modal-title" id="pwdModalLabel">비밀번호 수정</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                        <i class="tim-icons icon-simple-remove"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="col-sm-12">
+                        <div class="form-group has-label">
+                            <label>
+                                <strong>비밀번호 *</strong>
+                            </label>
+                            <input type="password" required="" name="passwd" id="updatePasswd" class="form-control validate-equalTo-blur" maxlength="256" >
+                        </div>
+                    </div>
+
+                    <div class="col-sm-12">
+                        <div class="form-group has-label">
+                            <label>
+                                <strong>비밀번호 확인 *</strong>
+                            </label>
+                            <input type="password" required="" name="passwordConfirm" class="form-control" maxlength="256" equalto="#updatePasswd">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">취소</button>
+                    <button type="submit" class="btn btn-primary btn-sm" >수정</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

@@ -1,38 +1,35 @@
-(function($, codeModal){
+(function($, usersInsert){
 
     var dupCheck = false;
 
-    codeModal.init = function(){
-        codeModal.setFormValidation('#insertCodeValidation');
+    usersInsert.init = function(){
+        usersInsert.setFormValidation('#insertUsersValidation');
 
-        codeModal.setEvent();
+        this.setEvent();
     };
 
-    codeModal.setEvent = function(){
-        $('#dupBtn').on('click.dup', function(){
-
-            if($('input[name="type"]').val() == '' ||
-                $('input[name="gubun"]').val() == ''){
-                alert("타입, 구분은 필수 입력값입니다.");
+    usersInsert.setEvent = function(){
+        $('#dupUsersBtn').on('click', function () {
+            if($('input[name="loginId"]').val() == ''){
+                alert("로그인 아이디를 입력해주세요.");
                 return ;
             }
 
             var data = {
-                "type" : $('input[name="type"]').val(),
-                "gubun" : $('input[name="gubun"]').val()
+                "loginId" : $('input[name="loginId"]').val()
             };
 
             $.ajax({
                 method: "get",
-                url: "/settings/code/condition",
+                url: "/settings/users/condition",
                 data: data,
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
                 success: function(data) {
                     if(data.code == "dup"){
-                        alert("사용중인 코드입니다.");
+                        alert("사용중인 로그인 아이디 입니다.");
                     }else{
-                        alert("사용할수 있는 코드입니다.");
+                        alert("사용할수 있는 로그인 아이디 입니다.");
                         dupCheck = true;
                     }
                 },
@@ -42,7 +39,16 @@
             });
         });
 
-        $('#insertCodeValidation').on('submit', function(){
+        $('#init').on('click.init', function(){
+            dupCheck = false;
+
+            $('input[name="loginId"]').val('');
+            $('input[name="passwd"]').val('');
+            $('input[name="passwordConfirm"]').val('');
+            $('input[name="name"]').val('');
+        });
+
+        $('#insertUsersValidation').on('submit', function(){
             if(dupCheck == false){
                 alert("중복체크를 해주세요");
                 return false;
@@ -50,7 +56,7 @@
         });
     };
 
-    codeModal.setFormValidation = function(id) {
+    usersInsert.setFormValidation = function(id) {
         $(id).validate({
             highlight: function(element) {
                 $(element).closest('.form-group').removeClass('has-success').addClass('has-danger');
@@ -66,5 +72,5 @@
         });
     };
 
-    codeModal.init();
+    usersInsert.init();
 })(jQuery, {});
