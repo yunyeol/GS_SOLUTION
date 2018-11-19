@@ -20,7 +20,11 @@ public class UserSession extends User {
 		// TODO Auto-generated constructor stub
 	}
 
+	public String loginId;
     public int authId;
+
+    public String getLoginId(){return loginId;}
+    public void setLoginId(String loginId){this.loginId = loginId;}
 
     public int getAuthId() {
         return authId;
