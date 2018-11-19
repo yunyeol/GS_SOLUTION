@@ -4,6 +4,8 @@ package com.project.alarmeweb.controller.settings.code;
 import com.project.alarmeweb.controller.BaseController;
 import com.project.alarmeweb.dto.Code;
 import com.project.alarmeweb.service.CodeService;
+import lombok.extern.slf4j.Slf4j;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -13,12 +15,13 @@ import org.springframework.web.servlet.ModelAndView;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Controller
 public class CodeController extends BaseController {
 
     @Autowired private CodeService codeService;
 
-	@RequestMapping(value={"/settings/code"}, produces="text/html; charset=UTF-8", method = RequestMethod.GET)
+    @RequestMapping(value={"/settings/code"}, produces="text/html; charset=UTF-8", method = RequestMethod.GET)
     public ModelAndView code(){
         return new ModelAndView("settings/code/code");
     }
@@ -29,7 +32,12 @@ public class CodeController extends BaseController {
         List<Code> codeList = codeService.getSystemCodeList("TYPE ASC", null);
 
         JSONObject result = new JSONObject();
-        result.put("data", codeList);
+
+        try{
+            result.put("data", codeList);
+        }catch (JSONException e){
+            log.error("{}",e);
+        }
 
         return result.toString();
     }
@@ -47,35 +55,43 @@ public class CodeController extends BaseController {
         List<Code> codeList = codeService.getSystemCodeList("TYPE ASC", code);
         JSONObject result = new JSONObject();
 
-        if(codeList.size() > 0){
-            result.put("code","dup");
-        }else{
-            result.put("code", "noDup");
+        try{
+            if(codeList.size() > 0){
+                result.put("code","dup");
+            }else{
+                result.put("code", "noDup");
+            }
+        }catch (JSONException e){
+            log.error("{}",e);
         }
 
         return result.toString();
     }
 
-	@RequestMapping(value={"/settings/code"}, produces="text/html; charset=UTF-8", method = RequestMethod.DELETE)
+    @RequestMapping(value={"/settings/code"}, produces="text/html; charset=UTF-8", method = RequestMethod.DELETE)
     @ResponseBody
     public String deleteCode(@RequestBody Map<String, String> params){
         String type = params.get("type");
         String gubun = params.get("gubun");
 
-	    Code code = new Code();
-	    code.setType(type);
-	    code.setGubun(gubun);
+        Code code = new Code();
+        code.setType(type);
+        code.setGubun(gubun);
 
-	    int deleteResult = codeService.deleteSystemCode(code);
+        int deleteResult = codeService.deleteSystemCode(code);
         JSONObject result = new JSONObject();
 
-        if(deleteResult > 0){
-            result.put("code","success");
-        }else{
-            result.put("code", "fail");
+        try{
+            if(deleteResult > 0){
+                result.put("code","success");
+            }else{
+                result.put("code", "fail");
+            }
+        }catch (JSONException e){
+            log.error("{}",e);
         }
 
-	    return result.toString();
+        return result.toString();
     }
 
     @RequestMapping(value={"/settings/code"}, produces="text/html; charset=UTF-8", method = RequestMethod.POST)

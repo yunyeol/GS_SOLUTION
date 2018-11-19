@@ -3,6 +3,8 @@ package com.project.alarmeweb.controller.settings.code;
 import com.project.alarmeweb.controller.BaseController;
 import com.project.alarmeweb.dto.User;
 import com.project.alarmeweb.service.UserService;
+import lombok.extern.slf4j.Slf4j;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -13,6 +15,7 @@ import org.springframework.web.servlet.ModelAndView;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Controller
 public class UsersController extends BaseController {
     @Autowired private UserService userService;
@@ -33,7 +36,12 @@ public class UsersController extends BaseController {
         List<User> userList = userService.getMemberList(null,"GM.LOGIN_ID ASC");
 
         JSONObject result = new JSONObject();
-        result.put("data", userList);
+
+        try{
+            result.put("data", userList);
+        }catch(JSONException e){
+            log.error("{}",e);
+        }
 
         return result.toString();
     }
@@ -49,10 +57,14 @@ public class UsersController extends BaseController {
         List<User> userList = userService.getMemberList(loginId, null);
         JSONObject result = new JSONObject();
 
-        if(userList.size() > 0){
-            result.put("code","dup");
-        }else{
-            result.put("code", "noDup");
+        try{
+            if(userList.size() > 0){
+                result.put("code","dup");
+            }else{
+                result.put("code", "noDup");
+            }
+        }catch(JSONException e){
+            log.error("{}",e);
         }
 
         return result.toString();
@@ -69,10 +81,14 @@ public class UsersController extends BaseController {
         int deleteResult = userService.deleteUsers(user);
         JSONObject result = new JSONObject();
 
-        if(deleteResult > 0){
-            result.put("code","success");
-        }else{
-            result.put("code", "fail");
+        try{
+            if(deleteResult > 0){
+                result.put("code","success");
+            }else{
+                result.put("code", "fail");
+            }
+        }catch (JSONException e){
+            log.error("{}",e);
         }
 
         return result.toString();
@@ -91,10 +107,14 @@ public class UsersController extends BaseController {
         int updateResult = userService.updateActiveUsers(user);
         JSONObject result = new JSONObject();
 
-        if(updateResult > 0){
-            result.put("code","success");
-        }else{
-            result.put("code", "fail");
+        try{
+            if(updateResult > 0){
+                result.put("code","success");
+            }else{
+                result.put("code", "fail");
+            }
+        }catch (JSONException e){
+            log.error("{}",e);
         }
 
         return result.toString();
@@ -113,10 +133,14 @@ public class UsersController extends BaseController {
         int updateResult = userService.updateAuthUsers(user);
         JSONObject result = new JSONObject();
 
-        if(updateResult > 0){
-            result.put("code","success");
-        }else{
-            result.put("code", "fail");
+        try{
+            if(updateResult > 0){
+                result.put("code","success");
+            }else{
+                result.put("code", "fail");
+            }
+        }catch (JSONException e){
+            log.error("{}",e);
         }
 
         return result.toString();
@@ -135,10 +159,14 @@ public class UsersController extends BaseController {
         int updateResult = userService.updateGrpUsers(user);
         JSONObject result = new JSONObject();
 
-        if(updateResult > 0){
-            result.put("code","success");
-        }else{
-            result.put("code", "fail");
+        try{
+            if(updateResult > 0){
+                result.put("code","success");
+            }else{
+                result.put("code", "fail");
+            }
+        }catch (JSONException e){
+            log.error("{}",e);
         }
 
         return result.toString();
