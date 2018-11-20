@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" class="perfect-scrollbar-on">
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" class="perfect-scrollbar-off">
 <head>
     {{> header }}
 </head>
@@ -16,12 +16,18 @@
                         <h4>Realtime</h4>
                     </div>
                     <div class="card-body">
-                        <div class="col-sm-1">
-                            <button type="button" name="realtimeSetting" class="btn btn-primary btn-simple btn-sm" >Realtime 설정</button>
+                        <div class="row">
+                            <div class="col-sm-12 col-md-10">
+                                <button type="button" name="realtimeSetting" class="btn btn-primary btn-simple btn-sm" >Realtime 설정</button>
+                            </div>
+                            <div class="col-sm-12 col-md-2">
+                                <input type="input" name="search" class="form-control" placeholder="Search records">
+                            </div>
                         </div>
+                        <br>
 
-                        <div class="col-sm-12">
-                            
+                        <div class="col-sm-12 col-md-6">
+                            {{> mail/send/realtime/realtimeDashBoard }}
                         </div>
                     </div>
                 </div>
