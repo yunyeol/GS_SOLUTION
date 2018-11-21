@@ -19,7 +19,7 @@
         GAG.UPT_DATE UPT_DATE
     </sql>
     <select id="getGroupList" resultMap="groupResult">
-        /* receiverMapper.getSystemCodeList */
+        /* receiverMapper.getGroupList */
         SELECT
           <include refid="columns" />
         FROM GS_ADDRESS_GRP GAG

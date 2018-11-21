@@ -1,7 +1,6 @@
 (function($, receiver){
 
     receiver.init = function(){
-        console.log('타라');
         $('#receiverListTable').DataTable({
             destroy: true,
             ajax: {
@@ -24,8 +23,19 @@
             columns:[
                 {"data" : "addrGrpName"},
                 {"data" : "addrGrpMbrCnt"},
-                {"data" : "createdDt"},
-                {"data" : "modifiedDt"},
+                {
+                    "defaultContent":'그룹대상관리'
+                },
+                {"data" : "createdDt",
+                    render : function(data){
+                        return '<td class="text-center">'+moment(data).format('YYYY.MM.DD')+'</td>'
+                    }
+                },
+                {"data" : "modifiedDt",
+                    render : function(data){
+                        return '<td class="text-center">'+moment(data).format('YYYY.MM.DD')+'</td>'
+                    }
+                },
                 {
                     "defaultContent":'수정'
                 },
@@ -34,8 +44,8 @@
                 }
             ],
             columnDefs:[
-                {className:'text-center', targets:[0,1,2,3,4,5]},
-                {sortable:false, targets:[5]}
+                {className:'text-center', targets:[0,1,2,3,4,5,6]},
+                {sortable:false, targets:[6]}
             ],
             initComplete: function () {
                 $('.dataTables_filter input[type="search"]').removeClass().addClass('form-control');
