@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.project.alarmeweb.mapper.GroupMapper">
+    <resultMap id="groupResult" type="Group">
+        <id 	property="addrGrpId" 		column="ADDRESS_GRP_ID"/>
+        <result property="addrGrpName" 		column="ADDRESS_GRP_NAME"/>
+        <result property="addrGrpMbrCnt" 	column="ADRESS_GRP_MBR_CNT"/>
+        <result property="createdDt" 		column="REG_DATE"/>
+        <result property="modifiedDt" 		column="UPT_DATE"/>
+    </resultMap>
+
+    <sql id="columns">
+        GAG.ADDRESS_GRP_ID ADDRESS_GRP_ID,
+        GAG.ADDRESS_GRP_NAME ADDRESS_GRP_NAME,
+        COUNT(GAM.ADDRESS_GRP_ID) ADRESS_GRP_MBR_CNT,
+        GAG.REG_DATE REG_DATE,
+        GAG.UPT_DATE UPT_DATE
+    </sql>
+    <select id="getGroupList" resultMap="groupResult">
+        /* receiverMapper.getSystemCodeList */
+        SELECT
+          <include refid="columns" />
+        FROM GS_ADDRESS_GRP GAG
+        LEFT JOIN GS_ADDRESS_MBR GAM
+        ON (GAG.ADDRESS_GRP_ID = GAM.ADDRESS_GRP_ID)
+        GROUP BY GAG.ADDRESS_GRP_ID,GAG.REG_DATE, GAG.UPT_DATE, GAM.ADDRESS_GRP_ID
+    </select>
+
+</mapper>
+
