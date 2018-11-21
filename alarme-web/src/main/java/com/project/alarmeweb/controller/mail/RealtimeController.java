@@ -11,8 +11,12 @@ import java.util.Locale;
 public class RealtimeController extends BaseController {
 
     @GetMapping(value={"/mail/send/realtime"}, produces="text/html; charset=UTF-8")
-    public String campaign(Locale locale, Model model){
-
+    public String realtime(){
         return "mail/send/realtime/realtime";
+    }
+
+    @GetMapping(value={"/mail/send/realtimeSetting"}, produces="text/html; charset=UTF-8")
+    public String realtimeSetting(){
+        return "mail/send/realtime/realtimeSetting";
     }
 }

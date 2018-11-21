@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" class="perfect-scrollbar-off">
+<head>
+    {{> header }}
+</head>
+
+<body class="sidebar-mini">
+    <div class="wrapper">
+        {{> left mailActive="active" menuExpand="true" mailRealtimeMenuActive="active" mailMenuShow="show"}}
+        <div class="main-panel ps ps--active-y">
+            {{> top title="Realtime"}}
+
+            <div class="content">
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Realtime 설정</h4>
+                    </div>
+                </div>
+
+                <div class="card card-timeline card-plain">
+                    <div class="card-body">
+                        <ul class="timeline timeline-simple">
+                            <li class="timeline-inverted">
+                                <div class="timeline-badge danger">
+                                    <i class="tim-icons icon-chat-33"></i>
+                                </div>
+                                <div class="timeline-panel">
+                                    <div class="timeline-heading">
+                                        <span class="badge badge-danger">Realtime 관리제목</span>
+                                    </div>
+                                    <div class="timeline-body">
+                                        <input class="form-control" type="text" name="realtimeSettingTitle">
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="timeline-inverted">
+                                <div class="timeline-badge success">
+                                    <i class="tim-icons icon-caps-small"></i>
+                                </div>
+                                <div class="timeline-panel">
+                                    <div class="timeline-heading">
+                                        <span class="badge badge-success">발송메시지 작성</span>
+                                    </div>
+                                    <div class="timeline-body">
+                                        <textarea style="resize: none;" name="content" id="editor"></textarea>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="timeline-inverted">
+                                <div class="timeline-badge info">
+                                    <i class="tim-icons icon-send"></i>
+                                </div>
+                                <div class="timeline-panel">
+                                    <div class="timeline-heading">
+                                        <span class="badge badge-info">Realtime 설정 저장</span>
+                                    </div>
+                                    <div class="timeline-body">
+
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{> footer }}
+
+    <script type="text/javascript" src="/viewJs/mail/send/realtime/realtime.js"></script>
+</body>
+</html>
