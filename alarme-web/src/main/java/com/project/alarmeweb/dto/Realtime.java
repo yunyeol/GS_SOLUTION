@@ -7,21 +7,23 @@ import org.apache.ibatis.type.Alias;
 @Alias("Realtime")
 public class Realtime {
     private int schdlId;
-    private String masterSchdlId;
+    private int masterSchdlId;
     private String schdlName;
     private String sender;
     private String filePath;
     private String sendGubun;
     private String sendType;
-    private int sendFlag;
+    private String sendFlag;
+    private String sendFlagStr;
     private int targetCnt;
     private int sendCnt;
     private int successCnt;
     private int failCnt;
     private int openCnt;
     private int clickCnt;
-    private String reserveDate;
     private int divideCnt;
+    private String activeYn;
+    private String reserveDate;
     private String regDate;
     private String uptDate;
 }
