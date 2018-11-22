@@ -25,10 +25,10 @@ public class ReceiverController extends BaseController {
     private ReceiverService receiverService;
 
     @RequestMapping(value={"/mail/receiver"}, produces="text/html; charset=UTF-8", method = {RequestMethod.GET})
-    public ModelAndView receiver(Model model){ return new ModelAndView("mail/receiver/receiver"); }
+    public ModelAndView receiver(){ return new ModelAndView("mail/receiver/receiver"); }
 
     @RequestMapping(value={"/mail/receiver/group"}, produces=MediaType.APPLICATION_JSON_VALUE, method = {RequestMethod.GET})
-    public ResponseEntity group(){
+    public ResponseEntity receiverGroup(){
         Map resultData = new HashMap();
         List<Receiver> receiverList = receiverService.getReceiverList();
         resultData.put("data", (receiverList != null) ? receiverList : new ArrayList<Receiver>()  );
