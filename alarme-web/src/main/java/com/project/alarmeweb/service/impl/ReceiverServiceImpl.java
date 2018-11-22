@@ -16,4 +16,19 @@ public class ReceiverServiceImpl implements ReceiverService {
     public List<Receiver> getReceiverList() {
         return receiverMapper.getReceiverList();
     }
+
+    @Override
+    public int addReceiver(Receiver receiver) {
+        return receiverMapper.insertReceiver(receiver);
+    }
+
+    @Override
+    public int modifyReceiver(Receiver receiver) {
+        return receiverMapper.updateReceiver(receiver);
+    }
+
+    @Override
+    public int removeReceiver(Long id) {
+        return receiverMapper.deleteReceiver(id);
+    }
 }

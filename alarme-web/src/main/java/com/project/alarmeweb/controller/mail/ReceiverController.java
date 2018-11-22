@@ -9,8 +9,10 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.util.ArrayList;
@@ -28,10 +30,35 @@ public class ReceiverController extends BaseController {
     public ModelAndView receiver(){ return new ModelAndView("mail/receiver/receiver"); }
 
     @RequestMapping(value={"/mail/receiver/group"}, produces=MediaType.APPLICATION_JSON_VALUE, method = {RequestMethod.GET})
-    public ResponseEntity receiverGroup(){
+    public ResponseEntity getReceiver(){
         Map resultData = new HashMap();
         List<Receiver> receiverList = receiverService.getReceiverList();
         resultData.put("data", (receiverList != null) ? receiverList : new ArrayList<Receiver>()  );
         return new ResponseEntity(resultData, HttpStatus.OK);
     }
+
+    @RequestMapping(value={"/mail/receiver/group"}, produces=MediaType.APPLICATION_JSON_VALUE, method = {RequestMethod.POST})
+    public ResponseEntity addReceiver(@RequestBody Receiver receiver){
+        Map resultData = new HashMap();
+        int cnt = receiverService.addReceiver(receiver);
+        resultData.put("data", (cnt > 0) ? "SUCCESS" : "FAIL"  );
+        return new ResponseEntity(resultData, HttpStatus.OK);
+    }
+
+    @RequestMapping(value={"/mail/receiver/group"}, produces=MediaType.APPLICATION_JSON_VALUE, method = {RequestMethod.PUT})
+    public ResponseEntity modifyReceiver(@RequestBody Receiver receiver){
+        Map resultData = new HashMap();
+        int cnt = receiverService.modifyReceiver(receiver);
+        resultData.put("data", (cnt > 0) ? "SUCCESS" : "FAIL"  );
+        return new ResponseEntity(resultData, HttpStatus.OK);
+    }
+
+    @RequestMapping(value={"/mail/receiver/group"}, produces=MediaType.APPLICATION_JSON_VALUE, method = {RequestMethod.DELETE})
+    public ResponseEntity removeReceiver(@RequestParam Long id){
+        Map resultData = new HashMap();
+        int cnt = receiverService.removeReceiver(id);
+        resultData.put("data", (cnt > 0) ? "SUCCESS" : "FAIL"  );
+        return new ResponseEntity(resultData, HttpStatus.OK);
+    }
+
 }

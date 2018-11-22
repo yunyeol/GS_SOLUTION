@@ -51,11 +51,16 @@
                 $('.dataTables_filter input[type="search"]').removeClass().addClass('form-control');
             }
         });
-        $('#insertReceiverValidation').validate();
+        this.setEvent()
     }
 
     receiver.setEvent = function(){
-        $('#insertReceiverValidation').validate();
+        var form = $('#receiverForm');
+
+        $('button[type="submit"]').on('click',function(){
+            form.validate();
+            console.log(form.valid());
+        });
     }
 
     receiver.init();
