@@ -15,7 +15,6 @@ import org.springframework.web.servlet.ModelAndView;
 import java.util.List;
 import java.util.Map;
 
-@Slf4j
 @Controller
 public class CodeController extends BaseController {
 
@@ -36,7 +35,7 @@ public class CodeController extends BaseController {
         try{
             result.put("data", codeList);
         }catch (JSONException e){
-            log.error("{}",e);
+            logger.error("{}",e);
         }
 
         return result.toString();
@@ -62,7 +61,7 @@ public class CodeController extends BaseController {
                 result.put("code", "noDup");
             }
         }catch (JSONException e){
-            log.error("{}",e);
+            logger.error("{}",e);
         }
 
         return result.toString();
@@ -88,7 +87,7 @@ public class CodeController extends BaseController {
                 result.put("code", "fail");
             }
         }catch (JSONException e){
-            log.error("{}",e);
+            logger.error("{}",e);
         }
 
         return result.toString();

@@ -29,7 +29,7 @@
                                         <span class="badge badge-danger">Realtime 관리제목</span>
                                     </div>
                                     <div class="timeline-body">
-                                        <input class="form-control" type="text" name="realtimeSettingTitle">
+                                        <input class="form-control" type="text" name="title" id="title">
                                     </div>
                                 </div>
                             </li>
@@ -42,23 +42,29 @@
                                         <span class="badge badge-success">발송메시지 작성</span>
                                     </div>
                                     <div class="timeline-body">
-                                        <textarea style="resize: none;" name="content" id="editor"></textarea>
+                                        <textarea style="resize: none;" name="contents" id="contents"></textarea>
                                     </div>
                                 </div>
                             </li>
-                            <li class="timeline-inverted">
-                                <div class="timeline-badge info">
-                                    <i class="tim-icons icon-send"></i>
-                                </div>
-                                <div class="timeline-panel">
-                                    <div class="timeline-heading">
-                                        <span class="badge badge-info">Realtime 설정 저장</span>
-                                    </div>
-                                    <div class="timeline-body">
+                            <!--<li class="timeline-inverted">-->
+                                <!--<div class="timeline-badge info">-->
+                                    <!--<i class="tim-icons icon-send"></i>-->
+                                <!--</div>-->
+                                <!--<div class="timeline-panel">-->
+                                    <!--<div class="timeline-heading">-->
+                                        <!--<span class="badge badge-info">Realtime 설정 저장</span>-->
+                                    <!--</div>-->
+                                    <!--<div class="timeline-body">-->
 
-                                    </div>
+                                    <!--</div>-->
+                                <!--</div>-->
+                            <!--</li>-->
+                            <div class="row">
+                                <div class="col-sm-10"></div>
+                                <div class="col-sm-2" >
+                                    <button type="button" style="float:right;" name="realtimeSave" class="btn btn-primary " >저장</button>
                                 </div>
-                            </li>
+                            </div>
                         </ul>
                     </div>
                 </div>
@@ -66,8 +72,10 @@
         </div>
     </div>
 
+    <input type="hidden" id="loginId" value="{{loginId}}">
+
     {{> footer }}
 
-    <script type="text/javascript" src="/viewJs/mail/send/realtime/realtime.js"></script>
+    <script type="text/javascript" src="/viewJs/mail/send/realtime/realtimeSetting.js"></script>
 </body>
 </html>

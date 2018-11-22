@@ -148,7 +148,6 @@
         });
 
         userTable.on('click.pwd', 'button[name="pwdChange"]', function(){
-            alert("1 : " + $(this).data('id'));
             $('#loginId').val($(this).data('id'));
         });
     };

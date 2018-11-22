@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.project.alarmeweb.mapper.RealtimeMapper">
+
+    <insert id="insertRealtimeSchdl">
+        INSERT INTO GS_SEND_SCHDL(MASTER_SCHDL_ID, SCHDL_NAME, SENDER, FILE_PATH,
+                                    SEND_GUBUN, SEND_TYPE, SEND_FLAG, RESERVE_DATE, REG_DATE)
+        VALUES(#{realtime.masterSchdlId}, #{realtime.schdlName}, #{realtime.sender}, #{realtime.filePath},
+                #{realtime.sendGubun}, #{realtime.sendType}, #{realtime.sendFlag}, SYSDATE(), SYSDATE())
+    </insert>
+
+
+</mapper>
+

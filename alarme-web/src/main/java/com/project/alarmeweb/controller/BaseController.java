@@ -36,7 +36,7 @@ public class BaseController {
     }
 
     @ModelAttribute("loginId")
-    private String  loginId(){
+    protected String  loginId(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String currentPrincipalName = authentication.getName();
         return currentPrincipalName;

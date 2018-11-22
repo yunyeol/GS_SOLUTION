@@ -15,7 +15,6 @@ import org.springframework.web.servlet.ModelAndView;
 import java.util.List;
 import java.util.Map;
 
-@Slf4j
 @Controller
 public class UsersController extends BaseController {
     @Autowired private UserService userService;
@@ -40,7 +39,7 @@ public class UsersController extends BaseController {
         try{
             result.put("data", userList);
         }catch(JSONException e){
-            log.error("{}",e);
+            logger.error("{}",e);
         }
 
         return result.toString();
@@ -64,7 +63,7 @@ public class UsersController extends BaseController {
                 result.put("code", "noDup");
             }
         }catch(JSONException e){
-            log.error("{}",e);
+            logger.error("{}",e);
         }
 
         return result.toString();
@@ -88,7 +87,7 @@ public class UsersController extends BaseController {
                 result.put("code", "fail");
             }
         }catch (JSONException e){
-            log.error("{}",e);
+            logger.error("{}",e);
         }
 
         return result.toString();
@@ -114,7 +113,7 @@ public class UsersController extends BaseController {
                 result.put("code", "fail");
             }
         }catch (JSONException e){
-            log.error("{}",e);
+            logger.error("{}",e);
         }
 
         return result.toString();
@@ -140,7 +139,7 @@ public class UsersController extends BaseController {
                 result.put("code", "fail");
             }
         }catch (JSONException e){
-            log.error("{}",e);
+            logger.error("{}",e);
         }
 
         return result.toString();
@@ -166,7 +165,7 @@ public class UsersController extends BaseController {
                 result.put("code", "fail");
             }
         }catch (JSONException e){
-            log.error("{}",e);
+            logger.error("{}",e);
         }
 
         return result.toString();
