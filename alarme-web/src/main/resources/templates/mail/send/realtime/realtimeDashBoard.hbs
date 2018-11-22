@@ -1,7 +1,8 @@
+{{#realtimeMasterList}}
 <div class="card" style="border:1px solid #e14eca">
     <div class="card-header row">
-        <h4 class="card-title col-sm-10">실시간 제목 </h4>
-        <input type="checkbox" checked="" name="checkbox" class="bootstrap-switch col-sm-2" data-on-label="ON" data-off-label="OFF">
+        <h4 class="card-title col-sm-10">{{schdlName}} </h4>
+        <input type="checkbox" {{activeYn}} checked name="checkbox" class="bootstrap-switch col-sm-2" data-on-label="ON" data-off-label="OFF">
     </div>
     <div class="card-body">
         <div class="row">
@@ -21,16 +22,16 @@
             </div>
             <div class="col-md-10 tab-content">
                 <div class="" id="">
-                    <h5>스케줄 아이디 : 1231</h5>
+                        <h5>스케줄 아이디 : {{schdlId}}</h5>
                 </div>
                 <div class="" id="">
-                    <h5>파일경로 : /ㅁㅁㅁㅁ/ㅠㅠㅠ/ㄸㄸ/ㅇㅇㅇ</h5>
+                    <h5>파일경로 : {{filePath}}</h5>
                 </div>
                 <div class="" id="">
-                    <h5>상태 : 발송중</h5>
+                    <h5>상태 : {{sendFlagStr}}</h5>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
+{{/realtimeMasterList}}

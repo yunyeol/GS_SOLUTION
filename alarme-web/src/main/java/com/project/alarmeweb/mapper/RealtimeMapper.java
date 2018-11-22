@@ -4,7 +4,10 @@ import com.project.alarmeweb.dto.Realtime;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+
 @Mapper
 public interface RealtimeMapper {
-    int InsertRealtimeSchdl(@Param("realtime") Realtime realtime);
+    int insertRealtimeSchdl(@Param("realtime") Realtime realtime);
+    List<Realtime> selectRealtimeMasterList();
 }

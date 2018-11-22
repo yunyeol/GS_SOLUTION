@@ -4,6 +4,26 @@
 
 <mapper namespace="com.project.alarmeweb.mapper.RealtimeMapper">
 
+    <select id="selectRealtimeMasterList" resultType="Realtime">
+    <![CDATA[
+        SELECT
+            SCHDL_ID schdlId,
+            MASTER_SCHDL_ID masterSchdlId,
+            SCHDL_NAME schdlName,
+            SENDER sender,
+            FILE_PATH filePath,
+            SEND_GUBUN sendGubun,
+            SEND_TYPE sendType,
+            SEND_FLAG sendFlag,
+            ACTIVE_YN activeYn,
+            REG_DATE regDate
+        FROM GS_SEND_SCHDL
+        WHERE 1=1
+        AND MASTER_SCHDL_ID = 0
+        AND SEND_TYPE = 'R_M'
+    ]]>
+    </select>
+
     <insert id="insertRealtimeSchdl">
         INSERT INTO GS_SEND_SCHDL(MASTER_SCHDL_ID, SCHDL_NAME, SENDER, FILE_PATH,
                                     SEND_GUBUN, SEND_TYPE, SEND_FLAG, RESERVE_DATE, REG_DATE)

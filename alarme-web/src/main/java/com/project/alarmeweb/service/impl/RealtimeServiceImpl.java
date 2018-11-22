@@ -6,6 +6,8 @@ import com.project.alarmeweb.service.RealtimeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class RealtimeServiceImpl implements RealtimeService {
 
@@ -13,6 +15,11 @@ public class RealtimeServiceImpl implements RealtimeService {
 
     @Override
     public int insertRealtimeSchdl(Realtime realtime) {
-        return realtimeMapper.InsertRealtimeSchdl(realtime);
+        return realtimeMapper.insertRealtimeSchdl(realtime);
+    }
+
+    @Override
+    public List<Realtime> selectRealtimeMasterList() {
+        return realtimeMapper.selectRealtimeMasterList();
     }
 }
