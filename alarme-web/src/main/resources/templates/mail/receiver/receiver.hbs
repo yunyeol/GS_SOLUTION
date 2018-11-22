@@ -15,24 +15,25 @@
                     <div class="card-header">
                         <h4>Receiver</h4>
                         <div class="row">
-                            <div class="col-sm-12">
+                            <div class="col-sm-9">
                                 <form id="insertReceiverValidation" novalidate="novalidate" method="post" action="/">
                                     <div class="row">
-                                        <div     class="col-sm-3">
+                                        <div class="col-sm-5">
                                             <div class="form-group has-label">
                                                 <label>
                                                     <strong>그룹이름 *</strong>
                                                 </label>
-                                                <input class="form-control" type="text" name="loginId" maxlength="10" required="" >
+                                                <input class="form-control" type="text" name="loginId" maxlength="10" required >
                                             </div>
                                         </div>
-
-                                        <div class="col-sm-1"></div>
-                                        <div class="col-sm-1"><button type="button" id="dupUsersBtn" class="btn btn-primary btn-simple btn-sm" >중복체크</button></div>
-                                        <div class="col-sm-1"><button type="submit" class="btn btn-primary btn-sm" >입력</button></div>
-                                        <div class="col-sm-1"><button type="button" class="btn btn-primary btn-sm" id="init">초기화</button></div>
                                     </div>
                                 </form>
+                            </div>
+
+                            <div class="col-md-3">
+                                <div class="col-sm-12"><button type="button" id="dupUsersBtn" class="btn btn-primary btn-simple btn-sm" >중복체크</button></div>
+                                <div class="col-sm-12"><button type="submit" class="btn btn-primary btn-sm" >입력</button>
+                                <button type="button" class="btn btn-primary btn-sm" id="init">초기화</button></div>
                             </div>
                         </div>
                     </div>
@@ -62,6 +63,6 @@
     </div>
 
     {{> footer }}
-    <script type="text/javascript" src="/viewJs/mail/receiver.js"></script>
+    <script type="text/javascript" src="/viewJs/mail/receiver/receiver.js"></script>
 </body>
 </html>

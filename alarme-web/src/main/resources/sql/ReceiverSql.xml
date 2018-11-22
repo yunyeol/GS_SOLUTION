@@ -2,8 +2,8 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.project.alarmeweb.mapper.GroupMapper">
-    <resultMap id="groupResult" type="Group">
+<mapper namespace="com.project.alarmeweb.mapper.ReceiverMapper">
+    <resultMap id="receiverResult" type="Receiver">
         <id 	property="addrGrpId" 		column="ADDRESS_GRP_ID"/>
         <result property="addrGrpName" 		column="ADDRESS_GRP_NAME"/>
         <result property="addrGrpMbrCnt" 	column="ADRESS_GRP_MBR_CNT"/>
@@ -18,13 +18,16 @@
         GAG.REG_DATE REG_DATE,
         GAG.UPT_DATE UPT_DATE
     </sql>
-    <select id="getGroupList" resultMap="groupResult">
+    <select id="getReceiverList" resultMap="receiverResult">
         /* receiverMapper.getGroupList */
         SELECT
           <include refid="columns" />
         FROM GS_ADDRESS_GRP GAG
         LEFT JOIN GS_ADDRESS_MBR GAM
         ON (GAG.ADDRESS_GRP_ID = GAM.ADDRESS_GRP_ID)
+        <where>
+
+          </where>
         GROUP BY GAG.ADDRESS_GRP_ID,GAG.REG_DATE, GAG.UPT_DATE, GAM.ADDRESS_GRP_ID
     </select>
 
