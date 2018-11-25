@@ -2,6 +2,7 @@ package gs.mail.engine.config;
 
 
 import com.zaxxer.hikari.HikariDataSource;
+import gs.mail.engine.job.scheduler.AutowiringSpringBeanJobFactory;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.SqlSessionTemplate;
@@ -66,13 +67,6 @@ public class Config {
         return new SqlSessionTemplate(sqlSessionFactory());
     }
 
-	//@Bean
-//	public PlatformTransactionManager transactionManager() {
-//        DataSourceTransactionManager transactionManager = new DataSourceTransactionManager(dataSource());
-//        transactionManager.setGlobalRollbackOnParticipationFailure(false);
-//        return transactionManager;
-//    }
-
     /**
      * TASK CONFIG
      * 멀티쓰레드를 사용하기 위한 ThreadPoolTaskExecutor 설정
@@ -94,32 +88,39 @@ public class Config {
      * BATCH CONFIG
      * 여러 JOB들이 동시에 돌아갈수 있도록 MapJobRepositoryFactoryBean, JobRepository, SimpleJobLauncher 설정
      */
-//    @Bean
-//    public JobExplorerFactoryBean jobExplorerFactoryBean(){
-//        JobExplorerFactoryBean jobExplorerFactoryBean = new JobExplorerFactoryBean();
-//        jobExplorerFactoryBean.setDataSource(dataSource());
-//        return jobExplorerFactoryBean;
-//    }
-//
-//    @Bean
-//    public MapJobRepositoryFactoryBean mapJobRepositoryFactoryBean(PlatformTransactionManager txManager) throws Exception {
-//        MapJobRepositoryFactoryBean mapJobRepositoryFactoryBean = new MapJobRepositoryFactoryBean(txManager);
-//        mapJobRepositoryFactoryBean.afterPropertiesSet();
-//        return mapJobRepositoryFactoryBean;
-//    }
-//
-//    @Bean
-//    public JobRepository jobRepository(MapJobRepositoryFactoryBean mapJobRepositoryFactoryBean) throws Exception {
-//        return mapJobRepositoryFactoryBean.getObject();
-//    }
-//
-//    @Bean
-//    public SimpleJobLauncher simpleJobLauncher(JobRepository jobRepository){
-//        SimpleJobLauncher simpleJobLauncher = new SimpleJobLauncher();
-//        simpleJobLauncher.setJobRepository(jobRepository);
-//        simpleJobLauncher.setTaskExecutor(executor());
-//        return simpleJobLauncher;
-//    }
+    @Bean
+    public JobFactory jobFactory(ApplicationContext applicationContext){
+        AutowiringSpringBeanJobFactory jobFactory = new AutowiringSpringBeanJobFactory();
+        jobFactory.setApplicationContext(applicationContext);
+        return jobFactory;
+    }
+
+    @Bean
+    public JobExplorerFactoryBean jobExplorerFactoryBean(){
+        JobExplorerFactoryBean jobExplorerFactoryBean = new JobExplorerFactoryBean();
+        jobExplorerFactoryBean.setDataSource(dataSource());
+        return jobExplorerFactoryBean;
+    }
+
+    @Bean
+    public MapJobRepositoryFactoryBean mapJobRepositoryFactoryBean(PlatformTransactionManager txManager) throws Exception {
+        MapJobRepositoryFactoryBean mapJobRepositoryFactoryBean = new MapJobRepositoryFactoryBean(txManager);
+        mapJobRepositoryFactoryBean.afterPropertiesSet();
+        return mapJobRepositoryFactoryBean;
+    }
+
+
+    public JobRepository jobRepository(MapJobRepositoryFactoryBean mapJobRepositoryFactoryBean) throws Exception {
+        return mapJobRepositoryFactoryBean.getObject();
+    }
+
+    @Bean
+    public SimpleJobLauncher simpleJobLauncher(JobRepository jobRepository){
+        SimpleJobLauncher simpleJobLauncher = new SimpleJobLauncher();
+        simpleJobLauncher.setJobRepository(jobRepository);
+        simpleJobLauncher.setTaskExecutor(executor());
+        return simpleJobLauncher;
+    }
 
     /**
      * REDIS CONFIG

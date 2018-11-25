@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="SQL.RealitmeSend">
+
+    <select id="selectRealtimeSchdl" resultType="Realtime">
+        SELECT
+            SCHDL_ID schdlId,
+            SCHDL_NAME schdlName,
+            SENDER sender,
+            FILE_PATH filePath,
+            SEND_GUBUN sendGubun,
+            SEND_TYPE sendType,
+            ACTIVE_YN activeYn
+        FROM GS_SEND_SCHDL
+        WHERE MASTER_SCHDL_ID = 0
+        AND SEND_TYPE = 'R_M'
+        AND ACTIVE_YN = 'Y'
+    </select>
+
+    <select id="selectRealtimeTodaySchdl" resultType="Realtime">
+        SELECT
+            SCHDL_ID schdlId
+        FROM GS_SEND_SCHDL
+        WHERE MASTER_SCHDL_ID = ${schdlId}
+        AND SEND_TYPE='R_S'
+        AND DATE_FORMAT(RESERVE_DATE, '%Y%m%d') = DATE_FORMAT(SYSDATE(), '%Y%m%d');
+    </select>
+
+    <insert id="insertRealtimeTodaySchdl" parameterType="Long">
+        INSERT INTO GS_SEND_SCHDL(MASTER_SCHDL_ID, SCHDL_NAME, SENDER, FILE_PATH,
+							SEND_GUBUN, SEND_TYPE, SEND_FLAG, RESERVE_DATE, REG_DATE)
+		SELECT SCHDL_ID, SCHDL_NAME, SENDER, FILE_PATH, SEND_GUBUN, 'R_S', '00', SYSDATE(), SYSDATE()
+		FROM GS_SEND_SCHDL
+		WHERE SCHDL_ID = ${schdlId}
+    </insert>
+
+    <select id="selectMailQueueMinMax" parameterType="Long" resultType="Map">
+    <![CDATA[
+      SELECT
+            'selectMailQueueMinMax',
+            MIN(ID) queueMinId,
+            MAX(ID) queueMaxId
+        FROM GS_MAIL_QUEUE
+        WHERE SCHDL_ID = ${schdlId}
+        AND TARGET_YN = 'N'
+        AND RESERVE_DATE < SYSDATE()
+        LIMIT 1000
+    ]]>
+    </select>
+
+    <select id="selectMailQueueList" parameterType="Long" resultType="Realtime">
+    <![CDATA[
+        SELECT
+            GSS.SCHDL_ID schdlId,
+            GSS.MASTER_SCHDL_ID masterSchdlId,
+            GSS.SCHDL_NAME schdlName,
+            GSS.FILE_PATH filePath,
+            GSS.SEND_GUBUN sendGubun,
+            GSS.SEND_TYPE sendType,
+            GSS.SEND_FLAG sendFlag,
+            GSS.ACTIVE_YN activeYn,
+            GSS.SENDER sender,
+
+            GMQ.RECEIVER receiver,
+            GMQ.TITLE mailTitle,
+            GMQ.CONTENTS mailContents,
+            GMQ.MAP1 map1,
+            GMQ.MAP2 map2,
+            GMQ.MAP3 map3,
+            GMQ.MAP4 map4,
+            GMQ.MAP5 map5,
+            GMQ.MAP6 map6,
+            GMQ.MAP7 map7,
+            GMQ.MAP8 map8,
+            GMQ.MAP9 map9,
+            GMQ.MAP10 map10,
+            GMQ.TARGET_YN targetYn,
+            GMQ.RESERVE_DATE reserveDate,
+            GMQ.REG_DATE regDate
+        FROM GS_SEND_SCHDL GSS
+        INNER JOIN GS_MAIL_QUEUE GMQ ON (GSS.MASTER_SCHDL_ID = GMQ.SCHDL_ID)
+        WHERE GSS.SEND_TYPE = 'R_S'
+        AND GMQ.SCHDL_ID = ${schdlId}
+        AND GMQ.TARGET_YN = 'N'
+        AND GMQ.RESERVE_DATE < SYSDATE()
+        AND GMQ.ID BETWEEN ${queueMinId} AND ${queueMaxId}
+    ]]>
+    </select>
+
+    <update id="updateTargetYn">
+        UPDATE GS_MAIL_QUEUE SET TARGET_YN = 'Y' WHERE SCHDL_ID = ${schdlId}
+    </update>
+
+    <insert id="insertRealtimeQueRaw" parameterType="Long">
+        INSERT INTO GS_SEND_QUE_RAW(SCHDL_ID, RECEIVER, SEND_GUBUN, REG_DATE)
+		VALUES(${schdlId}, #{receiver}, 'M', SYSDATE())
+    </insert>
+
+</mapper>
+

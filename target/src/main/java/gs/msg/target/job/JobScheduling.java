@@ -40,15 +40,15 @@ public class JobScheduling {
 //        log.info("Job finished with status : {}", execution.getStatus());
 //    }
 //
-//    @Scheduled(cron = "${target.test.sql}")
-//    public void sqlTest() throws Exception
-//    {
-//        JobParameters param = new JobParametersBuilder()
-//                .addString("jobId_sql", String.valueOf(System.currentTimeMillis())).toJobParameters();
-//
-//        JobExecution execution = simpleJobLauncher.run(dbtest.simpleJob2(), param);
-//        log.info("Job finished with status : {}", execution.getStatus());
-//    }
+    @Scheduled(cron = "${target.test.sql}")
+    public void sqlTest() throws Exception
+    {
+        JobParameters param = new JobParametersBuilder()
+                .addString("jobId_sql", String.valueOf(System.currentTimeMillis())).toJobParameters();
+
+        JobExecution execution = simpleJobLauncher.run(dbtest.simpleJob2(), param);
+        log.info("Job finished with status : {}", execution.getStatus());
+    }
 //
 //    @Scheduled(cron = "${target.test.master}")
 //    public void masterSlaveTest() throws Exception
@@ -60,15 +60,15 @@ public class JobScheduling {
 //        //log.info("Job finished with status : {}", execution.getStatus());
 //    }
 
-    @Scheduled(cron = "${target.test.redis}")
-    public void redisTest() throws Exception
-    {
-        JobParameters param = new JobParametersBuilder()
-                .addString("jobId_masterSlaveTest", String.valueOf(System.currentTimeMillis())).toJobParameters();
-
-        JobExecution execution = simpleJobLauncher.run(resttest.redisTestJob(), param);
-        //log.info("Job finished with status : {}", execution.getStatus());
-    }
+//    @Scheduled(cron = "${target.test.redis}")
+//    public void redisTest() throws Exception
+//    {
+//        JobParameters param = new JobParametersBuilder()
+//                .addString("jobId_masterSlaveTest", String.valueOf(System.currentTimeMillis())).toJobParameters();
+//
+//        JobExecution execution = simpleJobLauncher.run(resttest.redisTestJob(), param);
+//        //log.info("Job finished with status : {}", execution.getStatus());
+//    }
 
 
 }

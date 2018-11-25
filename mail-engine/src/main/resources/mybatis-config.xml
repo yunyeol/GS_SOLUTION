@@ -24,7 +24,4 @@
         <typeHandler javaType="java.sql.Date"      handler="org.apache.ibatis.type.DateTypeHandler"/>
     </typeHandlers>
 
-    <mappers>
-        <package name="gs.msg.target.mapper"/>
-    </mappers>
 </configuration>
