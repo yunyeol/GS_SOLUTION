@@ -32,12 +32,6 @@ public class RealtimeSendExecutor extends JobParameterContents implements Job {
             for (Realtime realtime : realtimeSendService.selectRealtimeSchdlList()){
                 jobDataMap.put("jobName", "RealtimeSend");
                 jobDataMap.put("schdlId", realtime.getSchdlId());
-//                jobDataMap.put("schdlName", realtime.getSchdlName());
-//                jobDataMap.put("sender", realtime.getSender());
-//                jobDataMap.put("filePath", realtime.getFilePath());
-//                jobDataMap.put("sendGubun", realtime.getSendGubun());
-//                jobDataMap.put("sendType", realtime.getSendType());
-//                jobDataMap.put("activeYn", realtime.getActiveYn());
                 jobDataMap.put("time", System.currentTimeMillis());
 
                 JobParameters jobParameters = getJobParametersFromJobMap(jobDataMap);

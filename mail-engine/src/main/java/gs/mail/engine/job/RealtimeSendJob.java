@@ -6,6 +6,8 @@ import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.mybatis.spring.batch.MyBatisCursorItemReader;
 import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobExecutionListener;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
@@ -21,9 +23,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
+import java.io.*;
+import java.net.Socket;
 import java.util.*;
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
@@ -40,18 +41,21 @@ public class RealtimeSendJob {
     @Autowired private SqlSessionFactory sqlSessionFactory;
 
     @Value("${batch.commit.interval}") private int commitInterval;
+    @Value("${batch.slave.cnt}") private int slaveCnt;
 
     @Value("${mail.smtp.host}") private String mailHost;
     @Value("${mail.smtp.port}") private String mailPort;
     @Value("${mail.smtp.protocol}") private String mailProtocol;
 
+    private long schdlId;
+
     @Bean
     public Job realtimeSendJobDetail() {
         try{
             return jobBuilderFactory.get("realtimeSendJobDetail")
-                    //.incrementer(new RunIdIncrementer())
                     .start(realtimeSchdlTasklet())
                     .next(realtimeSendStep())
+                    .listener(realtimeSendQueListener())
                     .build();
 
         }catch(Exception e){
@@ -108,11 +112,21 @@ public class RealtimeSendJob {
         return null;
     }
 
+//    @Bean
+//    public Step realtimeMasterSendStep() {
+//        return stepBuilderFactory.get("realtimeMasterSendStep")
+//                .partitioner("realtimeSlaveSendStep", partitioner())
+//                .step(realtimeSlaveSendStep())
+//                .gridSize(slaveCnt)
+//                .build();
+//    }
+
     /**
      * realtimeSendStep
      * @return
      */
     @Bean
+   // public Step realtimeSlaveSendStep(){
     public Step realtimeSendStep(){
         try{
             return stepBuilderFactory.get("realtimeSendStep")
@@ -130,6 +144,8 @@ public class RealtimeSendJob {
     @Bean
     @StepScope
     public MyBatisCursorItemReader realtimeSendQueueReader(
+//            @Value("#{stepExecutionContext['minValue']}") Long minValue,
+//            @Value("#{stepExecutionContext['maxValue']}") Long maxValue,
             @Value("#{jobExecutionContext['queueMinId']}") Long queueMinId,
             @Value("#{jobExecutionContext['queueMaxId']}") Long queueMaxId,
             @Value("#{jobParameters['schdlId']}") Long schdlId) {
@@ -168,7 +184,7 @@ public class RealtimeSendJob {
 
     @Bean
     @StepScope
-    public ItemWriter<Realtime> realtimeSendQueueWriter() throws Exception {
+    public ItemWriter<Realtime> realtimeSendQueueWriter() {
         ItemWriter<Realtime> writer = new ItemWriter<Realtime>() {
             @Override
             public void write(List<? extends Realtime> items) throws Exception {
@@ -177,12 +193,18 @@ public class RealtimeSendJob {
                 boolean isExists = file.exists();
 
                 if(isExists){
-                    BufferedReader in = new BufferedReader(new FileReader(file));
-                    String line;
-                    while ((line = in.readLine()) != null) {
-                        sb.append(line);
+                    try{
+                        BufferedReader in = new BufferedReader(new FileReader(file));
+                        String line;
+                        while ((line = in.readLine()) != null) {
+                            sb.append(line);
+                        }
+                        in.close();
+                    }catch(Exception e){
+                        e.printStackTrace();
                     }
-                    in.close();
+                }else{
+                    log.info("Not Exists Contents File");
                 }
                 String htmlContents = sb.toString();
 
@@ -209,6 +231,19 @@ public class RealtimeSendJob {
                 msg.setRecipients(Message.RecipientType.TO, recipientAddress);
                 Transport.send(msg);
 
+//                Socket socket = new Socket(mailHost, Integer.parseInt(mailPort));
+//                BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+//                PrintWriter pw = new PrintWriter(socket.getOutputStream(), true);
+//
+//                String line;
+//                //StringBuffer resultSb = new StringBuffer();
+//                while((line = br.readLine()) != null){
+//                    //resultSb.append(line);
+//                    log.info("### 1 {}", line);
+//                }
+//                br.close();
+//                socket.close();
+
                 Map<String, Object> paramMap = new HashMap<String, Object>();
                 paramMap.put("schdlId", items.get(0).getSchdlId());
                 paramMap.put("sendCnt", cnt);
@@ -220,4 +255,76 @@ public class RealtimeSendJob {
 
         return  writer;
     }
+
+    @Bean
+    public JobExecutionListener realtimeSendQueListener() throws Exception{
+        JobExecutionListener jobExecutionListener = new JobExecutionListener() {
+            @Override
+            public void beforeJob(JobExecution jobExecution) {
+                schdlId = jobExecution.getJobParameters().getLong("schdlId");
+            }
+
+            @Override
+            public void afterJob(JobExecution jobExecution) {
+
+            }
+        };
+
+        return jobExecutionListener;
+    }
+
+//    public Partitioner partitioner(){
+//        Partitioner partitioner = new Partitioner() {
+//            @Override
+//            public Map<String, ExecutionContext> partition(int gridSize) {
+//                Map<String, ExecutionContext> result = new HashMap<String, ExecutionContext>();
+//                Map<String, Long> selectQuery = new HashMap<String, Long>();
+//
+//                Map<String, Object> paramMap = new HashMap<String, Object>();
+//                paramMap.put("schdlId", schdlId);
+//
+//                log.info("### : {}",schdlId);
+//
+//                selectQuery = sqlSessionTemplate.selectOne("SQL.RealitmeSend.selectMailQueueMinMax", paramMap);
+//
+//                log.info("### = {}",selectQuery);
+//                long minValue = 0;
+//                long maxValue = 0;
+//
+//                if(selectQuery != null && selectQuery.get("queueMinId") != null){
+//                    minValue = selectQuery.get("queueMinId");
+//                    maxValue = selectQuery.get("queueMaxId");
+//                }
+//
+//                long targetSize = maxValue - minValue;
+//                long targetSizePerNode = (targetSize / gridSize  ) + 1;
+//
+////                if(targetSizePerNode <= gridSize){
+////                    targetSizePerNode = gridSize;
+////                }
+//
+//                int number = 0;
+//                long start = minValue;
+//                long end = start + targetSizePerNode - 1;
+//                while (start <= maxValue) {
+//                    ExecutionContext value = new ExecutionContext();
+//                    result.put("partition" + number, value);
+//
+//                    if (end >= maxValue) {
+//                        end = maxValue;
+//                    }
+//                    value.putLong("minValue", start);
+//                    value.putLong("maxValue", end);
+//
+//                    log.info("partition" + number+", "+start+","+end);
+//
+//                    start += targetSizePerNode;
+//                    end += targetSizePerNode;
+//                    number++;
+//                }
+//                return result;
+//            }
+//        };
+//        return  partitioner;
+//    }
 }
