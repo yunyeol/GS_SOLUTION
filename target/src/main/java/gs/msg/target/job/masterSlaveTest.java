@@ -69,7 +69,7 @@ public class masterSlaveTest {
                 }
 
                 int targetSize = maxValue - minValue;
-                long targetSizePerNode = (targetSize / gridSize ) + 1;
+                long targetSizePerNode = (targetSize / gridSize  ) + 1;
 
                 if(targetSizePerNode <= gridSize){
                     targetSizePerNode = gridSize;

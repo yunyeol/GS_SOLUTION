@@ -6,6 +6,7 @@ import org.apache.ibatis.type.Alias;
 @Data
 @Alias("Realtime")
 public class Realtime {
+    private long queId;
     private long schdlId;
     private String schdlName;
     private String sender;

@@ -28,17 +28,9 @@
         AND DATE_FORMAT(RESERVE_DATE, '%Y%m%d') = DATE_FORMAT(SYSDATE(), '%Y%m%d');
     </select>
 
-    <insert id="insertRealtimeTodaySchdl" parameterType="Long">
-        INSERT INTO GS_SEND_SCHDL(MASTER_SCHDL_ID, SCHDL_NAME, SENDER, FILE_PATH,
-							SEND_GUBUN, SEND_TYPE, SEND_FLAG, RESERVE_DATE, REG_DATE)
-		SELECT SCHDL_ID, SCHDL_NAME, SENDER, FILE_PATH, SEND_GUBUN, 'R_S', '00', SYSDATE(), SYSDATE()
-		FROM GS_SEND_SCHDL
-		WHERE SCHDL_ID = ${schdlId}
-    </insert>
-
     <select id="selectMailQueueMinMax" parameterType="Long" resultType="Map">
     <![CDATA[
-      SELECT
+        SELECT
             'selectMailQueueMinMax',
             MIN(ID) queueMinId,
             MAX(ID) queueMaxId
@@ -53,6 +45,7 @@
     <select id="selectMailQueueList" parameterType="Long" resultType="Realtime">
     <![CDATA[
         SELECT
+            GMQ.ID queId,
             GSS.SCHDL_ID schdlId,
             GSS.MASTER_SCHDL_ID masterSchdlId,
             GSS.SCHDL_NAME schdlName,
@@ -83,14 +76,24 @@
         INNER JOIN GS_MAIL_QUEUE GMQ ON (GSS.MASTER_SCHDL_ID = GMQ.SCHDL_ID)
         WHERE GSS.SEND_TYPE = 'R_S'
         AND GMQ.SCHDL_ID = ${schdlId}
-        AND GMQ.TARGET_YN = 'N'
+        AND GMQ.TARGET_YN = 'Y'
         AND GMQ.RESERVE_DATE < SYSDATE()
+        AND GSS.SCHDL_NAME = DATE_FORMAT(SYSDATE(), '%Y%m%d')
         AND GMQ.ID BETWEEN ${queueMinId} AND ${queueMaxId}
     ]]>
     </select>
 
     <update id="updateTargetYn">
-        UPDATE GS_MAIL_QUEUE SET TARGET_YN = 'Y' WHERE SCHDL_ID = ${schdlId}
+    <![CDATA[
+        UPDATE GS_MAIL_QUEUE SET TARGET_YN = 'Y' WHERE ID BETWEEN ${queueMinId} AND ${queueMaxId}
+    ]]>
+    </update>
+
+    <update id="updateSchdlTargetSendCnt">
+        UPDATE GS_SEND_SCHDL
+        SET TARGET_CNT = TARGET_CNT + ${targetCnt},
+            SEND_CNT = SEND_CNT + ${sendCnt}
+        WHERE SCHDL_ID = ${schdlId}
     </update>
 
     <insert id="insertRealtimeQueRaw" parameterType="Long">
@@ -98,5 +101,16 @@
 		VALUES(${schdlId}, #{receiver}, 'M', SYSDATE())
     </insert>
 
+    <insert id="insertRealtimeTodaySchdl" parameterType="Long">
+        INSERT INTO GS_SEND_SCHDL(MASTER_SCHDL_ID, SCHDL_NAME, SENDER, FILE_PATH,
+							SEND_GUBUN, SEND_TYPE, SEND_FLAG, ACTIVE_YN, RESERVE_DATE, REG_DATE)
+		SELECT SCHDL_ID, DATE_FORMAT(SYSDATE(), '%Y%m%d'), SENDER, FILE_PATH, SEND_GUBUN, 'R_S', '00', '-', SYSDATE(), SYSDATE()
+		FROM GS_SEND_SCHDL
+		WHERE SCHDL_ID = ${schdlId}
+    </insert>
+
+    <delete id="deleteMailQueue" parameterType="Long">
+        DELETE FROM GS_MAIL_QUEUE WHERE ID = ${queId}
+    </delete>
 </mapper>
 
