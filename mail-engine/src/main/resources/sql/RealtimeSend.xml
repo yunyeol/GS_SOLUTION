@@ -38,7 +38,7 @@
         WHERE SCHDL_ID = ${schdlId}
         AND TARGET_YN = 'N'
         AND RESERVE_DATE < SYSDATE()
-        LIMIT 1000
+        LIMIT 100000
     ]]>
     </select>
 
@@ -57,6 +57,7 @@
             GSS.SENDER sender,
 
             GMQ.RECEIVER receiver,
+            GMQ.UUID uuid,
             GMQ.TITLE mailTitle,
             GMQ.CONTENTS mailContents,
             GMQ.MAP1 map1,
@@ -85,20 +86,31 @@
 
     <update id="updateTargetYn">
     <![CDATA[
-        UPDATE GS_MAIL_QUEUE SET TARGET_YN = 'Y' WHERE ID BETWEEN ${queueMinId} AND ${queueMaxId}
+        UPDATE GS_MAIL_QUEUE SET TARGET_YN = 'Y' WHERE ID BETWEEN ${queueMinId} AND ${queueMaxId} AND SCHDL_ID = ${schdlId}
     ]]>
     </update>
 
-    <update id="updateSchdlTargetSendCnt">
+    <update id="updateSchdlCnt">
         UPDATE GS_SEND_SCHDL
         SET TARGET_CNT = TARGET_CNT + ${targetCnt},
-            SEND_CNT = SEND_CNT + ${sendCnt}
+            SEND_CNT = SEND_CNT + ${sendCnt},
+            SUCCES_CNT = SUCCES_CNT + ${succesCnt},
+            FAIL_CNT = FAIL_CNT + ${failCnt}
         WHERE SCHDL_ID = ${schdlId}
     </update>
 
+    <update id="updateFailSchdlRaw">
+        UPDATE GS_SEND_QUE_RAW
+        SET SEND_FLAG = #{sendFlag},
+            RESULT_CD = #{resultCd}
+        WHERE UUID = #{uuid}
+        AND SEND_GUBUN = 'M'
+        AND SEND_FLAG = '0000'
+    </update>
+
     <insert id="insertRealtimeQueRaw" parameterType="Long">
-        INSERT INTO GS_SEND_QUE_RAW(SCHDL_ID, RECEIVER, SEND_GUBUN, REG_DATE)
-		VALUES(${schdlId}, #{receiver}, 'M', SYSDATE())
+        INSERT INTO GS_SEND_QUE_RAW(SCHDL_ID, UUID, RECEIVER, SEND_GUBUN, REG_DATE)
+		VALUES(${schdlId}, #{uuid}, #{receiver}, 'M', SYSDATE())
     </insert>
 
     <insert id="insertRealtimeTodaySchdl" parameterType="Long">

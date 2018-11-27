@@ -8,9 +8,17 @@ import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.quartz.SchedulerException;
 import org.quartz.spi.JobFactory;
+import org.springframework.batch.core.configuration.JobRegistry;
+import org.springframework.batch.core.configuration.support.JobRegistryBeanPostProcessor;
+import org.springframework.batch.core.configuration.support.MapJobRegistry;
+import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.explore.support.JobExplorerFactoryBean;
+import org.springframework.batch.core.explore.support.MapJobExplorerFactoryBean;
+import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.launch.support.SimpleJobLauncher;
+import org.springframework.batch.core.launch.support.SimpleJobOperator;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean;
 import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.PropertiesFactoryBean;
@@ -39,7 +47,7 @@ import java.util.Properties;
 @EnableTransactionManagement
 public class Config {
 
-    private ApplicationContext applicationContext;
+
     /**
      * DB CONFIG
      * DATASOURCE 설정, 히카리데이터소스 사용
@@ -67,6 +75,12 @@ public class Config {
         return new SqlSessionTemplate(sqlSessionFactory());
     }
 
+    @Bean
+    public PlatformTransactionManager transactionManager() {
+        DataSourceTransactionManager transactionManager = new DataSourceTransactionManager(dataSource());
+        transactionManager.setGlobalRollbackOnParticipationFailure(false);
+        return transactionManager;
+    }
     /**
      * TASK CONFIG
      * 멀티쓰레드를 사용하기 위한 ThreadPoolTaskExecutor 설정
@@ -96,6 +110,24 @@ public class Config {
     }
 
     @Bean
+    public MapJobRegistry mapJobRegistry(){
+        MapJobRegistry mapJobRegistry = new MapJobRegistry();
+        return mapJobRegistry;
+    }
+
+    @Bean
+    public JobRegistry jobRegistry(){
+        return mapJobRegistry();
+    }
+
+    @Bean
+    public JobRegistryBeanPostProcessor jobRegistryBeanPostProcessor(){
+        JobRegistryBeanPostProcessor jobRegistryBeanPostProcessor = new JobRegistryBeanPostProcessor();
+        jobRegistryBeanPostProcessor.setJobRegistry(jobRegistry());
+        return jobRegistryBeanPostProcessor;
+    }
+
+    @Bean
     public JobExplorerFactoryBean jobExplorerFactoryBean(){
         JobExplorerFactoryBean jobExplorerFactoryBean = new JobExplorerFactoryBean();
         jobExplorerFactoryBean.setDataSource(dataSource());
@@ -103,15 +135,33 @@ public class Config {
     }
 
     @Bean
+    public JobExplorer jobExplorer(JobExplorerFactoryBean jobExplorerFactoryBean) throws Exception {
+        return jobExplorerFactoryBean.getObject();
+    }
+
+    @Bean
     public MapJobRepositoryFactoryBean mapJobRepositoryFactoryBean(PlatformTransactionManager txManager) throws Exception {
         MapJobRepositoryFactoryBean mapJobRepositoryFactoryBean = new MapJobRepositoryFactoryBean(txManager);
-        mapJobRepositoryFactoryBean.afterPropertiesSet();
         return mapJobRepositoryFactoryBean;
     }
 
-
+    @Bean
     public JobRepository jobRepository(MapJobRepositoryFactoryBean mapJobRepositoryFactoryBean) throws Exception {
         return mapJobRepositoryFactoryBean.getObject();
+    }
+
+    @Bean
+    public JobOperator jobOperator(){
+        SimpleJobOperator simpleJobOperator = new SimpleJobOperator();
+        try {
+            simpleJobOperator.setJobExplorer(jobExplorer(jobExplorerFactoryBean()));
+            simpleJobOperator.setJobRepository(jobRepository(mapJobRepositoryFactoryBean(transactionManager())));
+            simpleJobOperator.setJobLauncher(simpleJobLauncher(jobRepository(mapJobRepositoryFactoryBean(transactionManager()))));
+            simpleJobOperator.setJobRegistry(jobRegistry());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return simpleJobOperator;
     }
 
     @Bean
