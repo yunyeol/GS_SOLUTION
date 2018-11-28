@@ -1,6 +1,5 @@
 package gs.mail.engine.job;
 
-import gs.mail.engine.dto.Realtime;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionTemplate;
@@ -50,7 +49,7 @@ public class TargetJob {
                         Map<String, Long> param = new HashMap<>();
                         param.put("schdlId", schdlId);
 
-                        log.info("############ target schdl");
+                        log.info("############ target schdl : {}", schdlId);
 
                         return RepeatStatus.FINISHED;
                     })
