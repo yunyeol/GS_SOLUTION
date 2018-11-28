@@ -72,7 +72,7 @@ public class RealtimeSendJob {
                     .tasklet((contribution, chunkContext) -> {
                         final long  schdlId = chunkContext.getStepContext().getStepExecution().getJobParameters().getLong("schdlId");
 
-                        Map<String, Long> param = new HashMap<String, Long>();
+                        Map<String, Long> param = new HashMap<>();
                         param.put("schdlId", schdlId);
 
                         List<Realtime> todaySchdl = sqlSessionTemplate.selectList("SQL.RealitmeSend.selectRealtimeTodaySchdl", param);
@@ -91,7 +91,6 @@ public class RealtimeSendJob {
 
     /**
      * realtimeMasterSendStep
-     * @return
      */
     @Bean
     public Step realtimeMasterSendStep() {
@@ -104,7 +103,6 @@ public class RealtimeSendJob {
 
     /**
      * realtimeSlaveSendStep
-     * @return
      */
     @Bean
     public Step realtimeSlaveSendStep(){
@@ -184,52 +182,30 @@ public class RealtimeSendJob {
                         prop.setProperty("mail.transport.protocol", mailProtocol);
                         prop.setProperty("mail.smtp.host", mailHost);
                         prop.setProperty("mail.smtp.port", mailPort);
-                        prop.setProperty("mail.smtp.starttls.enable", "true");
 
                         Session mailSession = Session.getDefaultInstance(prop, null);
                         Message msg = new MimeMessage(mailSession);
 
-                        InternetAddress[] recipientAddress = new InternetAddress[items.size()];
+                        //InternetAddress[] recipientAddress = new InternetAddress[items.size()];
                         int cnt = 0;
                         for(Realtime realtime : items){
                             msg.setSubject(realtime.getMailTitle());
                             msg.setContent(htmlContents.replace("${CONTENTS}", realtime.getMailContents()), "text/html; charset=utf-8");
-
-                            recipientAddress[cnt] = new InternetAddress(realtime.getReceiver().trim());
+                            msg.setRecipient(Message.RecipientType.TO, new InternetAddress(realtime.getReceiver()));
+                            msg.setSentDate(new Date());
+//                            recipientAddress[cnt] = new InternetAddress(realtime.getReceiver().trim()); 동보발송시 사용
                             cnt++;
                         }
                         msg.setFrom(new InternetAddress(items.get(0).getSender()));
-                        msg.setSentDate(new Date());
-                        msg.setRecipients(Message.RecipientType.TO, recipientAddress);
                         Transport.send(msg);
 
-                        Map<String, Object> paramMap = new HashMap<String, Object>();
-                        paramMap.put("schdlId", items.get(0).getSchdlId());
-                        paramMap.put("sendCnt", cnt);
-                        paramMap.put("targetCnt", cnt);
-                        paramMap.put("succesCnt", 0);
-                        paramMap.put("failCnt", 0);
-                        sqlSessionTemplate.insert("SQL.RealitmeSend.updateSchdlCnt", paramMap);
-
-//                        Session session = Session.getDefaultInstance(prop, null);
-//                        session.setDebug(true);
-//                        log.info("######## : {}", session );
-//                        Store store = session.getStore("pop3");
-//                        store.connect();
-
+                        updateSchdlCnt(items.get(0).getSchdlId(), cnt, cnt, 0, 0);
                     }else{
                         log.info("Not Exists Contents File");
-
-                        Map<String, Object> paramMap = new HashMap<String, Object>();
-                        paramMap.put("schdlId", items.get(0).getSchdlId());
-                        paramMap.put("sendCnt", 0);
-                        paramMap.put("targetCnt", 0);
-                        paramMap.put("succesCnt", 0);
-                        paramMap.put("failCnt", items.size());
-                        sqlSessionTemplate.insert("SQL.RealitmeSend.updateSchdlCnt", paramMap);
+                        updateSchdlCnt(items.get(0).getSchdlId(), 0, 0, 0, items.size());
 
                         for(Realtime realtime : items){
-                            paramMap = new HashMap<String, Object>();
+                            HashMap<String, Object> paramMap = new HashMap<String, Object>();
                             paramMap.put("uuid", realtime.getUuid());
                             paramMap.put("sendFlag","50");
                             paramMap.put("resultCd","1100");
@@ -241,7 +217,6 @@ public class RealtimeSendJob {
                 }
             }
         };
-
         return  writer;
     }
 
@@ -333,5 +308,15 @@ public class RealtimeSendJob {
             }
         };
         return  partitioner;
+    }
+
+    private void updateSchdlCnt(long schdlId, int sendCnt, int targetCnt, int succesCnt, int failCnt){
+        Map<String, Object> paramMap = new HashMap<String, Object>();
+        paramMap.put("schdlId", schdlId);
+        paramMap.put("sendCnt", sendCnt);
+        paramMap.put("targetCnt", targetCnt);
+        paramMap.put("succesCnt", succesCnt);
+        paramMap.put("failCnt", failCnt);
+        sqlSessionTemplate.insert("SQL.RealitmeSend.updateSchdlCnt", paramMap);
     }
 }

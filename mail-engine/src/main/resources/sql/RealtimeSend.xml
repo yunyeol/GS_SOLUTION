@@ -15,6 +15,7 @@
             ACTIVE_YN activeYn
         FROM GS_SEND_SCHDL
         WHERE MASTER_SCHDL_ID = 0
+        AND SEND_GUBUN = 'M'
         AND SEND_TYPE = 'R_M'
         AND ACTIVE_YN = 'Y'
     </select>
