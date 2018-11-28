@@ -20,6 +20,7 @@ import org.springframework.batch.core.launch.support.SimpleJobOperator;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean;
 import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.PropertiesFactoryBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -28,6 +29,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.task.TaskExecutor;
@@ -47,6 +49,7 @@ import java.util.Properties;
 @EnableTransactionManagement
 public class Config {
 
+    @Autowired private ApplicationContext applicationContext;
 
     /**
      * DB CONFIG
@@ -170,6 +173,16 @@ public class Config {
         simpleJobLauncher.setJobRepository(jobRepository);
         simpleJobLauncher.setTaskExecutor(executor());
         return simpleJobLauncher;
+    }
+
+    @Bean
+    public SchedulerFactoryBean schedulerFactoryBean(){
+        SchedulerFactoryBean schedulerFactoryBean = new SchedulerFactoryBean();
+        schedulerFactoryBean.setConfigLocation(new PathMatchingResourcePatternResolver().getResource("classpath:/quartz.properties"));
+        schedulerFactoryBean.setDataSource(dataSource());
+        schedulerFactoryBean.setJobFactory(jobFactory(applicationContext));
+        schedulerFactoryBean.setOverwriteExistingJobs(true);
+        return schedulerFactoryBean;
     }
 
     /**
