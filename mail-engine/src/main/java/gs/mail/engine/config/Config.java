@@ -49,6 +49,8 @@ import java.util.Properties;
 @EnableTransactionManagement
 public class Config {
 
+    @Autowired private ApplicationContext applicationContext;
+
     /**
      * DB CONFIG
      * DATASOURCE 설정, 히카리데이터소스 사용
@@ -171,6 +173,16 @@ public class Config {
         simpleJobLauncher.setJobRepository(jobRepository);
         simpleJobLauncher.setTaskExecutor(executor());
         return simpleJobLauncher;
+    }
+
+    @Bean
+    public SchedulerFactoryBean schedulerFactoryBean(){
+        SchedulerFactoryBean schedulerFactoryBean = new SchedulerFactoryBean();
+        schedulerFactoryBean.setConfigLocation(new PathMatchingResourcePatternResolver().getResource("classpath:/quartz.properties"));
+        schedulerFactoryBean.setDataSource(dataSource());
+        schedulerFactoryBean.setJobFactory(jobFactory(applicationContext));
+        schedulerFactoryBean.setOverwriteExistingJobs(true);
+        return schedulerFactoryBean;
     }
 
     /**

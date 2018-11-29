@@ -32,6 +32,17 @@ public class TargetExecutor extends JobParameterContents implements Job {
         try {
             Map<String, Object> jobDataMap = context.getMergedJobDataMap();
 
+//            JobParameters jobParameters1 = getJobParametersFromJobMap(jobDataMap);
+//            JobExecution lastExecution = jobRepository.getLastJobExecution("realtimeSendJobDetail", jobParameters1);
+//
+//            if(lastExecution.getExitStatus().getExitCode() != "COMPLETED"){
+//                log.info("Job ExitCode : {}", lastExecution.getExitStatus().getExitCode());
+//                lastExecution.setExitStatus(ExitStatus.COMPLETED);
+//                lastExecution.setStatus(BatchStatus.COMPLETED);
+//                lastExecution.setEndTime(new Date());
+//                jobRepository.update(lastExecution);
+//            }
+
             for (Target target : targetService.selectTargetList()){
                 jobDataMap.put("jobName", "Target");
                 jobDataMap.put("schdlId", target.getSchdlId());

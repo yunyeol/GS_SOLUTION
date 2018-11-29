@@ -261,7 +261,7 @@ public class RealtimeSendJob {
                 Map<String, ExecutionContext> result = new HashMap<String, ExecutionContext>();
                 Map<String, Long> selectQuery = new HashMap<String, Long>();
                 Map<String, Object> paramMap = new HashMap<String, Object>();
-                paramMap.put("schdlId", schdlId != null ? schdlId : 0);
+                paramMap.put("schdlId", schdlId);
 
                 selectQuery = sqlSessionTemplate.selectOne("SQL.RealitmeSend.selectMailQueueMinMax", paramMap);
 
