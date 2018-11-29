@@ -125,7 +125,7 @@ public class TargetJob {
             public void write(List<? extends Target> items) {
                 try{
                     log.info(items.toString());
-                    redisTemplate.opsForValue().set("test","test1111");
+                    redisTemplate.opsForValue().set("test","test123123123");
                 }catch(Exception e){
                     e.printStackTrace();
                 }
