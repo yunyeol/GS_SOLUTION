@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 
 @Configuration
@@ -18,39 +19,23 @@ public class QuartzJobScheduler {
     @Value("${cron.mail.target}") private String targetCron;
 
     @Bean
-    public SchedulerFactoryBean RealtimeSendStart(@Autowired JobFactory jobFactory) throws SchedulerException {
+    public SchedulerFactoryBean quartzScheduler(@Autowired JobFactory jobFactory) throws SchedulerException {
         SchedulerFactoryBean schedulerFactoryBean = new SchedulerFactoryBean();
-
+        schedulerFactoryBean.setConfigLocation(new PathMatchingResourcePatternResolver().getResource("classpath:/quartz.properties"));
         schedulerFactoryBean.setOverwriteExistingJobs(true);
         schedulerFactoryBean.setJobFactory(jobFactory);
 
-        JobDetail job = JobBuilder.newJob(RealtimeSendExecutor.class).withIdentity("RealtimeSendExecutor").storeDurably(true).build();
-
-        CronTrigger trigger = TriggerBuilder.newTrigger().forJob("RealtimeSendExecutor").
+        JobDetail realtimeSendJob = JobBuilder.newJob(RealtimeSendExecutor.class).withIdentity("RealtimeSendExecutor").storeDurably(true).build();
+        CronTrigger realtimeSendTrigger = TriggerBuilder.newTrigger().forJob("RealtimeSendExecutor").withIdentity("RealtimeSendTrigger").
                 withSchedule(CronScheduleBuilder.cronSchedule(realtimeCron)).build();
 
-        schedulerFactoryBean.setJobDetails(job);
-        schedulerFactoryBean.setTriggers(trigger);
-
-        return schedulerFactoryBean;
-    }
-
-    @Bean
-    public SchedulerFactoryBean TargetStart(@Autowired JobFactory jobFactory) throws SchedulerException {
-        SchedulerFactoryBean schedulerFactoryBean = new SchedulerFactoryBean();
-
-        schedulerFactoryBean.setOverwriteExistingJobs(true);
-        schedulerFactoryBean.setJobFactory(jobFactory);
-
-        JobDetail job = JobBuilder.newJob(TargetExecutor.class).withIdentity("TargetExecutor").storeDurably(true).build();
-
-        CronTrigger trigger = TriggerBuilder.newTrigger().forJob("TargetExecutor").
+        JobDetail targetJob = JobBuilder.newJob(TargetExecutor.class).withIdentity("TargetExecutor").storeDurably(true).build();
+        CronTrigger targetTrigger = TriggerBuilder.newTrigger().forJob("TargetExecutor").withIdentity("TargetTrigger").
                 withSchedule(CronScheduleBuilder.cronSchedule(targetCron)).build();
 
-        schedulerFactoryBean.setJobDetails(job);
-        schedulerFactoryBean.setTriggers(trigger);
+        schedulerFactoryBean.setJobDetails(realtimeSendJob, targetJob);
+        schedulerFactoryBean.setTriggers(realtimeSendTrigger, targetTrigger);
 
         return schedulerFactoryBean;
     }
-
 }

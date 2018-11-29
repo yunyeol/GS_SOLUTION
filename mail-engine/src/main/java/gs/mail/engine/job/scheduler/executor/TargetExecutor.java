@@ -9,9 +9,7 @@ import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.launch.support.SimpleJobLauncher;
-import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Map;
@@ -20,8 +18,6 @@ import java.util.Map;
 @Slf4j
 public class TargetExecutor extends JobParameterContents implements Job {
 
-    @Autowired private JobOperator jobOperator;
-    @Autowired private JobRepository jobRepository;
     @Autowired private SimpleJobLauncher simpleJobLauncher;
 
     @Autowired private TargetJob targetJob;
@@ -32,20 +28,12 @@ public class TargetExecutor extends JobParameterContents implements Job {
         try {
             Map<String, Object> jobDataMap = context.getMergedJobDataMap();
 
-//            JobParameters jobParameters1 = getJobParametersFromJobMap(jobDataMap);
-//            JobExecution lastExecution = jobRepository.getLastJobExecution("realtimeSendJobDetail", jobParameters1);
-//
-//            if(lastExecution.getExitStatus().getExitCode() != "COMPLETED"){
-//                log.info("Job ExitCode : {}", lastExecution.getExitStatus().getExitCode());
-//                lastExecution.setExitStatus(ExitStatus.COMPLETED);
-//                lastExecution.setStatus(BatchStatus.COMPLETED);
-//                lastExecution.setEndTime(new Date());
-//                jobRepository.update(lastExecution);
-//            }
-
             for (Target target : targetService.selectTargetList()){
                 jobDataMap.put("jobName", "Target");
                 jobDataMap.put("schdlId", target.getSchdlId());
+                jobDataMap.put("addressGrpId", target.getAddressGrpId());
+                jobDataMap.put("sendGubun", target.getSendGubun());
+                jobDataMap.put("sendType", target.getSendType());
                 jobDataMap.put("time", System.currentTimeMillis());
 
                 JobParameters jobParameters = getJobParametersFromJobMap(jobDataMap);

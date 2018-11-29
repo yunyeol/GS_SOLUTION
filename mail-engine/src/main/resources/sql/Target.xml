@@ -7,16 +7,33 @@
     <select id="selectTargetList" resultType="Target">
         SELECT
             SCHDL_ID schdlId,
-            SCHDL_NAME schdlName,
-            SENDER sender,
-            FILE_PATH filePath,
+            ADDRESS_GRP_ID addressGrpId,
             SEND_GUBUN sendGubun,
-            SEND_TYPE sendType,
-            ACTIVE_YN activeYn
+            SEND_TYPE sendType
         FROM GS_SEND_SCHDL
         WHERE SEND_GUBUN = 'M'
         AND SEND_TYPE IN ('C_D', 'C_F')
         AND SEND_FLAG = '10'
+        AND ADDRESS_GRP_ID != 0
+    </select>
+
+    <select id="selectDbTargetList" resultType="Target">
+        SELECT
+            GAG.ADDRESS_GRP_ID addressGrpId,
+            GAG.ADDRESS_GRP_NAME addressGrpName,
+
+            GAM.ADDRESS_GRP_ID addressMbrId,
+            GAM.NAME mbrName,
+            GAM.ADDRESS mbrAddress,
+            GAM.DATA1 data1,
+            GAM.DATA2 data2,
+            GAM.DATA3 data3,
+            GAM.REG_DATE regDate
+        FROM GS_ADDRESS_GRP GAG
+        INNER JOIN GS_ADDRESS_MBR GAM ON (GAG.ADDRESS_GRP_ID = GAM.ADDRESS_GRP_ID)
+        INNER JOIN GS_SEND_SCHDL GSS ON (GAG.ADDRESS_GRP_ID = GSS.ADDRESS_GRP_ID)
+        WHERE GAG.ADDRESS_GRP_ID = ${addressGrpId}
+        AND GSS.SCHDL_ID = ${schdlId}
     </select>
 
 </mapper>

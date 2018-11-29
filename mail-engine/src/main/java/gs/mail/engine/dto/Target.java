@@ -7,4 +7,16 @@ import org.apache.ibatis.type.Alias;
 @Alias("Target")
 public class Target {
     private long schdlId;
+    private long addressGrpId;
+    private String sendGubun;
+    private String sendType;
+
+    private String addressGrpName;
+    private long addressMbrId;
+    private String mbrName;
+    private String mbrAddress;
+    private String data1;
+    private String data2;
+    private String data3;
+    private String regDate;
 }
