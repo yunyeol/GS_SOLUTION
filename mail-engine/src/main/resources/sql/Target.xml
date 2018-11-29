@@ -19,6 +19,8 @@
 
     <select id="selectDbTargetList" resultType="Target">
         SELECT
+            GSS.SCHDL_ID schdlId,
+
             GAG.ADDRESS_GRP_ID addressGrpId,
             GAG.ADDRESS_GRP_NAME addressGrpName,
 

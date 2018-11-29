@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.core.RedisTemplate;
 
 import java.util.HashMap;
 import java.util.List;
@@ -38,6 +39,8 @@ public class TargetJob {
 
     @Value("${batch.commit.interval}") private int commitInterval;
 
+    @Autowired private RedisTemplate<String, String> redisTemplate;
+
     @Bean
     public Job targetJobDetail() {
         try{
@@ -46,7 +49,7 @@ public class TargetJob {
             Flow flow = flowBuilder
                         .start(targetDbFileDecider())
                             .on("DB")
-                            .end()
+                            .to(targetDbStep())
                         .from(targetDbFileDecider())
                             .on("FILE")
                             .end()
@@ -121,7 +124,8 @@ public class TargetJob {
             @Override
             public void write(List<? extends Target> items) {
                 try{
-                    log.info("33333");
+                    log.info(items.toString());
+                    redisTemplate.opsForValue().set("test","test1111");
                 }catch(Exception e){
                     e.printStackTrace();
                 }
