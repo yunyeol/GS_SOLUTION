@@ -49,7 +49,7 @@ public class TargetJob {
                         Map<String, Long> param = new HashMap<>();
                         param.put("schdlId", schdlId);
 
-                        log.info("############ target schdl : {}", schdlId);
+                        log.info("############ target schdl 1: {}", schdlId);
 
                         return RepeatStatus.FINISHED;
                     })
