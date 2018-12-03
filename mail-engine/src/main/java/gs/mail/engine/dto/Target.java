@@ -19,4 +19,6 @@ public class Target {
     private String data2;
     private String data3;
     private String regDate;
+
+    private long rawId;
 }

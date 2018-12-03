@@ -30,13 +30,34 @@
             INNER JOIN GS_SEND_SCHDL GSS ON (GAG.ADDRESS_GRP_ID = GSS.ADDRESS_GRP_ID)
             WHERE GAG.ADDRESS_GRP_ID = ${addressGrpId}
             AND GSS.SCHDL_ID = ${schdlId}
-            LIMIT 1
+            AND NOT EXISTS (
+                SELECT ID FROM GS_SEND_RAW GSR WHERE GSR.ADDRESS = GAM.ADDRESS
+            )
+            LIMIT 10
+        ) A
+    </select>
+
+    <select id="selectTargetFileMinMax" resultType="Map">
+        SELECT
+            'selectTargetFileMinMax',
+            MIN(A.ID) addressMinId,
+            MAX(A.ID) addressMaxId
+        FROM (
+            SELECT
+                ID
+            FROM GS_SEND_SCHDL GSS
+            INNER JOiN GS_SEND_RAW GSR ON (GSS.SCHDL_ID = GSR.SCHDL_ID)
+            WHERE GSS.SEND_TYPE = 'C_F'
+            AND GSR.SEND_FLAG = 10
+            AND GSS.SCHDL_ID = ${schdlId}
+            LIMIT 10
         ) A
     </select>
 
     <select id="selectDbTargetList" resultType="Target">
         SELECT
             GSS.SCHDL_ID schdlId,
+            GSS.SEND_TYPE sendType,
 
             GAG.ADDRESS_GRP_ID addressGrpId,
             GAG.ADDRESS_GRP_NAME addressGrpName,
@@ -59,5 +80,63 @@
         AND GAM.ADDRESS_MBR_ID BETWEEN ${addressMinId} AND ${addressMaxId}
     </select>
 
+    <select id="selectFileTargetList" resultType="Target">
+        SELECT
+            GSS.SCHDL_ID schdlId,
+            GSS.SEND_TYPE sendType,
+
+            GSR.ID rawId,
+            GSR.ADDRESS mbrAddress,
+            GSR.DATA1 data1,
+            GSR.DATA2 data2,
+            GSR.DATA3 data3,
+            GSR.REG_DATE regDate
+        FROM GS_SEND_SCHDL GSS
+		INNER JOiN GS_SEND_RAW GSR ON (GSS.SCHDL_ID = GSR.SCHDL_ID)
+		WHERE GSS.SEND_TYPE = 'C_F'
+		AND GSR.SEND_FLAG = 10
+		AND GSS.SCHDL_ID = ${schdlId}
+        AND GSR.ID BETWEEN ${addressMinId} AND ${addressMaxId}
+    </select>
+
+    <select id="selectDbTargetRemainsCnt" resultType="Integer">
+        SELECT
+            COUNT(1) cnt
+        FROM GS_ADDRESS_GRP GAG
+        INNER JOIN GS_ADDRESS_MBR GAM ON (GAG.ADDRESS_GRP_ID = GAM.ADDRESS_GRP_ID)
+        INNER JOIN GS_SEND_SCHDL GSS ON (GAG.ADDRESS_GRP_ID = GSS.ADDRESS_GRP_ID)
+        WHERE GAG.ADDRESS_GRP_ID = ${addressGrpId}
+        AND GSS.SCHDL_ID = ${schdlId}
+        AND NOT EXISTS (
+			SELECT ID FROM GS_SEND_RAW GSR WHERE GSR.ADDRESS = GAM.ADDRESS
+        )
+    </select>
+
+    <select id="selectFileTargetRemainsCnt" resultType="Integer">
+        SELECT
+            COUNT(1) cnt
+        FROM GS_SEND_SCHDL GSS
+        INNER JOiN GS_SEND_RAW GSR ON (GSS.SCHDL_ID = GSR.SCHDL_ID)
+        WHERE GSS.SEND_TYPE = 'C_F'
+        AND GSR.SEND_FLAG = 10
+        AND GSS.SCHDL_ID = ${schdlId}
+    </select>
+
+    <update id="updateSendRawFlag">
+        UPDATE GS_SEND_RAW SET SEND_FLAG = #{sendFlag} WHERE ID = ${rawId}
+    </update>
+
+    <update id="updateSendSchldFlag">
+        UPDATE GS_SEND_SCHDL SET SEND_FLAG = #{sendFlag} WHERE SCHDL_ID = ${schdlId}
+    </update>
+
+    <update id="updateSendCnt">
+        UPDATE GS_SEND_SCHDL SET TARGET_CNT = TARGET_CNT + #{targetCnt} WHERE SCHDL_ID = ${schdlId}
+    </update>
+
+    <insert id="insertSendRaw">
+        INSERT INTO GS_SEND_RAW(SCHDL_ID, ADDRESS, DATA1, DATA2, DATA3, SEND_GUBUN, SEND_FLAG, REG_DATE)
+		VALUES(${schdlId}, #{mbrAddress}, #{data1}, #{data2}, #{data3}, 'M', '11', SYSDATE())
+    </insert>
 </mapper>
 

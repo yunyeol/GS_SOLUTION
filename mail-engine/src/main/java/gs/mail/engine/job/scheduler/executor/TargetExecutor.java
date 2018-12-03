@@ -35,6 +35,8 @@ public class TargetExecutor extends JobParameterContents implements Job {
             for (Target target : targetService.selectTargetList()){
                 jobDataMap.put("jobName", "Target");
                 jobDataMap.put("schdlId", target.getSchdlId());
+                jobDataMap.put("addressGrpId", target.getAddressGrpId());
+                jobDataMap.put("sendType", target.getSendType());
                 jobDataMap.put("time", System.currentTimeMillis());
 
                 JobParameters jobParameters = getJobParametersFromJobMap(jobDataMap);

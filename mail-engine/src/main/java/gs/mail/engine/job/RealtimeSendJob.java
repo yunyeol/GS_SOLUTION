@@ -298,7 +298,7 @@ public class RealtimeSendJob {
                     }
                     value.putLong("queueMinId", start);
                     value.putLong("queueMaxId", end);
-                    log.info("partition" + number+", "+start+","+end);
+                    log.info("realtime partition" + number+", "+start+","+end);
 
                     start += targetSizePerNode;
                     end += targetSizePerNode;

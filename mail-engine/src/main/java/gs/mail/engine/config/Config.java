@@ -195,7 +195,7 @@ public class Config {
     }
 
     @Bean
-    public RedisTemplate redisTemplate(){
+    public RedisTemplate<String, Object> redisTemplate(){
         RedisTemplate redisTemplate = new RedisTemplate();
         redisTemplate.setConnectionFactory(jedisConnectionFactory());
         redisTemplate.setKeySerializer(new StringRedisSerializer());
