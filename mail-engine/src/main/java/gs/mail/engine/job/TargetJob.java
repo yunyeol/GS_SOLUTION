@@ -200,8 +200,6 @@ public class TargetJob {
                         jsonArray.put(jsonObject);
                     }
 
-                    log.info("####  jsonArray : {}", jsonArray.toString());
-
                     redisTemplate.opsForValue().set(String.valueOf(items.get(0).getSchdlId())+"_"+items.get(0).getMbrAddress()
                                                     ,jsonArray.toString());
 

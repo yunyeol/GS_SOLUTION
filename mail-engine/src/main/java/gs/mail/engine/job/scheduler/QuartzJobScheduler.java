@@ -2,6 +2,7 @@ package gs.mail.engine.job.scheduler;
 
 
 
+import gs.mail.engine.job.scheduler.executor.CampaignSendExecutor;
 import gs.mail.engine.job.scheduler.executor.RealtimeSendExecutor;
 import gs.mail.engine.job.scheduler.executor.TargetExecutor;
 import org.quartz.*;
@@ -38,8 +39,14 @@ public class QuartzJobScheduler {
         CronTrigger targetTrigger = TriggerBuilder.newTrigger().forJob("TargetExecutor").withIdentity("TargetTrigger")
                                     .withSchedule(CronScheduleBuilder.cronSchedule(targetCron)).build();
 
-        schedulerFactoryBean.setJobDetails(realtimeSendJob, targetJob);
-        schedulerFactoryBean.setTriggers(realtimeSendTrigger, targetTrigger);
+        //캠페인발송
+        JobDetail campaignJob = JobBuilder.newJob(CampaignSendExecutor.class).withIdentity("CampaignSendExecutor")
+                .storeDurably(true).build();
+        CronTrigger campaignTrigger = TriggerBuilder.newTrigger().forJob("CampaignSendExecutor").withIdentity("CampaignSendTrigger")
+                .withSchedule(CronScheduleBuilder.cronSchedule(targetCron)).build();
+
+        schedulerFactoryBean.setJobDetails(realtimeSendJob, targetJob, campaignJob);
+        schedulerFactoryBean.setTriggers(realtimeSendTrigger, targetTrigger, campaignTrigger);
 
         return schedulerFactoryBean;
     }
