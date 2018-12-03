@@ -15,7 +15,8 @@
     </settings>
 
     <typeAliases>
-        <package name="gs.mail.engine.dto"/>
+        <typeAlias  type="gs.mail.engine.dto.Target" alias="Target"/>
+        <typeAlias  type="gs.mail.engine.dto.Realtime" alias="Realtime"/>
     </typeAliases>
 
     <typeHandlers>

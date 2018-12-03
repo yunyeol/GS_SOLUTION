@@ -95,7 +95,7 @@ public class RealtimeSendJob {
     @Bean
     public Step realtimeMasterSendStep() {
         return stepBuilderFactory.get("realtimeMasterSendStep")
-                .partitioner("realtimeSlavePartitioner", partitioner(0L))
+                .partitioner("realtimeSlavePartitioner", realtimePartitioner(0L))
                 .step(realtimeSlaveSendStep())
                 .gridSize(slaveCnt)
                 .build();
@@ -254,7 +254,7 @@ public class RealtimeSendJob {
 
     @Bean
     @JobScope
-    public Partitioner partitioner(@Value("#{jobParameters['schdlId']}") Long schdlId){
+    public Partitioner realtimePartitioner(@Value("#{jobParameters['schdlId']}") Long schdlId){
         Partitioner partitioner = new Partitioner() {
             @Override
             public Map<String, ExecutionContext> partition(int gridSize) {

@@ -29,17 +29,21 @@
         AND DATE_FORMAT(RESERVE_DATE, '%Y%m%d') = DATE_FORMAT(SYSDATE(), '%Y%m%d');
     </select>
 
-    <select id="selectMailQueueMinMax" parameterType="Long" resultType="Map">
+    <select id="selectMailQueueMinMax" resultType="Map">
     <![CDATA[
         SELECT
             'selectMailQueueMinMax',
-            MIN(ID) queueMinId,
-            MAX(ID) queueMaxId
-        FROM GS_MAIL_QUEUE
-        WHERE SCHDL_ID = ${schdlId}
-        AND TARGET_YN = 'N'
-        AND RESERVE_DATE < SYSDATE()
-        LIMIT 100000
+            MIN(A.ID) queueMinId,
+            MAX(A.ID) queueMaxId
+        FROM (
+			SELECT
+				ID
+			FROM GS_MAIL_QUEUE
+            WHERE SCHDL_ID = ${schdlId}
+            AND TARGET_YN = 'N'
+            AND RESERVE_DATE < SYSDATE()
+			LIMIT 10
+        ) A
     ]]>
     </select>
 

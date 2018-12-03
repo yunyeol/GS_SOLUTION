@@ -35,6 +35,7 @@ import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -177,17 +178,32 @@ public class Config {
      * REDIS CONFIG
      * 레디스 설정
      */
-//    @Bean
-//    public JedisConnectionFactory jedisConnectionFactory(){
-//        JedisConnectionFactory jedisConnectionFactory = new JedisConnectionFactory();
-//        return jedisConnectionFactory;
-//    }
-//
-//    @Bean()
-//    public RedisTemplate redisTemplate(){
-//        RedisTemplate redisTemplate = new RedisTemplate();
-//        redisTemplate.setConnectionFactory(jedisConnectionFactory());
-//        return redisTemplate;
-//    }
+    @Value("${spring.redis.host}") private String redisHost;
+    @Value("${spring.redis.port}") private int redisPort;
+    @Value("${spring.redis.password}") private String redisPwd;
+    @Value("${spring.redis.timeout}") private int redisTimeout;
+
+
+    @Bean
+    public JedisConnectionFactory jedisConnectionFactory(){
+        JedisConnectionFactory jedisConnectionFactory = new JedisConnectionFactory();
+        jedisConnectionFactory.setHostName(redisHost);
+        jedisConnectionFactory.setPassword(redisPwd);
+        jedisConnectionFactory.setPort(redisPort);
+        jedisConnectionFactory.setTimeout(redisTimeout);
+        return jedisConnectionFactory;
+    }
+
+    @Bean
+    public RedisTemplate redisTemplate(){
+        RedisTemplate redisTemplate = new RedisTemplate();
+        redisTemplate.setConnectionFactory(jedisConnectionFactory());
+        redisTemplate.setKeySerializer(new StringRedisSerializer());
+        redisTemplate.setHashKeySerializer(new StringRedisSerializer());
+        redisTemplate.setHashValueSerializer(new StringRedisSerializer());
+        redisTemplate.setStringSerializer(new StringRedisSerializer());
+        redisTemplate.setValueSerializer(new StringRedisSerializer());
+        return redisTemplate;
+    }
 
 }

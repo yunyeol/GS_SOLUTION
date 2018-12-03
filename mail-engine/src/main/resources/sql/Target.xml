@@ -17,6 +17,23 @@
         AND ADDRESS_GRP_ID != 0
     </select>
 
+    <select id="selectTargetDbMinMax" resultType="Map">
+        SELECT
+            'selectTargetDbMinMax',
+            MIN(A.ADDRESS_MBR_ID) addressMinId,
+            MAX(A.ADDRESS_MBR_ID) addressMaxId
+        FROM (
+            SELECT
+                GAM.ADDRESS_MBR_ID
+            FROM GS_ADDRESS_GRP GAG
+            INNER JOIN GS_ADDRESS_MBR GAM ON (GAG.ADDRESS_GRP_ID = GAM.ADDRESS_GRP_ID)
+            INNER JOIN GS_SEND_SCHDL GSS ON (GAG.ADDRESS_GRP_ID = GSS.ADDRESS_GRP_ID)
+            WHERE GAG.ADDRESS_GRP_ID = ${addressGrpId}
+            AND GSS.SCHDL_ID = ${schdlId}
+            LIMIT 1
+        ) A
+    </select>
+
     <select id="selectDbTargetList" resultType="Target">
         SELECT
             GSS.SCHDL_ID schdlId,
@@ -24,7 +41,7 @@
             GAG.ADDRESS_GRP_ID addressGrpId,
             GAG.ADDRESS_GRP_NAME addressGrpName,
 
-            GAM.ADDRESS_GRP_ID addressMbrId,
+            GAM.ADDRESS_MBR_ID addressMbrId,
             GAM.NAME mbrName,
             GAM.ADDRESS mbrAddress,
             GAM.DATA1 data1,
@@ -36,6 +53,10 @@
         INNER JOIN GS_SEND_SCHDL GSS ON (GAG.ADDRESS_GRP_ID = GSS.ADDRESS_GRP_ID)
         WHERE GAG.ADDRESS_GRP_ID = ${addressGrpId}
         AND GSS.SCHDL_ID = ${schdlId}
+        AND NOT EXISTS (
+			SELECT ID FROM GS_SEND_RAW GSR WHERE GSR.ADDRESS = GAM.ADDRESS
+        )
+        AND GAM.ADDRESS_MBR_ID BETWEEN ${addressMinId} AND ${addressMaxId}
     </select>
 
 </mapper>
