@@ -105,20 +105,16 @@ public class CampaignSendJob {
                             }
 
                         }
-                        long end =0;
-                        long start = 0;
-                        start=System.currentTimeMillis();
-                        for(int i=0; i<3000000; i++){
-                            log.info("## i : {}", i);
-                        }
-                        end=System.currentTimeMillis();
-                        long result=end-start;
-                        double seconds= TimeUnit.MILLISECONDS.toSeconds(result);
-                        log.info("########## second : {}", seconds);
-//                        if(keyName != null && !keyName.equals("")){
-//                            chunkContext.getStepContext().getStepExecution().getJobExecution().getExecutionContext()
-//                                    .putString("sendKeyName", keyName.substring(0, keyName.lastIndexOf(",")));
+//                        long end =0;
+//                        long start = 0;
+//                        start=System.currentTimeMillis();
+//                        for(int i=0; i<3000000; i++){
+//                            log.info("## i : {}", i);
 //                        }
+//                        end=System.currentTimeMillis();
+//                        long result=end-start;
+//                        double seconds= TimeUnit.MILLISECONDS.toSeconds(result);
+//                        log.info("########## second : {}", seconds);
                         return RepeatStatus.FINISHED;
                     })
                     .build();
