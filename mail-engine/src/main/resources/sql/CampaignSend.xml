@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="SQL.CampaignSend">
+
+    <select id="selectCampaignSchdl" resultType="Campaign">
+    <![CDATA[
+        SELECT
+            SCHDL_ID schdlId,
+            SCHDL_NAME schdlName,
+            ADDRESS_GRP_ID addressGrpId,
+            SENDER sender,
+            FILE_PATH filePath,
+            SEND_GUBUN sendGubun,
+            SEND_TYPE sendType,
+            SEND_FLAG sendFlag,
+            REG_DATE regDate
+        FROM GS_SEND_SCHDL
+        WHERE SEND_GUBUN = 'M'
+        AND SEND_TYPE LIKE 'C%'
+        AND SEND_FLAG = '20'
+        AND RESERVE_DATE < SYSDATE()
+    ]]>
+    </select>
+
+</mapper>
+

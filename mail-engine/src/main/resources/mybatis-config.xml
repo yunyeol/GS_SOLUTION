@@ -17,6 +17,7 @@
     <typeAliases>
         <typeAlias  type="gs.mail.engine.dto.Target" alias="Target"/>
         <typeAlias  type="gs.mail.engine.dto.Realtime" alias="Realtime"/>
+        <typeAlias  type="gs.mail.engine.dto.Campaign" alias="Campaign"/>
     </typeAliases>
 
     <typeHandlers>

@@ -16,9 +16,9 @@ import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 
 @Configuration
 public class QuartzJobScheduler {
+    @Value("${cron.mail.campaign}") private String campaignCron;
     @Value("${cron.mail.realtime}") private String realtimeCron;
     @Value("${cron.mail.target}") private String targetCron;
-
 
     @Bean
     public SchedulerFactoryBean quartzScheduler(@Autowired JobFactory jobFactory) throws SchedulerException {
@@ -43,7 +43,7 @@ public class QuartzJobScheduler {
         JobDetail campaignJob = JobBuilder.newJob(CampaignSendExecutor.class).withIdentity("CampaignSendExecutor")
                 .storeDurably(true).build();
         CronTrigger campaignTrigger = TriggerBuilder.newTrigger().forJob("CampaignSendExecutor").withIdentity("CampaignSendTrigger")
-                .withSchedule(CronScheduleBuilder.cronSchedule(targetCron)).build();
+                .withSchedule(CronScheduleBuilder.cronSchedule(campaignCron)).build();
 
         schedulerFactoryBean.setJobDetails(realtimeSendJob, targetJob, campaignJob);
         schedulerFactoryBean.setTriggers(realtimeSendTrigger, targetTrigger, campaignTrigger);

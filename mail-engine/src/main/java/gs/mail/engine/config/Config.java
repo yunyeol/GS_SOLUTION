@@ -58,10 +58,8 @@ public class Config {
      */
 	@Bean(destroyMethod = "close")
     @Lazy
-	@ConfigurationProperties("spring.datasource")
-	public HikariDataSource dataSource(){
-		return DataSourceBuilder.create().type(HikariDataSource.class).build();
-	}
+	@ConfigurationProperties("spring.datasource.hikari")
+	public HikariDataSource dataSource(){ return DataSourceBuilder.create().type(HikariDataSource.class).build(); }
 
     @Bean
     public SqlSessionFactory sqlSessionFactory() throws Exception {
@@ -142,14 +140,13 @@ public class Config {
     }
 
     @Bean
-    public MapJobRepositoryFactoryBean mapJobRepositoryFactoryBean(PlatformTransactionManager txManager) throws Exception {
-        MapJobRepositoryFactoryBean mapJobRepositoryFactoryBean = new MapJobRepositoryFactoryBean(txManager);
-        return mapJobRepositoryFactoryBean;
-    }
-
-    @Bean
-    public JobRepository jobRepository(MapJobRepositoryFactoryBean mapJobRepositoryFactoryBean) throws Exception {
-        return mapJobRepositoryFactoryBean.getObject();
+    public JobRepository jobRepository() throws Exception {
+        JobRepositoryFactoryBean jobRepositoryFactoryBean = new JobRepositoryFactoryBean();
+        jobRepositoryFactoryBean.setTransactionManager(transactionManager());
+        jobRepositoryFactoryBean.setIsolationLevelForCreate("ISOLATION_REPEATABLE_READ");
+        jobRepositoryFactoryBean.setDataSource(dataSource());
+        jobRepositoryFactoryBean.setDatabaseType("MYSQL");
+        return jobRepositoryFactoryBean.getObject();
     }
 
     @Bean
@@ -157,8 +154,8 @@ public class Config {
         SimpleJobOperator simpleJobOperator = new SimpleJobOperator();
         try {
             simpleJobOperator.setJobExplorer(jobExplorer(jobExplorerFactoryBean()));
-            simpleJobOperator.setJobRepository(jobRepository(mapJobRepositoryFactoryBean(transactionManager())));
-            simpleJobOperator.setJobLauncher(simpleJobLauncher(jobRepository(mapJobRepositoryFactoryBean(transactionManager()))));
+            simpleJobOperator.setJobRepository(jobRepository());
+            simpleJobOperator.setJobLauncher(simpleJobLauncher(jobRepository()));
             simpleJobOperator.setJobRegistry(jobRegistry());
         } catch (Exception e) {
             e.printStackTrace();

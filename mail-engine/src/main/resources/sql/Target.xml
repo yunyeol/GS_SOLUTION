@@ -14,7 +14,6 @@
         WHERE SEND_GUBUN = 'M'
         AND SEND_TYPE IN ('C_D', 'C_F')
         AND SEND_FLAG = '10'
-        AND ADDRESS_GRP_ID != 0
     </select>
 
     <select id="selectTargetDbMinMax" resultType="Map">
