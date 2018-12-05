@@ -198,7 +198,7 @@ public class TargetJob {
 
                         jsonArray.put(jsonObject);
                     }
-                    //redisTemplate.opsForZSet().
+
                     redisTemplate.opsForValue().set(String.valueOf(items.get(0).getSchdlId())+"_"+items.get(0).getMbrAddress()
                                                     ,jsonArray.toString());
 

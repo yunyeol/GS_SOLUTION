@@ -130,6 +130,12 @@ public class RealtimeSendJob {
         paramMap.put("queueMaxId",queueMaxId);
         paramMap.put("schdlId", schdlId != null ? schdlId : 0);
 
+        HashMap<String, Long> param = new HashMap<String, Long>();
+        param.put("queueMinId", queueMinId);
+        param.put("queueMaxId",queueMaxId);
+        param.put("schdlId",schdlId);
+        sqlSessionTemplate.update("SQL.RealitmeSend.updateTargetYn", param);
+
         MyBatisCursorItemReader reader = new MyBatisCursorItemReader();
         reader.setSqlSessionFactory(sqlSessionFactory);
         reader.setParameterValues(paramMap);
@@ -271,12 +277,6 @@ public class RealtimeSendJob {
                 if(selectQuery != null && selectQuery.get("queueMinId") != null){
                     minValue = selectQuery.get("queueMinId");
                     maxValue = selectQuery.get("queueMaxId");
-
-                    HashMap<String, Long> param = new HashMap<String, Long>();
-                    param.put("queueMinId", minValue);
-                    param.put("queueMaxId",maxValue);
-                    param.put("schdlId",schdlId);
-                    sqlSessionTemplate.update("SQL.RealitmeSend.updateTargetYn", param);
                 }
 
                 long targetSize = maxValue - minValue;

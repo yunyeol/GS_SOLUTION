@@ -54,29 +54,32 @@
     </select>
 
     <select id="selectDbTargetList" resultType="Target">
-        SELECT
-            GSS.SCHDL_ID schdlId,
-            GSS.SEND_TYPE sendType,
+        SELECT * FROM (
+            SELECT
+                GSS.SCHDL_ID schdlId,
+                GSS.SEND_TYPE sendType,
 
-            GAG.ADDRESS_GRP_ID addressGrpId,
-            GAG.ADDRESS_GRP_NAME addressGrpName,
+                GAG.ADDRESS_GRP_ID addressGrpId,
+                GAG.ADDRESS_GRP_NAME addressGrpName,
 
-            GAM.ADDRESS_MBR_ID addressMbrId,
-            GAM.NAME mbrName,
-            GAM.ADDRESS mbrAddress,
-            GAM.DATA1 data1,
-            GAM.DATA2 data2,
-            GAM.DATA3 data3,
-            GAM.REG_DATE regDate
-        FROM GS_ADDRESS_GRP GAG
-        INNER JOIN GS_ADDRESS_MBR GAM ON (GAG.ADDRESS_GRP_ID = GAM.ADDRESS_GRP_ID)
-        INNER JOIN GS_SEND_SCHDL GSS ON (GAG.ADDRESS_GRP_ID = GSS.ADDRESS_GRP_ID)
-        WHERE GAG.ADDRESS_GRP_ID = ${addressGrpId}
-        AND GSS.SCHDL_ID = ${schdlId}
-        AND NOT EXISTS (
-			SELECT ID FROM GS_SEND_RAW GSR WHERE GSR.ADDRESS = GAM.ADDRESS AND GSR.SCHDL_ID = GSS.SCHDL_ID
-        )
-        AND GAM.ADDRESS_MBR_ID BETWEEN ${addressMinId} AND ${addressMaxId}
+                GAM.ADDRESS_MBR_ID addressMbrId,
+                GAM.NAME mbrName,
+                GAM.ADDRESS mbrAddress,
+                GAM.DATA1 data1,
+                GAM.DATA2 data2,
+                GAM.DATA3 data3,
+                GAM.REG_DATE regDate
+            FROM GS_ADDRESS_GRP GAG
+            INNER JOIN GS_ADDRESS_MBR GAM ON (GAG.ADDRESS_GRP_ID = GAM.ADDRESS_GRP_ID)
+            INNER JOIN GS_SEND_SCHDL GSS ON (GAG.ADDRESS_GRP_ID = GSS.ADDRESS_GRP_ID)
+            WHERE GAG.ADDRESS_GRP_ID = ${addressGrpId}
+            AND GSS.SCHDL_ID = ${schdlId}
+            AND NOT EXISTS (
+                SELECT ID FROM GS_SEND_RAW GSR WHERE GSR.ADDRESS = GAM.ADDRESS AND GSR.SCHDL_ID = GSS.SCHDL_ID
+            )
+            ORDER BY SUBSTRING_INDEX(GAM.ADDRESS, '@', -1) ASC
+        ) A
+        WHERE A.addressMbrId BETWEEN ${addressMinId} AND ${addressMaxId}
     </select>
 
     <select id="selectFileTargetList" resultType="Target">
