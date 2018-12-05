@@ -4,6 +4,7 @@ import gs.mail.engine.dto.Campaign;
 import gs.mail.engine.job.CampaignSendJob;
 import gs.mail.engine.job.JobParameterContents;
 import gs.mail.engine.service.CampaignSendService;
+import gs.mail.engine.util.SmtpSender;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
@@ -23,9 +24,16 @@ public class CampaignSendExecutor extends JobParameterContents implements Job {
     @Autowired private CampaignSendService campaignSendService;
     @Autowired private CampaignSendJob campaignSendJob;
 
+    @Autowired private SmtpSender smtpSender;
+
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {
         try{
+
+//            log.info("smtp : 1");
+//            smtpSender.send();
+//            log.info("smpt : 2");
+
             Map<String, Object> jobDataMap = context.getMergedJobDataMap();
 
             for(Campaign campaign : campaignSendService.selectCampaignSchdlList()){

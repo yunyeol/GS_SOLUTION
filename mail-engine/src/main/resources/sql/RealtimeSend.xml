@@ -42,7 +42,7 @@
             WHERE SCHDL_ID = ${schdlId}
             AND TARGET_YN = 'N'
             AND RESERVE_DATE < SYSDATE()
-			LIMIT 10
+			LIMIT 10000
         ) A
     ]]>
     </select>

@@ -200,6 +200,7 @@ public class Config {
         redisTemplate.setHashValueSerializer(new StringRedisSerializer());
         redisTemplate.setStringSerializer(new StringRedisSerializer());
         redisTemplate.setValueSerializer(new StringRedisSerializer());
+
         return redisTemplate;
     }
 

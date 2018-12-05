@@ -197,7 +197,7 @@ public class RealtimeSendJob {
                             cnt++;
                         }
                         msg.setFrom(new InternetAddress(items.get(0).getSender()));
-                        Transport.send(msg);
+                        //Transport.send(msg);
 
                         updateSchdlCnt(items.get(0).getSchdlId(), cnt, cnt, 0, 0);
                     }else{
