@@ -29,9 +29,6 @@
             INNER JOIN GS_SEND_SCHDL GSS ON (GAG.ADDRESS_GRP_ID = GSS.ADDRESS_GRP_ID)
             WHERE GAG.ADDRESS_GRP_ID = ${addressGrpId}
             AND GSS.SCHDL_ID = ${schdlId}
-            AND NOT EXISTS (
-                SELECT ID FROM GS_SEND_RAW GSR WHERE GSR.ADDRESS = GAM.ADDRESS AND GSR.SCHDL_ID = GSS.SCHDL_ID
-            )
             LIMIT 1000
         ) A
     </select>
@@ -49,9 +46,6 @@
             WHERE GSS.SEND_TYPE = 'C_F'
             AND GSR.SEND_FLAG = 10
             AND GSS.SCHDL_ID = ${schdlId}
-            AND NOT EXISTS (
-                SELECT ID FROM GS_SEND_RAW GSR WHERE GSR.ADDRESS = GAM.ADDRESS AND GSR.SCHDL_ID = GSS.SCHDL_ID
-            )
             LIMIT 1000
         ) A
     </select>
@@ -77,9 +71,6 @@
             INNER JOIN GS_SEND_SCHDL GSS ON (GAG.ADDRESS_GRP_ID = GSS.ADDRESS_GRP_ID)
             WHERE GAG.ADDRESS_GRP_ID = ${addressGrpId}
             AND GSS.SCHDL_ID = ${schdlId}
-            AND NOT EXISTS (
-                SELECT ID FROM GS_SEND_RAW GSR WHERE GSR.ADDRESS = GAM.ADDRESS AND GSR.SCHDL_ID = GSS.SCHDL_ID
-            )
             ORDER BY SUBSTRING_INDEX(GAM.ADDRESS, '@', -1) ASC
         ) A
         WHERE A.addressMbrId BETWEEN ${addressMinId} AND ${addressMaxId}
@@ -102,9 +93,6 @@
             WHERE GSS.SEND_TYPE = 'C_F'
             AND GSR.SEND_FLAG = 10
             AND GSS.SCHDL_ID = ${schdlId}
-            AND NOT EXISTS (
-                SELECT ID FROM GS_SEND_RAW GSR WHERE GSR.ADDRESS = GAM.ADDRESS AND GSR.SCHDL_ID = GSS.SCHDL_ID
-            )
             ORDER BY SUBSTRING_INDEX(GSR.ADDRESS, '@', -1) ASC
         ) A
         AND A.rawId BETWEEN ${addressMinId} AND ${addressMaxId}

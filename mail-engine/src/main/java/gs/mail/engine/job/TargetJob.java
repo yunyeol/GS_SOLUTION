@@ -8,6 +8,7 @@ import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.mybatis.spring.batch.MyBatisCursorItemReader;
+import org.mybatis.spring.batch.MyBatisPagingItemReader;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.Step;
@@ -109,7 +110,7 @@ public class TargetJob {
             return stepBuilderFactory.get("targetDbSlavetStep")
                     .<Target, Target>chunk(commitInterval)
                     .reader(targetDbReader(0L,0L, 0L, 0L))
-                    .processor(targetProcessor())
+                    .processor(targetProcessor(0L,0L))
                     .writer(targetWriter(0L))
                     .build();
         }catch (Exception e){
@@ -139,7 +140,9 @@ public class TargetJob {
     }
 
     @Bean
-    public ItemProcessor<Target, Target> targetProcessor(){
+    @StepScope
+    public ItemProcessor<Target, Target> targetProcessor(@Value("#{stepExecutionContext['addressMinId']}") Long addressMinId,
+                                                         @Value("#{stepExecutionContext['addressMaxId']}") Long addressMaxId){
         ItemProcessor<Target, Target> pross = new ItemProcessor<Target, Target>() {
             @Override
             public Target process(Target item) throws Exception {
@@ -148,10 +151,8 @@ public class TargetJob {
                     param.put("schdlId", item.getSchdlId());
                     param.put("addressGrpId", item.getAddressGrpId());
                     param.put("sendFlag", "11");
-                    param.put("mbrAddress", item.getMbrAddress());
-                    param.put("data1", item.getData1());
-                    param.put("data2", item.getData2());
-                    param.put("data3", item.getData3());
+                    param.put("addressMinId", addressMinId != null ? addressMinId : 0);
+                    param.put("addressMaxId", addressMaxId != null ? addressMaxId : 0);
 
                     sqlSessionTemplate.insert("SQL.Target.insertSendRaw", param);
 
@@ -298,7 +299,7 @@ public class TargetJob {
             return stepBuilderFactory.get("targetFileSlavetStep")
                     .<Target, Target>chunk(commitInterval)
                     .reader(targetFIleReader(0L,0L, 0L))
-                    .processor(targetProcessor())
+                    .processor(targetProcessor(0L,0L))
                     .writer(targetWriter(0L))
                     .build();
         }catch (Exception e){

@@ -110,7 +110,7 @@ public class RealtimeSendJob {
             return stepBuilderFactory.get("realtimeSendStep")
                     .<Realtime, Realtime>chunk(commitInterval)
                     .reader(realtimeSendQueueReader(0L,0L, 0L))
-                    .processor(realtimeSendQueueProcessor())
+                    .processor(realtimeSendQueueProcessor(0L,0L))
                     .writer(realtimeSendQueueWriter())
                     .build();
         }catch (Exception e){
@@ -130,12 +130,6 @@ public class RealtimeSendJob {
         paramMap.put("queueMaxId",queueMaxId);
         paramMap.put("schdlId", schdlId != null ? schdlId : 0);
 
-        HashMap<String, Long> param = new HashMap<String, Long>();
-        param.put("queueMinId", queueMinId);
-        param.put("queueMaxId",queueMaxId);
-        param.put("schdlId",schdlId);
-        sqlSessionTemplate.update("SQL.RealitmeSend.updateTargetYn", param);
-
         MyBatisCursorItemReader reader = new MyBatisCursorItemReader();
         reader.setSqlSessionFactory(sqlSessionFactory);
         reader.setParameterValues(paramMap);
@@ -144,20 +138,20 @@ public class RealtimeSendJob {
     }
 
     @Bean
-    public ItemProcessor<Realtime, Realtime> realtimeSendQueueProcessor(){
+    @StepScope
+    public ItemProcessor<Realtime, Realtime> realtimeSendQueueProcessor(
+                                @Value("#{stepExecutionContext['queueMinId']}") Long queueMinId,
+                                @Value("#{stepExecutionContext['queueMaxId']}") Long queueMaxId){
         ItemProcessor<Realtime, Realtime> pross = new ItemProcessor<Realtime, Realtime>() {
             @Override
             public Realtime process(Realtime item) throws Exception {
                 Map<String, Object> paramMap = new HashMap<String, Object>();
-                paramMap.put("schdlId", item.getSchdlId());
-                paramMap.put("uuid", item.getUuid());
-                paramMap.put("receiver", item.getReceiver());
+                paramMap.put("queueMinId",queueMinId);
+                paramMap.put("queueMaxId",queueMaxId);
+
                 sqlSessionTemplate.insert("SQL.RealitmeSend.insertRealtimeQueRaw", paramMap);
 
-                paramMap = new HashMap<String, Object>();
-                paramMap.put("queId", item.getQueId());
                 sqlSessionTemplate.delete("SQL.RealitmeSend.deleteMailQueue",paramMap);
-
                 return item;
             }
         };
@@ -277,6 +271,11 @@ public class RealtimeSendJob {
                 if(selectQuery != null && selectQuery.get("queueMinId") != null){
                     minValue = selectQuery.get("queueMinId");
                     maxValue = selectQuery.get("queueMaxId");
+
+                    HashMap<String, Long> param = new HashMap<String, Long>();
+                    param.put("queueMinId", minValue);
+                    param.put("queueMaxId",maxValue);
+                    sqlSessionTemplate.update("SQL.RealitmeSend.updateTargetYn", param);
                 }
 
                 long targetSize = maxValue - minValue;
