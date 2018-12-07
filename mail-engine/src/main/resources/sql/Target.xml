@@ -24,15 +24,10 @@
         FROM (
             SELECT
                 GAM.ADDRESS_MBR_ID
-            FROM GS_ADDRESS_GRP GAG
-            INNER JOIN GS_ADDRESS_MBR GAM ON (GAG.ADDRESS_GRP_ID = GAM.ADDRESS_GRP_ID)
-            INNER JOIN GS_SEND_SCHDL GSS ON (GAG.ADDRESS_GRP_ID = GSS.ADDRESS_GRP_ID)
-            WHERE GAG.ADDRESS_GRP_ID = ${addressGrpId}
+            FROM GS_SEND_SCHDL GSS
+            INNER JOIN GS_ADDRESS_MBR GAM ON (GSS.ADDRESS_GRP_ID = GAM.ADDRESS_GRP_ID )
+            WHERE  GAM.ADDRESS_GRP_ID = ${addressGrpId}
             AND GSS.SCHDL_ID = ${schdlId}
-            AND NOT EXISTS (
-                SELECT ID FROM GS_SEND_RAW GSR WHERE GSR.ADDRESS = GAM.ADDRESS AND GSR.SCHDL_ID = GSS.SCHDL_ID
-            )
-            LIMIT 1000
         ) A
     </select>
 
@@ -57,32 +52,21 @@
     </select>
 
     <select id="selectDbTargetList" resultType="Target">
-        SELECT * FROM (
-            SELECT
-                GSS.SCHDL_ID schdlId,
-                GSS.SEND_TYPE sendType,
-
-                GAG.ADDRESS_GRP_ID addressGrpId,
-                GAG.ADDRESS_GRP_NAME addressGrpName,
-
-                GAM.ADDRESS_MBR_ID addressMbrId,
-                GAM.NAME mbrName,
-                GAM.ADDRESS mbrAddress,
-                GAM.DATA1 data1,
-                GAM.DATA2 data2,
-                GAM.DATA3 data3,
-                GAM.REG_DATE regDate
-            FROM GS_ADDRESS_GRP GAG
-            INNER JOIN GS_ADDRESS_MBR GAM ON (GAG.ADDRESS_GRP_ID = GAM.ADDRESS_GRP_ID)
-            INNER JOIN GS_SEND_SCHDL GSS ON (GAG.ADDRESS_GRP_ID = GSS.ADDRESS_GRP_ID)
-            WHERE GAG.ADDRESS_GRP_ID = ${addressGrpId}
-            AND GSS.SCHDL_ID = ${schdlId}
-            AND NOT EXISTS (
-                SELECT ID FROM GS_SEND_RAW GSR WHERE GSR.ADDRESS = GAM.ADDRESS AND GSR.SCHDL_ID = GSS.SCHDL_ID
-            )
-            ORDER BY SUBSTRING_INDEX(GAM.ADDRESS, '@', -1) ASC
-        ) A
-        WHERE A.addressMbrId BETWEEN ${addressMinId} AND ${addressMaxId}
+        SELECT
+            GAM.ADDRESS_MBR_ID addressMbrId,
+            GAM.NAME mbrName,
+            GAM.ADDRESS mbrAddress,
+            GAM.DATA1 data1,
+            GAM.DATA2 data2,
+            GAM.DATA3 data3,
+            GAM.REG_DATE regDate
+        FROM GS_SEND_SCHDL GSS
+        INNER JOIN GS_ADDRESS_MBR GAM ON (GSS.ADDRESS_GRP_ID = GAM.ADDRESS_GRP_ID )
+        LEFT JOIN GS_SEND_RAW GSR ON (GSS.SCHDL_ID = GSR.SCHDL_ID AND GAM.ADDRESS = GSR.ADDRESS)
+        WHERE GAM.ADDRESS_GRP_ID = ${addressGrpId}
+        AND GSS.SCHDL_ID = ${schdlId}
+        AND GSR.ADDRESS IS NULL
+        LIMIT #{_skiprows}, #{_pagesize}
     </select>
 
     <select id="selectFileTargetList" resultType="Target">
@@ -113,14 +97,10 @@
     <select id="selectDbTargetRemainsCnt" resultType="Integer">
         SELECT
             COUNT(1) cnt
-        FROM GS_ADDRESS_GRP GAG
-        INNER JOIN GS_ADDRESS_MBR GAM ON (GAG.ADDRESS_GRP_ID = GAM.ADDRESS_GRP_ID)
-        INNER JOIN GS_SEND_SCHDL GSS ON (GAG.ADDRESS_GRP_ID = GSS.ADDRESS_GRP_ID)
-        WHERE GAG.ADDRESS_GRP_ID = ${addressGrpId}
-        AND GSS.SCHDL_ID = ${schdlId}
-        AND NOT EXISTS (
-			SELECT ID FROM GS_SEND_RAW GSR WHERE GSR.ADDRESS = GAM.ADDRESS AND GSR.SCHDL_ID = GSS.SCHDL_ID
-        )
+        FROM GS_ADDRESS_MBR GAM
+        LEFT JOIN GS_SEND_RAW GSR ON (GSR.SCHDL_ID = ${schdlId}  AND GSR.ADDRESS = GAM.ADDRESS )
+        WHERE GAM.ADDRESS_GRP_ID = ${addressGrpId}
+        AND GSR.ADDRESS IS NULL
     </select>
 
     <select id="selectFileTargetRemainsCnt" resultType="Integer">
@@ -147,17 +127,7 @@
 
     <insert id="insertSendRaw">
         INSERT INTO GS_SEND_RAW(SCHDL_ID, ADDRESS, DATA1, DATA2, DATA3, SEND_GUBUN, SEND_FLAG, REG_DATE)
-		SELECT
-            ${schdlId},
-            ADDRESS,
-            DATA1,
-            DATA2,
-            DATA3,
-            'M',
-            '11',
-            SYSDATE()
-        FROM GS_ADDRESS_MBR
-        WHERE ADDRESS_MBR_ID BETWEEN ${addressMinId} AND ${addressMaxId}
+		VALUES(${schdlId}, #{address}, #{data1}, #{data2}, #{data3}, 'M', '11', SYSDATE())
     </insert>
 </mapper>
 

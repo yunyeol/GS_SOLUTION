@@ -3,6 +3,7 @@ package gs.mail.engine.config;
 
 import com.zaxxer.hikari.HikariDataSource;
 import gs.mail.engine.job.scheduler.AutowiringSpringBeanJobFactory;
+import org.apache.ibatis.session.ExecutorType;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.SqlSessionTemplate;
@@ -72,7 +73,7 @@ public class Config {
 
     @Bean
     public SqlSessionTemplate sqlSessionTemplate() throws Exception {
-        return new SqlSessionTemplate(sqlSessionFactory());
+        return new SqlSessionTemplate(sqlSessionFactory(), ExecutorType.BATCH);
     }
 
     @Bean

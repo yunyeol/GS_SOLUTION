@@ -36,18 +36,18 @@ public class CampaignSendExecutor extends JobParameterContents implements Job {
 
             Map<String, Object> jobDataMap = context.getMergedJobDataMap();
 
-            for(Campaign campaign : campaignSendService.selectCampaignSchdlList()){
-                jobDataMap.put("jobName", "CampaignMailSend");
-                jobDataMap.put("schdlId", campaign.getSchdlId());
-                jobDataMap.put("filePath", campaign.getFilePath());
-                jobDataMap.put("schdlName", campaign.getSchdlName());
-                jobDataMap.put("sender", campaign.getSender());
-                jobDataMap.put("time", System.currentTimeMillis());
-
-                JobParameters jobParameters = getJobParametersFromJobMap(jobDataMap);
-
-                JobExecution jobExecution = simpleJobLauncher.run(campaignSendJob.campaignSendJobDetail(), jobParameters);
-            }
+//            for(Campaign campaign : campaignSendService.selectCampaignSchdlList()){
+//                jobDataMap.put("jobName", "CampaignMailSend");
+//                jobDataMap.put("schdlId", campaign.getSchdlId());
+//                jobDataMap.put("filePath", campaign.getFilePath());
+//                jobDataMap.put("schdlName", campaign.getSchdlName());
+//                jobDataMap.put("sender", campaign.getSender());
+//                jobDataMap.put("time", System.currentTimeMillis());
+//
+//                JobParameters jobParameters = getJobParametersFromJobMap(jobDataMap);
+//
+//                JobExecution jobExecution = simpleJobLauncher.run(campaignSendJob.campaignSendJobDetail(), jobParameters);
+//            }
         }catch (Exception e){
             e.printStackTrace();
         }

@@ -28,10 +28,10 @@ public class QuartzJobScheduler {
         schedulerFactoryBean.setConfigLocation(new PathMatchingResourcePatternResolver().getResource("classpath:/quartz.properties"));
 
         //실시간발송
-        JobDetail realtimeSendJob = JobBuilder.newJob(RealtimeSendExecutor.class).withIdentity("RealtimeSendExecutor")
-                                    .storeDurably(true).build();
-        CronTrigger realtimeSendTrigger = TriggerBuilder.newTrigger().forJob("RealtimeSendExecutor").withIdentity("RealtimeSendTrigger")
-                                            .withSchedule(CronScheduleBuilder.cronSchedule(realtimeCron)).build();
+//        JobDetail realtimeSendJob = JobBuilder.newJob(RealtimeSendExecutor.class).withIdentity("RealtimeSendExecutor")
+//                                    .storeDurably(true).build();
+//        CronTrigger realtimeSendTrigger = TriggerBuilder.newTrigger().forJob("RealtimeSendExecutor").withIdentity("RealtimeSendTrigger")
+//                                            .withSchedule(CronScheduleBuilder.cronSchedule(realtimeCron)).build();
 
         //타게팅
         JobDetail targetJob = JobBuilder.newJob(TargetExecutor.class).withIdentity("TargetExecutor")
@@ -40,13 +40,15 @@ public class QuartzJobScheduler {
                                     .withSchedule(CronScheduleBuilder.cronSchedule(targetCron)).build();
 
         //캠페인발송
-        JobDetail campaignJob = JobBuilder.newJob(CampaignSendExecutor.class).withIdentity("CampaignSendExecutor")
-                .storeDurably(true).build();
-        CronTrigger campaignTrigger = TriggerBuilder.newTrigger().forJob("CampaignSendExecutor").withIdentity("CampaignSendTrigger")
-                .withSchedule(CronScheduleBuilder.cronSchedule(campaignCron)).build();
+//        JobDetail campaignJob = JobBuilder.newJob(CampaignSendExecutor.class).withIdentity("CampaignSendExecutor")
+//                .storeDurably(true).build();
+//        CronTrigger campaignTrigger = TriggerBuilder.newTrigger().forJob("CampaignSendExecutor").withIdentity("CampaignSendTrigger")
+//                .withSchedule(CronScheduleBuilder.cronSchedule(campaignCron)).build();
 
-        schedulerFactoryBean.setJobDetails(realtimeSendJob, targetJob, campaignJob);
-        schedulerFactoryBean.setTriggers(realtimeSendTrigger, targetTrigger, campaignTrigger);
+//        schedulerFactoryBean.setJobDetails(realtimeSendJob, targetJob, campaignJob);
+//        schedulerFactoryBean.setTriggers(realtimeSendTrigger, targetTrigger, campaignTrigger);
+        schedulerFactoryBean.setJobDetails(targetJob);
+        schedulerFactoryBean.setTriggers(targetTrigger);
 
         return schedulerFactoryBean;
     }
