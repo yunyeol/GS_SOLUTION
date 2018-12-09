@@ -110,59 +110,60 @@ public class Config {
         return jobFactory;
     }
 
-    @Bean
-    public MapJobRegistry mapJobRegistry(){
-        MapJobRegistry mapJobRegistry = new MapJobRegistry();
-        return mapJobRegistry;
-    }
-
-    @Bean
-    public JobRegistry jobRegistry(){
-        return mapJobRegistry();
-    }
-
-    @Bean
-    public JobRegistryBeanPostProcessor jobRegistryBeanPostProcessor(){
-        JobRegistryBeanPostProcessor jobRegistryBeanPostProcessor = new JobRegistryBeanPostProcessor();
-        jobRegistryBeanPostProcessor.setJobRegistry(jobRegistry());
-        return jobRegistryBeanPostProcessor;
-    }
-
-    @Bean
-    public JobExplorerFactoryBean jobExplorerFactoryBean(){
-        JobExplorerFactoryBean jobExplorerFactoryBean = new JobExplorerFactoryBean();
-        jobExplorerFactoryBean.setDataSource(dataSource());
-        return jobExplorerFactoryBean;
-    }
-
-    @Bean
-    public JobExplorer jobExplorer(JobExplorerFactoryBean jobExplorerFactoryBean) throws Exception {
-        return jobExplorerFactoryBean.getObject();
-    }
-
-    @Bean
-    public JobRepository jobRepository() throws Exception {
-        JobRepositoryFactoryBean jobRepositoryFactoryBean = new JobRepositoryFactoryBean();
-        jobRepositoryFactoryBean.setTransactionManager(transactionManager());
-        jobRepositoryFactoryBean.setIsolationLevelForCreate("ISOLATION_REPEATABLE_READ");
-        jobRepositoryFactoryBean.setDataSource(dataSource());
-        jobRepositoryFactoryBean.setDatabaseType("MYSQL");
-        return jobRepositoryFactoryBean.getObject();
-    }
-
-    @Bean
-    public JobOperator jobOperator(){
-        SimpleJobOperator simpleJobOperator = new SimpleJobOperator();
-        try {
-            simpleJobOperator.setJobExplorer(jobExplorer(jobExplorerFactoryBean()));
-            simpleJobOperator.setJobRepository(jobRepository());
-            simpleJobOperator.setJobLauncher(simpleJobLauncher(jobRepository()));
-            simpleJobOperator.setJobRegistry(jobRegistry());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return simpleJobOperator;
-    }
+//    @Bean
+//    public MapJobRegistry mapJobRegistry(){
+//        MapJobRegistry mapJobRegistry = new MapJobRegistry();
+//        return mapJobRegistry;
+//    }
+//
+//    @Bean
+//    public JobRegistry jobRegistry(){
+//        return mapJobRegistry();
+//    }
+//
+//
+//    @Bean
+//    public JobRegistryBeanPostProcessor jobRegistryBeanPostProcessor(){
+//        JobRegistryBeanPostProcessor jobRegistryBeanPostProcessor = new JobRegistryBeanPostProcessor();
+//        jobRegistryBeanPostProcessor.setJobRegistry(jobRegistry());
+//        return jobRegistryBeanPostProcessor;
+//    }
+//
+//    @Bean
+//    public JobExplorerFactoryBean jobExplorerFactoryBean(){
+//        JobExplorerFactoryBean jobExplorerFactoryBean = new JobExplorerFactoryBean();
+//        jobExplorerFactoryBean.setDataSource(dataSource());
+//        return jobExplorerFactoryBean;
+//    }
+//
+//    @Bean
+//    public JobExplorer jobExplorer(JobExplorerFactoryBean jobExplorerFactoryBean) throws Exception {
+//        return jobExplorerFactoryBean.getObject();
+//    }
+//
+//    @Bean
+//    public JobRepository jobRepository() throws Exception {
+//        JobRepositoryFactoryBean jobRepositoryFactoryBean = new JobRepositoryFactoryBean();
+//        jobRepositoryFactoryBean.setTransactionManager(transactionManager());
+//        jobRepositoryFactoryBean.setIsolationLevelForCreate("ISOLATION_REPEATABLE_READ");
+//        jobRepositoryFactoryBean.setDataSource(dataSource());
+//        jobRepositoryFactoryBean.setDatabaseType("MYSQL");
+//        return jobRepositoryFactoryBean.getObject();
+//    }
+//
+//    @Bean
+//    public JobOperator jobOperator(){
+//        SimpleJobOperator simpleJobOperator = new SimpleJobOperator();
+//        try {
+//            simpleJobOperator.setJobExplorer(jobExplorer(jobExplorerFactoryBean()));
+//            simpleJobOperator.setJobRepository(jobRepository());
+//            simpleJobOperator.setJobLauncher(simpleJobLauncher(jobRepository()));
+//            simpleJobOperator.setJobRegistry(jobRegistry());
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        return simpleJobOperator;
+//    }
 
     @Bean
     public SimpleJobLauncher simpleJobLauncher(JobRepository jobRepository){

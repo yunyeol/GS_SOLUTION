@@ -15,9 +15,19 @@ public class SmtpSender {
     private String host = "119.207.76.55";
     private int port = 25;
 
+    private Socket socket;
+
+    public void sendSocket(){
+        try{
+            socket = new Socket(host, port);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
     public void send(){
         try {
-            Socket socket = new Socket(host, port);
+            sendSocket();
 
             BufferedReader br = new BufferedReader(new InputStreamReader( socket.getInputStream(), "euc-kr" ) );
             PrintWriter pw = new PrintWriter(new OutputStreamWriter(socket.getOutputStream() , "euc-kr"), true );

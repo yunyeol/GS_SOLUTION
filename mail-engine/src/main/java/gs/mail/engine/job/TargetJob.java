@@ -1,6 +1,5 @@
 package gs.mail.engine.job;
 
-import com.google.gson.Gson;
 import gs.mail.engine.dto.Target;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.session.ExecutorType;
@@ -9,9 +8,7 @@ import org.apache.ibatis.session.SqlSessionFactory;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 import org.mybatis.spring.SqlSessionTemplate;
-import org.mybatis.spring.batch.MyBatisBatchItemWriter;
 import org.mybatis.spring.batch.MyBatisCursorItemReader;
-import org.mybatis.spring.batch.MyBatisPagingItemReader;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.Step;
@@ -26,9 +23,7 @@ import org.springframework.batch.core.job.flow.FlowExecutionStatus;
 import org.springframework.batch.core.job.flow.JobExecutionDecider;
 import org.springframework.batch.core.partition.support.Partitioner;
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -60,15 +55,12 @@ public class TargetJob {
             FlowBuilder<Flow> flowBuilder = new FlowBuilder<Flow>("targetFlow");
 
             Flow flow = flowBuilder
-                    .start(targetTasklet())
-                    .next(targetDbFileDecider())
+                    .start(targetDbFileDecider())
                         .on("DB")
-                        //.to(targetDbMasterStep())
-                        .to(targetDbSlavetStep())
+                        .to(targetDbMasterStep())
                     .from(targetDbFileDecider())
                         .on("FILE")
-                        //.to(targetFileMasterStep())
-                        .to(targetFileSlavetStep())
+                        .to(targetFileMasterStep())
                     .from(targetDbFileDecider())
                         .on("COMPLETED")
                         .end()
@@ -80,27 +72,6 @@ public class TargetJob {
                     .build();
 
         }catch(Exception e){
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    @Bean
-    public Step targetTasklet()  {
-        try {
-            return stepBuilderFactory.get("realtimeSchdlTasklet")
-                    .tasklet((contribution, chunkContext) -> {
-                        final long  schdlId = chunkContext.getStepContext().getStepExecution().getJobParameters().getLong("schdlId");
-
-                        Map<String, Object> param = new HashMap<>();
-                        param.put("schdlId", schdlId);
-                        param.put("sendFlag", "11");
-                        sqlSessionTemplate.update("SQL.Target.updateSendSchldFlag", param);
-
-                        return RepeatStatus.FINISHED;
-                    })
-                    .build();
-        }catch (Exception e){
             e.printStackTrace();
         }
         return null;
@@ -124,14 +95,14 @@ public class TargetJob {
         return  jobExecutionDecider;
     }
 
-//    @Bean
-//    public Step targetDbMasterStep() {
-//        return stepBuilderFactory.get("targetMasterSendStep")
-//                .partitioner("targetDbPartitioner", targetPartitioner(0L, 0L, ""))
-//                .step(targetDbSlavetStep())
-//                .gridSize(slaveCnt)
-//                .build();
-//    }
+    @Bean
+    public Step targetDbMasterStep() {
+        return stepBuilderFactory.get("targetMasterSendStep")
+                .partitioner("targetDbPartitioner", targetPartitioner(0L, 0L, ""))
+                .step(targetDbSlavetStep())
+                .gridSize(slaveCnt)
+                .build();
+    }
 
 
     @Bean
@@ -139,10 +110,8 @@ public class TargetJob {
         try{
             return stepBuilderFactory.get("targetDbSlavetStep")
                     .<Target, Target>chunk(commitInterval)
-                    .reader(targetDbReader(0L,0L, 0L, 0L))
-                    //.processor(targetProcessor(0L,0L,"",0L))
-                    .writer(targetWriter(0L))
-                    .throttleLimit(1)
+                    .reader(targetDbReader(0L,0L,0L,0L))
+                    .writer(targetWriter(0L,0L,""))
                     .build();
         }catch (Exception e){
             e.printStackTrace();
@@ -152,89 +121,30 @@ public class TargetJob {
 
     @Bean
     @StepScope
-    public MyBatisPagingItemReader targetDbReader(
-            @Value("#{jobParameters['schdlId']}") Long schdlId,
-            @Value("#{jobParameters['addressGrpId']}") Long addressGrpId,
+    public MyBatisCursorItemReader targetDbReader(
             @Value("#{stepExecutionContext['addressMinId']}") Long addressMinId,
-            @Value("#{stepExecutionContext['addressMaxId']}") Long addressMaxId) {
+            @Value("#{stepExecutionContext['addressMaxId']}") Long addressMaxId,
+            @Value("#{jobParameters['schdlId']}") Long schdlId,
+            @Value("#{jobParameters['addressGrpId']}") Long addressGrpId) {
         Map<String, Object> paramMap = new HashMap<String, Object>();
         paramMap.put("schdlId", schdlId != null ? schdlId : 0);
         paramMap.put("addressGrpId", addressGrpId != null ? addressGrpId : 0);
-//        paramMap.put("addressMinId", addressMinId != null ? addressMinId : 0);
-//        paramMap.put("addressMaxId", addressMaxId != null ? addressMaxId : 0);
+        paramMap.put("addressMinId", addressMinId != null ? addressMinId : 0);
+        paramMap.put("addressMaxId", addressMaxId != null ? addressMaxId : 0);
 
-        /*MyBatisCursorItemReader reader = new MyBatisCursorItemReader();
-        reader.setSqlSessionFactory(sqlSessionFactory);
-        reader.setParameterValues(paramMap);
-        reader.setQueryId("SQL.Target.selectDbTargetList");*/
-        log.info("########## page reader");
-        MyBatisPagingItemReader reader = new MyBatisPagingItemReader();
-        reader.setPageSize(commitInterval);
+        MyBatisCursorItemReader reader = new MyBatisCursorItemReader();
         reader.setParameterValues(paramMap);
         reader.setSqlSessionFactory(sqlSessionFactory);
         reader.setQueryId("SQL.Target.selectDbTargetList");
         return reader;
     }
 
-//    @Bean
-//    @StepScope
-//    public ItemProcessor<Target, Target> targetProcessor(@Value("#{stepExecutionContext['addressMinId']}") Long addressMinId,
-//                                                         @Value("#{stepExecutionContext['addressMaxId']}") Long addressMaxId,
-//                                                         @Value("#{jobParameters['sendType']}") String sendType,
-//                                                         @Value("#{jobParameters['schdlId']}") Long schdlId){
-//        ItemProcessor<Target, Target> pross = new ItemProcessor<Target, Target>() {
-//            @Override
-//            public Target process(Target item) throws Exception {
-//                if(sendType.equals("C_D")){
-//                    Map<String, Object> param = new HashMap<>();
-//                    param.put("schdlId", schdlId);
-//                    param.put("address", item.getMbrAddress());
-//                    param.put("data1", item.getData1());
-//                    param.put("data2", item.getData2());
-//                    param.put("data3", item.getData3());
-//
-//                    param.put("addressGrpId", item.getAddressGrpId());
-//                    param.put("addressMbrId", item.getAddressMbrId());
-//                    param.put("sendFlag", "11");
-//
-////                    param.put("addressMinId", addressMinId != null ? addressMinId : 0);
-////                    param.put("addressMaxId", addressMaxId != null ? addressMaxId : 0);
-//
-//                    log.info("@@@ item : {}", item);
-////                    log.info("### min : {}, max : {}", addressMinId, addressMaxId);
-//
-//                    sqlSessionTemplate.insert("SQL.Target.insertSendRaw", param);
-//
-////                    SqlSession sqlSession = sqlSessionFactory.openSession();
-////
-////                    sqlSession.insert("SQL.Target.insertSendRaw", param);
-//
-////                    int cnt = sqlSessionTemplate.selectOne("SQL.Target.selectDbTargetRemainsCnt", param);
-////                    if(cnt == 0){
-//                    sqlSessionTemplate.update("SQL.Target.updateSendSchldFlag", param);
-////                    }
-//                }else if(sendType.equals("C_F")){
-//                    Map<String, Object> param = new HashMap<>();
-//                    param.put("sendFlag", "11");
-//                    param.put("schdlId", schdlId);
-//                    param.put("rawId", item.getRawId());
-//                    sqlSessionTemplate.update("SQL.Target.updateSendRawFlag", param);
-//
-//                    int cnt = sqlSessionTemplate.selectOne("SQL.Target.selectFileTargetRemainsCnt", param);
-//                    if(cnt == 0){
-//                        sqlSessionTemplate.update("SQL.Target.updateSendSchldFlag", param);
-//                    }
-//                }
-//                return item;
-//            }
-//        };
-//        return pross;
-//    }
-
     @Bean
     @StepScope
     @Transactional
-    public ItemWriter<Target> targetWriter(@Value("#{jobParameters['schdlId']}") Long schdlId) {
+    public ItemWriter<Target> targetWriter(@Value("#{jobParameters['schdlId']}") Long schdlId,
+                                           @Value("#{jobParameters['addressGrpId']}") Long addressGrpId,
+                                           @Value("#{jobParameters['sendType']}") String sendType) {
         ItemWriter<Target> writer = new ItemWriter<Target>() {
             @Override
             public void write(List<? extends Target> items) {
@@ -250,8 +160,13 @@ public class TargetJob {
                         param.put("data2", target.getData2());
                         param.put("data3", target.getData3());
 
-                        //sqlSession.insert("SQL.Target.insertSendRaw", param);
-                        sqlSessionTemplate.insert("SQL.Target.insertSendRaw", param);
+                        if(sendType.equals("C_D")){
+                            sqlSessionTemplate.insert("SQL.Target.insertSendRaw", param);
+                        }else if(sendType.equals("C_F")){
+                            param.put("sendFlag", "11");
+                            param.put("rawId", target.getRawId());
+                            sqlSessionTemplate.update("SQL.Target.updateSendRawFlag", param);
+                        }
 
                         JSONObject jsonObject = new JSONObject();
                         jsonObject.put("addressGrpId", target.getAddressGrpId());
@@ -266,13 +181,15 @@ public class TargetJob {
                         jsonArray.put(jsonObject);
                     }
                     sqlSessionTemplate.flushStatements();
-                    //sqlSession.flushStatements();
-
-                    redisTemplate.opsForValue().set(String.valueOf(items.get(0).getSchdlId())+"_"+items.get(0).getMbrAddress()
-                                                    ,jsonArray.toString());
 
                     Map<String, Object> param = new HashMap<>();
-                    param.put("schdlId", items.get(0).getSchdlId());
+                    param.put("schdlId", schdlId);
+                    param.put("addressGrpId", addressGrpId);
+                    param.put("sendFlag", "10");
+
+                    redisTemplate.opsForValue().set(String.valueOf(schdlId)+"_"+items.get(0).getMbrAddress()
+                                                    ,jsonArray.toString());
+
                     param.put("targetCnt", items.size());
                     sqlSessionTemplate.update("SQL.Target.updateSendCnt", param);
 
@@ -289,80 +206,80 @@ public class TargetJob {
         return  writer;
     }
 
-//    @Bean
-//    @JobScope
-//    public Partitioner targetPartitioner(@Value("#{jobParameters['schdlId']}") Long schdlId,
-//                                           @Value("#{jobParameters['addressGrpId']}") Long addressGrpId,
-//                                           @Value("#{jobParameters['sendType']}") String sendType){
-//        Partitioner partitioner = new Partitioner() {
-//            @Override
-//            public Map<String, ExecutionContext> partition(int gridSize) {
-//                Map<String, ExecutionContext> result = new HashMap<String, ExecutionContext>();
-//                Map<String, Long> selectQuery = new HashMap<String, Long>();
-//                Map<String, Object> paramMap = new HashMap<String, Object>();
-//                paramMap.put("schdlId", schdlId != null ? schdlId : 0);
-//                paramMap.put("addressGrpId", addressGrpId != null ? addressGrpId : 0);
-//                paramMap.put("sendFlag", "11");
-//
-//                sqlSessionTemplate.update("SQL.Target.updateSendSchldFlag", paramMap);
-//
-//                if(sendType.equals("C_D")){
-//                    selectQuery = sqlSessionTemplate.selectOne("SQL.Target.selectTargetDbMinMax", paramMap);
-//                }else if(sendType.equals("C_F")){
-//                    selectQuery = sqlSessionTemplate.selectOne("SQL.Target.selectTargetFileMinMax", paramMap);
-//                }
-//
-//                long minValue = 0;
-//                long maxValue = 0;
-//
-//                if(selectQuery != null && selectQuery.get("addressMinId") != null){
-//                    minValue = selectQuery.get("addressMinId");
-//                    maxValue = selectQuery.get("addressMaxId");
-//                }
-//
-//                long targetSize = maxValue - minValue;
-//                long targetSizePerNode = (targetSize / gridSize) + 1;
-//
-//                if(targetSizePerNode <= gridSize){
-//                    targetSizePerNode = gridSize;
-//                }
-//
-//                int number = 0;
-//                long start = minValue;
-//                long end = start + targetSizePerNode - 1;
-//                while (start <= maxValue) {
-//                    ExecutionContext value = new ExecutionContext();
-//                    result.put("partition" + number, value);
-//
-//                    if (end >= maxValue) {
-//                        end = maxValue;
-//                    }
-//                    value.putLong("addressMinId", start);
-//                    value.putLong("addressMaxId", end);
-//                    log.info("target partition" + number+", "+start+","+end);
-//
-//                    start += targetSizePerNode;
-//                    end += targetSizePerNode;
-//                    number++;
-//                }
-//                return result;
-//            }
-//        };
-//        return  partitioner;
-//    }
+    @Bean
+    @JobScope
+    public Partitioner targetPartitioner(@Value("#{jobParameters['schdlId']}") Long schdlId,
+                                           @Value("#{jobParameters['addressGrpId']}") Long addressGrpId,
+                                           @Value("#{jobParameters['sendType']}") String sendType){
+        Partitioner partitioner = new Partitioner() {
+            @Override
+            public Map<String, ExecutionContext> partition(int gridSize) {
+                Map<String, ExecutionContext> result = new HashMap<String, ExecutionContext>();
+                Map<String, Long> selectQuery = new HashMap<String, Long>();
+                Map<String, Object> paramMap = new HashMap<String, Object>();
+                paramMap.put("schdlId", schdlId != null ? schdlId : 0);
+                paramMap.put("addressGrpId", addressGrpId != null ? addressGrpId : 0);
+                paramMap.put("sendFlag", "11");
+
+                sqlSessionTemplate.update("SQL.Target.updateSendSchldFlag", paramMap);
+
+                if(sendType.equals("C_D")){
+                    selectQuery = sqlSessionTemplate.selectOne("SQL.Target.selectTargetDbMinMax", paramMap);
+                }else if(sendType.equals("C_F")){
+                    selectQuery = sqlSessionTemplate.selectOne("SQL.Target.selectTargetFileMinMax", paramMap);
+                }
+
+                long minValue = 0;
+                long maxValue = 0;
+
+                if(selectQuery != null && selectQuery.get("addressMinId") != null){
+                    minValue = selectQuery.get("addressMinId");
+                    maxValue = selectQuery.get("addressMaxId");
+                }
+
+                long targetSize = maxValue - minValue;
+                long targetSizePerNode = (targetSize / gridSize) + 1;
+
+                if(targetSizePerNode <= gridSize){
+                    targetSizePerNode = gridSize;
+                }
+
+                int number = 0;
+                long start = minValue;
+                long end = start + targetSizePerNode - 1;
+                while (start <= maxValue) {
+                    ExecutionContext value = new ExecutionContext();
+                    result.put("partition" + number, value);
+
+                    if (end >= maxValue) {
+                        end = maxValue;
+                    }
+                    value.putLong("addressMinId", start);
+                    value.putLong("addressMaxId", end);
+                    log.info("target partition" + number+", "+start+","+end);
+
+                    start += targetSizePerNode;
+                    end += targetSizePerNode;
+                    number++;
+                }
+                return result;
+            }
+        };
+        return  partitioner;
+    }
 
     /**
      * targetFileMasterStep
      * @return
      */
-//    @Bean
-//    public Step targetFileMasterStep() {
-//        return stepBuilderFactory.get("targetFileMasterStep")
-//                .partitioner("targetFilePartitioner", targetPartitioner(0L, 0L, ""))
-//                .step(targetFileSlavetStep())
-//                .gridSize(slaveCnt)
-//                .build();
-//    }
+    @Bean
+    public Step targetFileMasterStep() {
+        return stepBuilderFactory.get("targetFileMasterStep")
+                .partitioner("targetFilePartitioner", targetPartitioner(0L, 0L, ""))
+                .step(targetFileSlavetStep())
+                .gridSize(slaveCnt)
+                .build();
+    }
 
     @Bean
     public Step targetFileSlavetStep(){
@@ -370,8 +287,7 @@ public class TargetJob {
             return stepBuilderFactory.get("targetFileSlavetStep")
                     .<Target, Target>chunk(commitInterval)
                     .reader(targetFIleReader(0L,0L, 0L))
-                    //.processor(targetProcessor(0L,0L,"", 0L))
-                    .writer(targetWriter(0L))
+                    .writer(targetWriter(0L,0L,""))
                     .build();
         }catch (Exception e){
             e.printStackTrace();

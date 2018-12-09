@@ -44,29 +44,28 @@
             WHERE GSS.SEND_TYPE = 'C_F'
             AND GSR.SEND_FLAG = 10
             AND GSS.SCHDL_ID = ${schdlId}
-            AND NOT EXISTS (
-                SELECT ID FROM GS_SEND_RAW GSR WHERE GSR.ADDRESS = GAM.ADDRESS AND GSR.SCHDL_ID = GSS.SCHDL_ID
-            )
-            LIMIT 1000
         ) A
     </select>
 
     <select id="selectDbTargetList" resultType="Target">
-        SELECT
-            GAM.ADDRESS_MBR_ID addressMbrId,
-            GAM.NAME mbrName,
-            GAM.ADDRESS mbrAddress,
-            GAM.DATA1 data1,
-            GAM.DATA2 data2,
-            GAM.DATA3 data3,
-            GAM.REG_DATE regDate
-        FROM GS_SEND_SCHDL GSS
-        INNER JOIN GS_ADDRESS_MBR GAM ON (GSS.ADDRESS_GRP_ID = GAM.ADDRESS_GRP_ID )
-        LEFT JOIN GS_SEND_RAW GSR ON (GSS.SCHDL_ID = GSR.SCHDL_ID AND GAM.ADDRESS = GSR.ADDRESS)
-        WHERE GAM.ADDRESS_GRP_ID = ${addressGrpId}
-        AND GSS.SCHDL_ID = ${schdlId}
-        AND GSR.ADDRESS IS NULL
-        LIMIT #{_skiprows}, #{_pagesize}
+        SELECT * FROM (
+            SELECT
+                GAM.ADDRESS_MBR_ID addressMbrId,
+                GAM.NAME mbrName,
+                GAM.ADDRESS mbrAddress,
+                GAM.DATA1 data1,
+                GAM.DATA2 data2,
+                GAM.DATA3 data3,
+                GAM.REG_DATE regDate
+            FROM GS_SEND_SCHDL GSS
+            INNER JOIN GS_ADDRESS_MBR GAM ON (GSS.ADDRESS_GRP_ID = GAM.ADDRESS_GRP_ID )
+            LEFT JOIN GS_SEND_RAW GSR ON (GSS.SCHDL_ID = GSR.SCHDL_ID AND GAM.ADDRESS = GSR.ADDRESS)
+            WHERE GAM.ADDRESS_GRP_ID = ${addressGrpId}
+            AND GSS.SCHDL_ID = ${schdlId}
+            AND GSR.ADDRESS IS NULL
+            ORDER BY SUBSTRING_INDEX(GAM.ADDRESS, '@', -1) ASC
+        ) A
+        WHERE A.addressMbrId BETWEEN ${addressMinId} AND ${addressMaxId}
     </select>
 
     <select id="selectFileTargetList" resultType="Target">
@@ -86,24 +85,23 @@
             WHERE GSS.SEND_TYPE = 'C_F'
             AND GSR.SEND_FLAG = 10
             AND GSS.SCHDL_ID = ${schdlId}
-            AND NOT EXISTS (
-                SELECT ID FROM GS_SEND_RAW GSR WHERE GSR.ADDRESS = GAM.ADDRESS AND GSR.SCHDL_ID = GSS.SCHDL_ID
-            )
             ORDER BY SUBSTRING_INDEX(GSR.ADDRESS, '@', -1) ASC
         ) A
-        AND A.rawId BETWEEN ${addressMinId} AND ${addressMaxId}
+        WHERE A.rawId BETWEEN ${addressMinId} AND ${addressMaxId}
     </select>
 
-    <select id="selectDbTargetRemainsCnt" resultType="Integer">
+    <!--<select id="selectDbTargetRemainsCnt" resultType="Integer">
         SELECT
-            COUNT(1) cnt
-        FROM GS_ADDRESS_MBR GAM
-        LEFT JOIN GS_SEND_RAW GSR ON (GSR.SCHDL_ID = ${schdlId}  AND GSR.ADDRESS = GAM.ADDRESS )
+            COUNT(1)
+        FROM GS_SEND_SCHDL GSS
+        INNER JOIN GS_ADDRESS_MBR GAM ON (GSS.ADDRESS_GRP_ID = GAM.ADDRESS_GRP_ID )
+        LEFT JOIN GS_SEND_RAW GSR ON (GSS.SCHDL_ID = GSR.SCHDL_ID AND GAM.ADDRESS = GSR.ADDRESS)
         WHERE GAM.ADDRESS_GRP_ID = ${addressGrpId}
+        AND GSS.SCHDL_ID = ${schdlId}
         AND GSR.ADDRESS IS NULL
-    </select>
+    </select>-->
 
-    <select id="selectFileTargetRemainsCnt" resultType="Integer">
+    <!--<select id="selectFileTargetRemainsCnt" resultType="Integer">
         SELECT
             COUNT(1) cnt
         FROM GS_SEND_SCHDL GSS
@@ -111,7 +109,7 @@
         WHERE GSS.SEND_TYPE = 'C_F'
         AND GSR.SEND_FLAG = 10
         AND GSS.SCHDL_ID = ${schdlId}
-    </select>
+    </select>-->
 
     <update id="updateSendRawFlag">
         UPDATE GS_SEND_RAW SET SEND_FLAG = #{sendFlag} WHERE ID = ${rawId}
