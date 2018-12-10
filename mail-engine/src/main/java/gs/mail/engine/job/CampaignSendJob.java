@@ -48,7 +48,7 @@ public class CampaignSendJob {
     public Job campaignSendJobDetail() {
         try{
             return jobBuilderFactory.get("campaignSendJobDetail")
-                    //.incrementer(new SimpleIncrementer())
+                    .incrementer(new SimpleIncrementer())
                     .start(campaignSchdlTasklet())
                     .listener(campaignSendListener())
                     .build();

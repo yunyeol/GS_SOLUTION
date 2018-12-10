@@ -28,7 +28,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
@@ -67,7 +69,7 @@ public class TargetJob {
                     .end();
 
             return jobBuilderFactory.get("targetJobDetail")
-                    //.incrementer(new SimpleIncrementer())
+                    .incrementer(new SimpleIncrementer())
                     .start(flow)
                     .end()
                     .build();
@@ -276,8 +278,9 @@ public class TargetJob {
     @Bean
     public Step targetFileMasterStep() {
         return stepBuilderFactory.get("targetFileMasterStep")
+                .partitioner(targetFileSlavetStep())
                 .partitioner("targetFilePartitioner", targetPartitioner(0L, 0L, ""))
-                .step(targetFileSlavetStep())
+                .taskExecutor(executor())
                 .gridSize(slaveCnt)
                 .build();
     }
@@ -314,4 +317,16 @@ public class TargetJob {
         return reader;
     }
 
+    @Value("${executor.core.pool.size}") private int corePool;
+    @Value("${executor.max.pool.size}") private int maxPool;
+    @Value("${executor.que.capacity}") private int queCapacity;
+
+    @Bean
+    public TaskExecutor executor(){
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(corePool);
+        executor.setMaxPoolSize(maxPool);
+        executor.setQueueCapacity(queCapacity);
+        return executor;
+    }
 }

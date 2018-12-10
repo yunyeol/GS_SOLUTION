@@ -56,7 +56,7 @@ public class RealtimeSendJob {
     public Job realtimeSendJobDetail() {
         try{
             return jobBuilderFactory.get("realtimeSendJobDetail")
-                    //.incrementer(new SimpleIncrementer())
+                    .incrementer(new SimpleIncrementer())
                     .start(realtimeSchdlTasklet())
                     .next(realtimeMasterSendStep())
                     .listener(realtimeSendQueListener(0L))
