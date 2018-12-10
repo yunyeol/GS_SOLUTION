@@ -101,8 +101,9 @@ public class TargetJob {
     @Bean
     public Step targetDbMasterStep() {
         return stepBuilderFactory.get("targetMasterSendStep")
+                .partitioner(targetDbSlavetStep())
                 .partitioner("targetDbPartitioner", targetPartitioner(0L, 0L, ""))
-                .step(targetDbSlavetStep())
+                .taskExecutor(executor())
                 .gridSize(slaveCnt)
                 .build();
     }

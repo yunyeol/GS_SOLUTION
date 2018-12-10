@@ -20,7 +20,7 @@
         WHERE SEND_GUBUN = 'M'
         AND SEND_TYPE LIKE 'C%'
         AND SEND_FLAG = '20'
-        AND RESERVE_DATE < SYSDATE()
+        AND RESERVE_DATE < NOW()
     ]]>
     </select>
 
