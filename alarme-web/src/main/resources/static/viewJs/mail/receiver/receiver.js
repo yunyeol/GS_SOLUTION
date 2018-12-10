@@ -1,6 +1,47 @@
 (function($, receiver){
 
+    receiver.field = {
+        grpNameChk : false
+    }
     receiver.init = function(){
+        this.dataTable();
+        this.setEvent();
+    }
+
+    receiver.setEvent = function(){
+        var form = $('#receiverForm');
+
+        $('#dupUsersBtn').off('click.receiver').on('click.receiver',function(){
+
+            var params = {};
+            params.addrGrpName = $('#receiverForm input.form-control').val();
+
+            var sCallBack = function(data) {
+                receiver.field.grpNameChk = ( data ) ? true : false;
+                console.log(receiver.field.grpNameChk);
+            }
+
+            receiver.ajaxCall('get','/mail/receiver/group/checkname',params,sCallBack);
+        });
+
+        $('button[type="submit"]').on('click.receiver',function(){
+            form.validate();
+            console.log(form.valid());
+
+            var params = {};
+            params.addrGrpName = $('#receiverForm input.form-control').val();
+            params.loginId = $('input[type=hidden]#loginId').val();
+
+            if( form.valid() ){
+                console.log('true');
+            }else{
+                console.log('why?');
+                alert('그룹이름을 입력해 주시기 바랍니다.');
+            }
+        });
+    }
+
+    receiver.dataTable = function(){
         $('#receiverListTable').DataTable({
             destroy: true,
             ajax: {
@@ -51,15 +92,21 @@
                 $('.dataTables_filter input[type="search"]').removeClass().addClass('form-control');
             }
         });
-        this.setEvent()
     }
 
-    receiver.setEvent = function(){
-        var form = $('#receiverForm');
-
-        $('button[type="submit"]').on('click',function(){
-            form.validate();
-            console.log(form.valid());
+    receiver.ajaxCall = function(httpType, url, params, sCallBack){
+        $.ajax({
+            type: httpType,
+            dataType : 'json',
+            data : params,
+            url : url,
+            success:function(data){
+                if( jQuery.isFunction(sCallBack) ){
+                    sCallBack(data);
+                }
+            },
+            error:function(){
+            }
         });
     }
 
