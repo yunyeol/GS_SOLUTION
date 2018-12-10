@@ -11,9 +11,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-@Component
 @Slf4j
-public class SmtpSender {
+@Component
+public class SmtpSender{
 
     private String host = "119.207.76.55";
     private int port = 25;
@@ -54,9 +54,6 @@ public class SmtpSender {
 
     public void close(){
         try{
-            if(br != null) br.close();
-            if(pw != null) pw.close();
-            if(sendLog != null) sendLog.close();
             if(socket != null) socket.close();
         }catch (Exception e){
             e.printStackTrace();
@@ -119,9 +116,14 @@ public class SmtpSender {
             sendLog.println();
             pw.println("quit");
 
-            //close();
+            if(br != null) br.close();
+            if(pw != null) pw.close();
+            if(sendLog != null) sendLog.close();
+
         } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+            //close();
         }
     }
 }

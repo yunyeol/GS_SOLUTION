@@ -4,10 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.JobParametersIncrementer;
-import org.springframework.stereotype.Component;
 
 @Slf4j
-@Component
 public class SimpleIncrementer implements JobParametersIncrementer {
 
     @Override

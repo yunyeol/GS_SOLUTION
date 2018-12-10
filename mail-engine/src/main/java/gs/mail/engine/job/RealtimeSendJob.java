@@ -6,10 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.mybatis.spring.batch.MyBatisCursorItemReader;
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobExecutionListener;
-import org.springframework.batch.core.Step;
+import org.springframework.batch.core.*;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.JobScope;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
@@ -25,7 +22,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.stereotype.Component;
 
+import javax.mail.internet.MimeUtility;
 import java.io.*;
 import java.util.*;
 
@@ -40,6 +39,7 @@ public class RealtimeSendJob {
     @Autowired private SqlSessionFactory sqlSessionFactory;
 
     @Autowired private SmtpSender smtpSender;
+    @Autowired private TaskExecutor taskExecutor;
 
     @Value("${batch.commit.interval}") private int commitInterval;
     @Value("${batch.slave.cnt}") private int slaveCnt;
@@ -55,7 +55,7 @@ public class RealtimeSendJob {
                     .incrementer(new SimpleIncrementer())
                     .start(realtimeSchdlTasklet())
                     .next(realtimeMasterSendStep())
-                    .listener(realtimeSendQueListener(0L))
+                    .listener(realtimeSendQueJobListener(0L))
                     .build();
 
         }catch(Exception e){
@@ -97,12 +97,18 @@ public class RealtimeSendJob {
      */
     @Bean
     public Step realtimeMasterSendStep() {
-        return stepBuilderFactory.get("realtimeMasterSendStep")
-                .partitioner(realtimeSlaveSendStep())
-                .partitioner("realtimeSlavePartitioner", realtimePartitioner(0L))
-                .gridSize(slaveCnt)
-                .taskExecutor(executor())
-                .build();
+        try{
+            return stepBuilderFactory.get("realtimeMasterSendStep")
+                    .partitioner(realtimeSlaveSendStep())
+                    .partitioner("realtimeSlavePartitioner", realtimePartitioner(0L))
+                    .gridSize(slaveCnt)
+                    .taskExecutor(taskExecutor)
+                    .listener(realtimeSendQueStepListener())
+                    .build();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return null;
     }
 
     /**
@@ -199,13 +205,15 @@ public class RealtimeSendJob {
 //                            msg.setSentDate(new Date());
 //                            recipientAddress[cnt] = new InternetAddress(realtime.getReceiver().trim()); 동보발송시 사용
 
-//                            smtpSender.send("R",
-//                                realtime.getSender(),
-//                                realtime.getReceiver(),
-//                                MimeUtility.encodeText(realtime.getMailTitle(),"EUC-KR", "B"),
-//                                MimeUtility.encodeText(htmlContents.replace("${CONTENTS}", realtime.getMailContents()),"EUC-KR", "B"),
-//                                cnt
-//                            );
+                            //계속 커넥션 열고 발송하고 닫고 하는 로직
+//                            SmtpSender smtpSender = new SmtpSender();
+                            smtpSender.send("R",
+                                realtime.getSender(),
+                                realtime.getReceiver(),
+                                MimeUtility.encodeText(realtime.getMailTitle(),"EUC-KR", "B"),
+                                MimeUtility.encodeText(htmlContents.replace("${CONTENTS}", realtime.getMailContents()),"EUC-KR", "B"),
+                                cnt
+                            );
 
                             cnt++;
                         }
@@ -234,8 +242,30 @@ public class RealtimeSendJob {
     }
 
     @Bean
+    @StepScope
+    public StepExecutionListener realtimeSendQueStepListener(){
+        StepExecutionListener stepExecutionListener = new StepExecutionListener() {
+            SmtpSender smtpSender = new SmtpSender();
+            @Override
+            public void beforeStep(StepExecution stepExecution) {
+                log.info("####### step before");
+                //smtpSender.connect("R");
+            }
+
+            @Override
+            public ExitStatus afterStep(StepExecution stepExecution) {
+                log.info("######### step after");
+                //smtpSender.close();
+                return ExitStatus.COMPLETED;
+            }
+        };
+
+        return stepExecutionListener;
+    }
+
+    @Bean
     @JobScope
-    public JobExecutionListener realtimeSendQueListener(@Value("#{jobParameters['schdlId']}") Long schdlId) throws Exception{
+    public JobExecutionListener realtimeSendQueJobListener(@Value("#{jobParameters['schdlId']}") Long schdlId) throws Exception{
         JobExecutionListener jobExecutionListener = new JobExecutionListener() {
             @Override
             public void beforeJob(JobExecution jobExecution) {
@@ -324,18 +354,5 @@ public class RealtimeSendJob {
         paramMap.put("succesCnt", succesCnt);
         paramMap.put("failCnt", failCnt);
         sqlSessionTemplate.insert("SQL.RealitmeSend.updateSchdlCnt", paramMap);
-    }
-
-    @Value("${executor.core.pool.size}") private int corePool;
-    @Value("${executor.max.pool.size}") private int maxPool;
-    @Value("${executor.que.capacity}") private int queCapacity;
-
-    @Bean
-    public TaskExecutor executor(){
-        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(corePool);
-        executor.setMaxPoolSize(maxPool);
-        executor.setQueueCapacity(queCapacity);
-        return executor;
     }
 }

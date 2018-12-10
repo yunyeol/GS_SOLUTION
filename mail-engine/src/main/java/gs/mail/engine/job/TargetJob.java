@@ -45,6 +45,7 @@ public class TargetJob {
 
     @Autowired private SqlSessionTemplate sqlSessionTemplate;
     @Autowired private SqlSessionFactory sqlSessionFactory;
+    @Autowired private TaskExecutor taskExecutor;
 
     @Value("${batch.commit.interval}") private int commitInterval;
     @Value("${batch.slave.cnt}") private int slaveCnt;
@@ -103,7 +104,7 @@ public class TargetJob {
         return stepBuilderFactory.get("targetMasterSendStep")
                 .partitioner(targetDbSlavetStep())
                 .partitioner("targetDbPartitioner", targetPartitioner(0L, 0L, ""))
-                .taskExecutor(executor())
+                .taskExecutor(taskExecutor)
                 .gridSize(slaveCnt)
                 .build();
     }
@@ -281,7 +282,7 @@ public class TargetJob {
         return stepBuilderFactory.get("targetFileMasterStep")
                 .partitioner(targetFileSlavetStep())
                 .partitioner("targetFilePartitioner", targetPartitioner(0L, 0L, ""))
-                .taskExecutor(executor())
+                .taskExecutor(taskExecutor)
                 .gridSize(slaveCnt)
                 .build();
     }
@@ -316,18 +317,5 @@ public class TargetJob {
         reader.setParameterValues(paramMap);
         reader.setQueryId("SQL.Target.selectFileTargetList");
         return reader;
-    }
-
-    @Value("${executor.core.pool.size}") private int corePool;
-    @Value("${executor.max.pool.size}") private int maxPool;
-    @Value("${executor.que.capacity}") private int queCapacity;
-
-    @Bean
-    public TaskExecutor executor(){
-        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(corePool);
-        executor.setMaxPoolSize(maxPool);
-        executor.setQueueCapacity(queCapacity);
-        return executor;
     }
 }

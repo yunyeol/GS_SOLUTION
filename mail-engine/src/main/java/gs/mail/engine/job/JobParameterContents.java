@@ -3,21 +3,12 @@ package gs.mail.engine.job;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.core.task.TaskExecutor;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.util.Date;
 import java.util.Map;
 
 @Slf4j
 public class JobParameterContents {
-
-    @Value("${executor.core.pool.size}") private int corePool;
-    @Value("${executor.max.pool.size}") private int maxPool;
-    @Value("${executor.que.capacity}") private int queCapacity;
-
     protected static final String JOB_NAME = "jobName";
 
     protected JobParameters getJobParametersFromJobMap(Map<String, Object> jobDataMap) {
@@ -45,13 +36,5 @@ public class JobParameterContents {
         }
 
         return builder.toJobParameters();
-    }
-
-    protected TaskExecutor executor(){
-        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(corePool);
-        executor.setMaxPoolSize(maxPool);
-        executor.setQueueCapacity(queCapacity);
-        return executor;
     }
 }
