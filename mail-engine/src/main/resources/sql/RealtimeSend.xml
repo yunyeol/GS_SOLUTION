@@ -99,7 +99,7 @@
         UPDATE GS_SEND_SCHDL
         SET TARGET_CNT = TARGET_CNT + ${targetCnt},
             SEND_CNT = SEND_CNT + ${sendCnt},
-            SUCCES_CNT = SUCCES_CNT + ${succesCnt},
+            SUCCESS_CNT = SUCCESS_CNT + ${succesCnt},
             FAIL_CNT = FAIL_CNT + ${failCnt}
         WHERE SCHDL_ID = ${schdlId}
     </update>

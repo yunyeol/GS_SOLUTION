@@ -6,7 +6,10 @@ import org.springframework.stereotype.Component;
 import javax.mail.internet.MimeUtility;
 import java.io.*;
 import java.net.Socket;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Component
 @Slf4j
@@ -16,72 +19,107 @@ public class SmtpSender {
     private int port = 25;
 
     private Socket socket;
+    private BufferedReader br;
+    private PrintWriter pw, sendLog;
 
-    public void sendSocket(){
+    public void connect(int id, String gubun){
         try{
+            String fileDir = "C:/git/";
+            if(gubun.equals("C")){
+                fileDir = fileDir+"campaign";
+            }else if(gubun.equals("R")){
+                fileDir = fileDir+"realtime";
+            }
+
+            Date today = new Date();
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+
+            File dir = new File(fileDir);
+            if (!dir.exists()){
+                dir.mkdirs();
+            }
+
+            File file = new File(fileDir+"/sendLog_"+sdf.format(today)+".log");
+
             socket = new Socket(host, port);
+            br = new BufferedReader(new InputStreamReader( socket.getInputStream(), "euc-kr" ) );
+            pw = new PrintWriter(new OutputStreamWriter(socket.getOutputStream() , "euc-kr"), true );
+
+            sendLog = new PrintWriter(new BufferedWriter(new FileWriter(file, true)));
+            sendLog.print(id + " : CONNECT SERVER :: RES :"+br.readLine() +" || ");
         }catch (Exception e){
             e.printStackTrace();
         }
     }
 
-    public void send(){
-        try {
-            sendSocket();
+    public void close(){
+        try{
+            if(br != null) br.close();
+            if(pw != null) pw.close();
+            if(sendLog != null) sendLog.close();
+            if(socket != null) socket.close();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
 
-            BufferedReader br = new BufferedReader(new InputStreamReader( socket.getInputStream(), "euc-kr" ) );
-            PrintWriter pw = new PrintWriter(new OutputStreamWriter(socket.getOutputStream() , "euc-kr"), true );
-            log.info("서버에 연결되었습니다.");
+    public String getMxDomain(String receiver){
+        try{
+            String domain = receiver.substring(receiver.indexOf("@")+1);
 
-            String line=br.readLine();
-            System.out.println("응답:"+line);
-            if (!line.startsWith("220")) {
-                log.info("SMTP서버가 아닙니다");
+            Process process = Runtime.getRuntime().exec("nslookup -type=mx " + domain);
+            InputStream in = process.getInputStream();
+            BufferedReader br = new BufferedReader(new InputStreamReader(in));
+
+            List<String> domainList = new ArrayList();
+            String line = "";
+            while ((line = br.readLine()) != null){
+                domainList.add(line);
             }
+            br.close();
+            in.close();
 
-            System.out.println("HELO 명령을 전송합니다.");
-            pw.println("HELO humuson.com");line=br.readLine();
-            System.out.println("응답:"+line);
-            if (!line.startsWith("250")) log.info("HELO 실패했습니다:"+line);
+            log.info("### nslookup : {} ", domainList.get(0).toString());
 
-            System.out.println("MAIL FROM 명령을 전송합니다.");
-            pw.println("MAIL FROM: <test@naver.com>");
-            line=br.readLine();
-            System.out.println("응답:"+line);
-            if (!line.startsWith("250")) log.info("MAIL FROM 에서 실패했습니다:"+line);
+            return domainList.get(0).toString();
+        }catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
+    }
 
-            System.out.println("RCPT 명령을 전송합니다.");
-            //pw.println("RCPT TO:<eklee@humuson.com>");
-            pw.println("RCPT TO:<dyhwang@humuson.com>");
-            line=br.readLine();
-            System.out.println("응답:"+line);
-            if (!line.startsWith("250")) log.info("RCPT TO 에서 실패했습니다:"+line);
+    public void send(String gubun, String sender, String receiver, String title, String contents, int id){
+        try {
+            connect(id, gubun);
+            //파라미터로 받는사람 주소를 받으면 해당 도메인을 오픈
+            pw.println("HELO "+getMxDomain(receiver));
+            sendLog.print("HELO SEND :: RES :"+br.readLine()+" || ");
 
-            System.out.println("DATA 명령을 전송합니다.");
+            pw.println("MAIL FROM: <"+sender+">");
+            sendLog.print("MAIL FROM :: RES :"+br.readLine()+" || ");
+
+            pw.println("RCPT TO:<"+receiver+">");
+            sendLog.print("RCPT TO :: RES :"+br.readLine()+" || ");
+
             pw.println("DATA");
-            line=br.readLine();
-            System.out.println("응답:"+line);
-            if (!line.startsWith("354")) log.info("DATA 에서 실패했습니다:"+line);
+            sendLog.print("DATA :: RES :"+br.readLine()+" || ");
 
-            System.out.println("본문을 전송합니다.");
-            pw.println("Subject:" +  MimeUtility.encodeText("스팸입니다 고갱님  ㅎ ", "EUC-KR", "B"));
-            pw.println("from: test@naver.com");
-            pw.println("to: dyhwang@humuson.com");
+            //pw.println("Subject:" +  MimeUtility.encodeText("스팸입니다 고갱님  ㅎ ", "EUC-KR", "B"));
+            pw.println("subject:"+title);
+            pw.println("from:"+sender);
+            pw.println("to:"+receiver);
             pw.println("date: "+new Date());
             pw.println();
-            pw.println( MimeUtility.encodeText("메롱 스팸이다!!!!! ㅎ", "EUC-KR", "B"));
+            //pw.println( MimeUtility.encodeText("메롱 스팸이다!!!!! ㅎ", "EUC-KR", "B"));
+            pw.println(contents);
             pw.println(".");
-            line=br.readLine();
-            System.out.println("응답:"+line);
-            if (!line.startsWith("250")) log.info("내용전송에서 실패했습니다:"+line);
+            sendLog.print("DATA SEND :: RES :"+br.readLine()+" || ");
 
-            System.out.println("접속 종료합니다.");
+            sendLog.print("QUIT");
+            sendLog.println();
             pw.println("quit");
 
-            br.close();
-            pw.close();
-            socket.close();
-
+            //close();
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -1,6 +1,7 @@
 package gs.mail.engine.job;
 
 import gs.mail.engine.dto.Realtime;
+import gs.mail.engine.util.SmtpSender;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionTemplate;
@@ -22,12 +23,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.task.TaskExecutor;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.io.*;
 import java.util.*;
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeUtility;
 
 @Slf4j
 @Configuration
@@ -38,6 +42,8 @@ public class RealtimeSendJob {
 
     @Autowired private SqlSessionTemplate sqlSessionTemplate;
     @Autowired private SqlSessionFactory sqlSessionFactory;
+
+    @Autowired private SmtpSender smtpSender;
 
     @Value("${batch.commit.interval}") private int commitInterval;
     @Value("${batch.slave.cnt}") private int slaveCnt;
@@ -50,6 +56,7 @@ public class RealtimeSendJob {
     public Job realtimeSendJobDetail() {
         try{
             return jobBuilderFactory.get("realtimeSendJobDetail")
+                    //.incrementer(new SimpleIncrementer())
                     .start(realtimeSchdlTasklet())
                     .next(realtimeMasterSendStep())
                     .listener(realtimeSendQueListener(0L))
@@ -95,9 +102,10 @@ public class RealtimeSendJob {
     @Bean
     public Step realtimeMasterSendStep() {
         return stepBuilderFactory.get("realtimeMasterSendStep")
+                .partitioner(realtimeSlaveSendStep())
                 .partitioner("realtimeSlavePartitioner", realtimePartitioner(0L))
-                .step(realtimeSlaveSendStep())
                 .gridSize(slaveCnt)
+                .taskExecutor(executor())
                 .build();
     }
 
@@ -178,25 +186,34 @@ public class RealtimeSendJob {
 
                         String htmlContents = sb.toString();
 
-                        Properties prop = new Properties();
-                        prop.setProperty("mail.transport.protocol", mailProtocol);
-                        prop.setProperty("mail.smtp.host", mailHost);
-                        prop.setProperty("mail.smtp.port", mailPort);
-
-                        Session mailSession = Session.getDefaultInstance(prop, null);
-                        Message msg = new MimeMessage(mailSession);
+//                        Properties prop = new Properties();
+//                        prop.setProperty("mail.transport.protocol", mailProtocol);
+//                        prop.setProperty("mail.smtp.host", mailHost);
+//                        prop.setProperty("mail.smtp.port", mailPort);
+//
+//                        Session mailSession = Session.getDefaultInstance(prop, null);
+//                        Message msg = new MimeMessage(mailSession);
 
                         //InternetAddress[] recipientAddress = new InternetAddress[items.size()];
                         int cnt = 0;
                         for(Realtime realtime : items){
-                            msg.setSubject(realtime.getMailTitle());
-                            msg.setContent(htmlContents.replace("${CONTENTS}", realtime.getMailContents()), "text/html; charset=utf-8");
-                            msg.setRecipient(Message.RecipientType.TO, new InternetAddress(realtime.getReceiver()));
-                            msg.setSentDate(new Date());
+//                            msg.setSubject(realtime.getMailTitle());
+//                            msg.setContent(htmlContents.replace("${CONTENTS}", realtime.getMailContents()), "text/html; charset=utf-8");
+//                            msg.setRecipient(Message.RecipientType.TO, new InternetAddress(realtime.getReceiver()));
+//                            msg.setSentDate(new Date());
 //                            recipientAddress[cnt] = new InternetAddress(realtime.getReceiver().trim()); 동보발송시 사용
+
+//                            smtpSender.send("R",
+//                                realtime.getSender(),
+//                                realtime.getReceiver(),
+//                                MimeUtility.encodeText(realtime.getMailTitle(),"EUC-KR", "B"),
+//                                MimeUtility.encodeText(htmlContents.replace("${CONTENTS}", realtime.getMailContents()),"EUC-KR", "B"),
+//                                cnt
+//                            );
+
                             cnt++;
                         }
-                        msg.setFrom(new InternetAddress(items.get(0).getSender()));
+                        //msg.setFrom(new InternetAddress(items.get(0).getSender()));
                         //Transport.send(msg);
 
                         updateSchdlCnt(items.get(0).getSchdlId(), cnt, cnt, 0, 0);
@@ -226,23 +243,17 @@ public class RealtimeSendJob {
         JobExecutionListener jobExecutionListener = new JobExecutionListener() {
             @Override
             public void beforeJob(JobExecution jobExecution) {
+                try {
+
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
             }
 
             @Override
             public void afterJob(JobExecution jobExecution) {
                 try{
-//                    Socket socket = new Socket(mailHost, Integer.parseInt(mailPort));
-//                    BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-//                    PrintWriter pw = new PrintWriter(socket.getOutputStream(), true);
-//
-//                    String line;
-//                    //StringBuffer resultSb = new StringBuffer();
-//                    while((line = br.readLine()) != null){
-//                        //resultSb.append(line);
-//                        log.info("###  {}", line);
-//                    }
-//                    br.close();
-//                    socket.close();
+
                 }catch(Exception e){
                     e.printStackTrace();
                 }
@@ -317,5 +328,18 @@ public class RealtimeSendJob {
         paramMap.put("succesCnt", succesCnt);
         paramMap.put("failCnt", failCnt);
         sqlSessionTemplate.insert("SQL.RealitmeSend.updateSchdlCnt", paramMap);
+    }
+
+    @Value("${executor.core.pool.size}") private int corePool;
+    @Value("${executor.max.pool.size}") private int maxPool;
+    @Value("${executor.que.capacity}") private int queCapacity;
+
+    @Bean
+    public TaskExecutor executor(){
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(corePool);
+        executor.setMaxPoolSize(maxPool);
+        executor.setQueueCapacity(queCapacity);
+        return executor;
     }
 }

@@ -67,6 +67,7 @@ public class TargetJob {
                     .end();
 
             return jobBuilderFactory.get("targetJobDetail")
+                    //.incrementer(new SimpleIncrementer())
                     .start(flow)
                     .end()
                     .build();
