@@ -30,7 +30,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
@@ -42,6 +41,7 @@ import java.util.Map;
 public class TargetJob {
     @Autowired private JobBuilderFactory jobBuilderFactory;
     @Autowired private StepBuilderFactory stepBuilderFactory;
+    @Autowired private SimpleIncrementer simpleIncrementer;
 
     @Autowired private SqlSessionTemplate sqlSessionTemplate;
     @Autowired private SqlSessionFactory sqlSessionFactory;
@@ -70,7 +70,7 @@ public class TargetJob {
                     .end();
 
             return jobBuilderFactory.get("targetJobDetail")
-                    .incrementer(new SimpleIncrementer())
+                    .incrementer(simpleIncrementer)
                     .start(flow)
                     .end()
                     .build();

@@ -24,8 +24,6 @@ public class CampaignSendExecutor extends JobParameterContents implements Job {
     @Autowired private CampaignSendService campaignSendService;
     @Autowired private CampaignSendJob campaignSendJob;
 
-    @Autowired private SmtpSender smtpSender;
-
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {
         try{

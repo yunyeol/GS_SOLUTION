@@ -42,7 +42,7 @@
             WHERE SCHDL_ID = ${schdlId}
             AND TARGET_YN = 'N'
             AND RESERVE_DATE < NOW()
-            ORDER BY ID
+            ORDER BY ID ASC
 			LIMIT 1000
         ) A
     ]]>

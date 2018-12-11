@@ -11,6 +11,7 @@ import org.springframework.batch.core.configuration.annotation.JobBuilderFactory
 import org.springframework.batch.core.configuration.annotation.JobScope;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepScope;
+import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.partition.support.Partitioner;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemProcessor;
@@ -34,28 +35,24 @@ public class RealtimeSendJob {
 
     @Autowired private JobBuilderFactory jobBuilderFactory;
     @Autowired private StepBuilderFactory stepBuilderFactory;
+    @Autowired private SimpleIncrementer simpleIncrementer;
 
     @Autowired private SqlSessionTemplate sqlSessionTemplate;
     @Autowired private SqlSessionFactory sqlSessionFactory;
 
-    @Autowired private SmtpSender smtpSender;
     @Autowired private TaskExecutor taskExecutor;
 
     @Value("${batch.commit.interval}") private int commitInterval;
     @Value("${batch.slave.cnt}") private int slaveCnt;
 
-    @Value("${mail.smtp.host}") private String mailHost;
-    @Value("${mail.smtp.port}") private String mailPort;
-    @Value("${mail.smtp.protocol}") private String mailProtocol;
-
     @Bean
     public Job realtimeSendJobDetail() {
         try{
             return jobBuilderFactory.get("realtimeSendJobDetail")
-                    .incrementer(new SimpleIncrementer())
+                    .incrementer(simpleIncrementer)
                     .start(realtimeSchdlTasklet())
                     .next(realtimeMasterSendStep())
-                    .listener(realtimeSendQueJobListener(0L))
+                    //.listener(realtimeSendQueJobListener(smtpSender,0L))
                     .build();
 
         }catch(Exception e){
@@ -103,7 +100,6 @@ public class RealtimeSendJob {
                     .partitioner("realtimeSlavePartitioner", realtimePartitioner(0L))
                     .gridSize(slaveCnt)
                     .taskExecutor(taskExecutor)
-                    .listener(realtimeSendQueStepListener())
                     .build();
         }catch (Exception e){
             e.printStackTrace();
@@ -188,38 +184,23 @@ public class RealtimeSendJob {
 
                         String htmlContents = sb.toString();
 
-//                        Properties prop = new Properties();
-//                        prop.setProperty("mail.transport.protocol", mailProtocol);
-//                        prop.setProperty("mail.smtp.host", mailHost);
-//                        prop.setProperty("mail.smtp.port", mailPort);
-//
-//                        Session mailSession = Session.getDefaultInstance(prop, null);
-//                        Message msg = new MimeMessage(mailSession);
-
-                        //InternetAddress[] recipientAddress = new InternetAddress[items.size()];
                         int cnt = 0;
                         for(Realtime realtime : items){
-//                            msg.setSubject(realtime.getMailTitle());
-//                            msg.setContent(htmlContents.replace("${CONTENTS}", realtime.getMailContents()), "text/html; charset=utf-8");
-//                            msg.setRecipient(Message.RecipientType.TO, new InternetAddress(realtime.getReceiver()));
-//                            msg.setSentDate(new Date());
-//                            recipientAddress[cnt] = new InternetAddress(realtime.getReceiver().trim()); 동보발송시 사용
-
                             //계속 커넥션 열고 발송하고 닫고 하는 로직
-//                            SmtpSender smtpSender = new SmtpSender();
-                            smtpSender.send("R",
+                            SmtpSender smtpSender = new SmtpSender("R", realtime.getReceiver());
+
+                            smtpSender.send(
                                 realtime.getSender(),
                                 realtime.getReceiver(),
                                 MimeUtility.encodeText(realtime.getMailTitle(),"EUC-KR", "B"),
-                                MimeUtility.encodeText(htmlContents.replace("${CONTENTS}", realtime.getMailContents()),"EUC-KR", "B"),
-                                cnt
+                                MimeUtility.encodeText(htmlContents.replace("${CONTENTS}", realtime.getMailContents()),"EUC-KR", "B")
                             );
 
                             cnt++;
                         }
                         //msg.setFrom(new InternetAddress(items.get(0).getSender()));
                         //Transport.send(msg);
-
+                        //smtpSender.start();
                         updateSchdlCnt(items.get(0).getSchdlId(), cnt, cnt, 0, 0);
                     }else{
                         log.info("Not Exists Contents File");
@@ -239,54 +220,6 @@ public class RealtimeSendJob {
             }
         };
         return  writer;
-    }
-
-    @Bean
-    @StepScope
-    public StepExecutionListener realtimeSendQueStepListener(){
-        StepExecutionListener stepExecutionListener = new StepExecutionListener() {
-            SmtpSender smtpSender = new SmtpSender();
-            @Override
-            public void beforeStep(StepExecution stepExecution) {
-                log.info("####### step before");
-                //smtpSender.connect("R");
-            }
-
-            @Override
-            public ExitStatus afterStep(StepExecution stepExecution) {
-                log.info("######### step after");
-                //smtpSender.close();
-                return ExitStatus.COMPLETED;
-            }
-        };
-
-        return stepExecutionListener;
-    }
-
-    @Bean
-    @JobScope
-    public JobExecutionListener realtimeSendQueJobListener(@Value("#{jobParameters['schdlId']}") Long schdlId) throws Exception{
-        JobExecutionListener jobExecutionListener = new JobExecutionListener() {
-            @Override
-            public void beforeJob(JobExecution jobExecution) {
-                try {
-
-                }catch (Exception e){
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void afterJob(JobExecution jobExecution) {
-                try{
-
-                }catch(Exception e){
-                    e.printStackTrace();
-                }
-            }
-        };
-
-        return jobExecutionListener;
     }
 
     @Bean

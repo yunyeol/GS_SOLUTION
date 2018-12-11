@@ -35,6 +35,7 @@ public class CampaignSendJob {
 
     @Autowired private JobBuilderFactory jobBuilderFactory;
     @Autowired private StepBuilderFactory stepBuilderFactory;
+    @Autowired private SimpleIncrementer simpleIncrementer;
 
     @Autowired private SqlSessionTemplate sqlSessionTemplate;
     @Autowired private SqlSessionFactory sqlSessionFactory;
@@ -48,7 +49,7 @@ public class CampaignSendJob {
     public Job campaignSendJobDetail() {
         try{
             return jobBuilderFactory.get("campaignSendJobDetail")
-                    .incrementer(new SimpleIncrementer())
+                    .incrementer(simpleIncrementer)
                     .start(campaignSchdlTasklet())
                     .listener(campaignSendListener())
                     .build();

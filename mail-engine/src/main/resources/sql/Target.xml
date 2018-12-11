@@ -48,46 +48,33 @@
     </select>
 
     <select id="selectDbTargetList" resultType="Target">
-        SELECT * FROM (
-            SELECT
-                GAM.ADDRESS_MBR_ID addressMbrId,
-                GAM.NAME mbrName,
-                GAM.ADDRESS mbrAddress,
-                GAM.DATA1 data1,
-                GAM.DATA2 data2,
-                GAM.DATA3 data3,
-                GAM.REG_DATE regDate
-            FROM GS_SEND_SCHDL GSS
-            INNER JOIN GS_ADDRESS_MBR GAM ON (GSS.ADDRESS_GRP_ID = GAM.ADDRESS_GRP_ID )
-            LEFT JOIN GS_SEND_RAW GSR ON (GSS.SCHDL_ID = GSR.SCHDL_ID AND GAM.ADDRESS = GSR.ADDRESS)
-            WHERE GAM.ADDRESS_GRP_ID = ${addressGrpId}
-            AND GSS.SCHDL_ID = ${schdlId}
-            AND GSR.ADDRESS IS NULL
-            ORDER BY SUBSTRING_INDEX(GAM.ADDRESS, '@', -1) ASC
-        ) A
-        WHERE A.addressMbrId BETWEEN ${addressMinId} AND ${addressMaxId}
+        SELECT
+            GAM.ADDRESS_MBR_ID addressMbrId,
+            GAM.NAME mbrName,
+            GAM.ADDRESS mbrAddress,
+            GAM.DATA1 data1,
+            GAM.DATA2 data2,
+            GAM.DATA3 data3,
+            GAM.REG_DATE regDate
+        FROM GS_ADDRESS_MBR GAM
+        WHERE GAM.ADDRESS_GRP_ID = ${addressGrpId}
+        AND GAM.ADDRESS_MBR_ID BETWEEN ${addressMinId} AND ${addressMaxId}
     </select>
 
     <select id="selectFileTargetList" resultType="Target">
-        SELECT * FROM (
-            SELECT
-                GSS.SCHDL_ID schdlId,
-                GSS.SEND_TYPE sendType,
-
-                GSR.ID rawId,
-                GSR.ADDRESS mbrAddress,
-                GSR.DATA1 data1,
-                GSR.DATA2 data2,
-                GSR.DATA3 data3,
-                GSR.REG_DATE regDate
-            FROM GS_SEND_SCHDL GSS
-            INNER JOiN GS_SEND_RAW GSR ON (GSS.SCHDL_ID = GSR.SCHDL_ID)
-            WHERE GSS.SEND_TYPE = 'C_F'
-            AND GSR.SEND_FLAG = 10
-            AND GSS.SCHDL_ID = ${schdlId}
-            ORDER BY SUBSTRING_INDEX(GSR.ADDRESS, '@', -1) ASC
-        ) A
-        WHERE A.rawId BETWEEN ${addressMinId} AND ${addressMaxId}
+        SELECT
+            GSR.ID rawId,
+            GSR.SCHDL_ID schdlId,
+            GSR.ADDRESS mbrAddress,
+            GSR.DATA1 data1,
+            GSR.DATA2 data2,
+            GSR.DATA3 data3,
+            GSR.REG_DATE regDate
+        FROM GS_SEND_RAW GSR
+        WHERE GSR.SCHDL_ID = ${schdlId}
+        AND GSR.SEND_GUBUN = 'M'
+        AND GSR.SEND_FLAG = 10
+        AND GSR.ID BETWEEN ${addressMinId} AND ${addressMaxId}
     </select>
 
     <!--<select id="selectDbTargetRemainsCnt" resultType="Integer">
