@@ -29,7 +29,7 @@
         GROUP BY GAG.ADDRESS_GRP_ID,GAG.REG_DATE, GAG.UPT_DATE, GAM.ADDRESS_GRP_ID
     </select>
 
-    <select id="getReceivGrpNameCnt" resultType="int">
+    <select id="getReceivGrpNameCnt" resultType="int" parameterType="String">
         /* receiverMapper.getReceivGrpNameCnt */
         SELECT
           COUNT(1)
@@ -38,9 +38,21 @@
         <include refid="condition" />
     </select>
 
+    <insert id="insertReceiver" parameterType="Receiver">
+      /* receiverMapper.insertReceiver */
+      INSERT INTO GS_ADDRESS_GRP(ADDRESS_GRP_NAME, LOGIN_ID, REG_DATE, UPT_DATE)
+      VALUES(#{addrGrpName}, #{loginId}, now(), now())
+    </insert>
+
+    <delete id="deleteReceiver" parameterType="long">
+      /* receiverMapper.deleteReceiver */
+      DELETE FROM GS_ADDRESS_GRP
+      WHERE ADDRESS_GRP_ID = #{addrGrpId}
+    </delete>
+
     <sql id="condition">
       <where>
-          <if test=" addrGrpName != null and appGrpName != '' ">
+          <if test=" addrGrpName != null and addrGrpName != '' ">
               ADDRESS_GRP_NAME = #{addrGrpName};
           </if>
       </where>
