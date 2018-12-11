@@ -14,9 +14,8 @@ import java.util.List;
 
 @Slf4j
 @Component
-public class SmtpSender extends Thread{
+public class SmtpUtils extends Thread{
 
-    //private String host = "119.207.76.55";
     private int port = 25;
     //@Value("${mail.smtp.send.log.path}")
     //private String dirPath = "C:/git/";
@@ -26,50 +25,27 @@ public class SmtpSender extends Thread{
     private BufferedReader br;
     private PrintWriter pw, sendLog;
 
-    private String gubun;
-    private String sender;
     private String receiver;
-    private String title;
-    private String contents;
 
-    public SmtpSender(){
-    }
+    public SmtpUtils() {}
 
-    public SmtpSender(String gubun, String receiver){
-        connect(gubun, receiver);
+    public SmtpUtils(String receiver){
+        this.receiver = receiver;
     }
 
     public void run(){
+        log.info("###### : receiver : {}", receiver);
+        connect("119.207.76.55");
         log.info("###### test");
     }
 
-    public void connect(String gubun, String receiver){
+    public void connect(String receiver){
         try{
-            String fileDir = dirPath;
-            if (gubun.equals("C")) {
-                fileDir = fileDir + "campaign";
-            } else if (gubun.equals("R")) {
-                fileDir = fileDir + "realtime";
-            }
-
-            Date today = new Date();
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-
-            File dir = new File(fileDir);
-            if (!dir.exists()) {
-                dir.mkdirs();
-            }
-
-            log.info("#### fileDir : {}", fileDir);
-            File file = new File(fileDir + "/sendLog_" + sdf.format(today) + ".log");
-
-            socket = new Socket(getMxDomain(receiver), port);
+            //socket = new Socket(getMxDomain(receiver), port);
+            socket = new Socket(receiver,port);
             log.info("socker open : host : {}, port ; {}", getMxDomain(receiver), port);
             br = new BufferedReader(new InputStreamReader(socket.getInputStream(), "euc-kr"));
             pw = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), "euc-kr"), true);
-
-            sendLog = new PrintWriter(new BufferedWriter(new FileWriter(file, true)), true);
-            sendLog.print("CONNECT SERVER :: RES :" + br.readLine() + " || ");
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -114,11 +90,29 @@ public class SmtpSender extends Thread{
         }
     }
 
-    public void send(String sender, String receiver, String title, String contents){
+    public void send(String gubun, String sender, String receiver, String title, String contents){
         try {
-            //파라미터로 받는사람 주소를 받으면 해당 도메인을 오픈
+            String fileDir = dirPath;
+            if (gubun.equals("C")) {
+                fileDir = fileDir + "campaign";
+            } else if (gubun.equals("R")) {
+                fileDir = fileDir + "realtime";
+            }
+
+            Date today = new Date();
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+
+            File dir = new File(fileDir);
+            if (!dir.exists()) {
+                dir.mkdirs();
+            }
+
+            log.info("#### fileDir : {}", fileDir);
+            File file = new File(fileDir + "/sendLog_" + sdf.format(today) + ".log");
+
+            sendLog = new PrintWriter(new BufferedWriter(new FileWriter(file, true)), true);
+
             pw.println("HELO "+receiver.substring(receiver.indexOf("@")+1));
-            log.info("############### HELO : {}",receiver.substring(receiver.indexOf("@")+1));
             sendLog.print("HELO SEND :: RES :"+br.readLine()+" || ");
 
             pw.println("MAIL FROM: <"+sender+">");

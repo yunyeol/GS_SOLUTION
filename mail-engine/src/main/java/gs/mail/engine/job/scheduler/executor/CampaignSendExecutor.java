@@ -1,16 +1,11 @@
 package gs.mail.engine.job.scheduler.executor;
 
-import gs.mail.engine.dto.Campaign;
 import gs.mail.engine.job.CampaignSendJob;
-import gs.mail.engine.job.JobParameterContents;
 import gs.mail.engine.service.CampaignSendService;
-import gs.mail.engine.util.SmtpSender;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.launch.support.SimpleJobLauncher;
 import org.springframework.beans.factory.annotation.Autowired;
 

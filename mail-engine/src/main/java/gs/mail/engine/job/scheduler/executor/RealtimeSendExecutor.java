@@ -1,22 +1,17 @@
 package gs.mail.engine.job.scheduler.executor;
 
 import gs.mail.engine.dto.Realtime;
-import gs.mail.engine.job.JobParameterContents;
 import gs.mail.engine.job.RealtimeSendJob;
 import gs.mail.engine.service.RealtimeSendService;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.springframework.batch.core.*;
-import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.launch.support.SimpleJobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.CollectionUtils;
 
-import java.util.Date;
-import java.util.List;
 import java.util.Map;
 
 

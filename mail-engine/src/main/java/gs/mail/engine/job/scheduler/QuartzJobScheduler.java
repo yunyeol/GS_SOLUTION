@@ -3,6 +3,7 @@ package gs.mail.engine.job.scheduler;
 
 
 import gs.mail.engine.job.scheduler.executor.CampaignSendExecutor;
+import gs.mail.engine.job.scheduler.executor.DomainConnectExecutor;
 import gs.mail.engine.job.scheduler.executor.RealtimeSendExecutor;
 import gs.mail.engine.job.scheduler.executor.TargetExecutor;
 import org.quartz.*;
@@ -19,6 +20,7 @@ public class QuartzJobScheduler {
     @Value("${cron.mail.campaign}") private String campaignCron;
     @Value("${cron.mail.realtime}") private String realtimeCron;
     @Value("${cron.mail.target}") private String targetCron;
+    @Value("${cron.mail.domain}") private String domainConnectCron;
 
     @Bean
     public SchedulerFactoryBean quartzScheduler(@Autowired JobFactory jobFactory) throws SchedulerException {
@@ -45,8 +47,14 @@ public class QuartzJobScheduler {
         CronTrigger campaignTrigger = TriggerBuilder.newTrigger().forJob("CampaignSendExecutor").withIdentity("CampaignSendTrigger")
                 .withSchedule(CronScheduleBuilder.cronSchedule(campaignCron)).build();
 
-        schedulerFactoryBean.setJobDetails(realtimeSendJob, targetJob, campaignJob);
-        schedulerFactoryBean.setTriggers(realtimeSendTrigger, targetTrigger, campaignTrigger);
+        //도메인세션
+        JobDetail domainConnectJob = JobBuilder.newJob(DomainConnectExecutor.class).withIdentity("DomainConnectExecutor")
+                .storeDurably(true).build();
+        CronTrigger domainConnectTrigger = TriggerBuilder.newTrigger().forJob("DomainConnectExecutor").withIdentity("DomainConnectTrigger")
+                .withSchedule(CronScheduleBuilder.cronSchedule(domainConnectCron)).build();
+
+        schedulerFactoryBean.setJobDetails(realtimeSendJob, targetJob, campaignJob, domainConnectJob);
+        schedulerFactoryBean.setTriggers(realtimeSendTrigger, targetTrigger, campaignTrigger, domainConnectTrigger);
 
         return schedulerFactoryBean;
     }

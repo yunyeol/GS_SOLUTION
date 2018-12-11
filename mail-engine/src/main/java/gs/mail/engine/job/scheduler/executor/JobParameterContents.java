@@ -1,4 +1,4 @@
-package gs.mail.engine.job;
+package gs.mail.engine.job.scheduler.executor;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.JobParameters;

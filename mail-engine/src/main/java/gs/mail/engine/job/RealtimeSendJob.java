@@ -1,7 +1,7 @@
 package gs.mail.engine.job;
 
 import gs.mail.engine.dto.Realtime;
-import gs.mail.engine.util.SmtpSender;
+import gs.mail.engine.util.SmtpUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionTemplate;
@@ -11,7 +11,6 @@ import org.springframework.batch.core.configuration.annotation.JobBuilderFactory
 import org.springframework.batch.core.configuration.annotation.JobScope;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepScope;
-import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.partition.support.Partitioner;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemProcessor;
@@ -22,8 +21,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.TaskExecutor;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import org.springframework.stereotype.Component;
 
 import javax.mail.internet.MimeUtility;
 import java.io.*;
@@ -42,6 +39,8 @@ public class RealtimeSendJob {
 
     @Autowired private TaskExecutor taskExecutor;
 
+    @Autowired private SmtpUtils smtpUtils;
+
     @Value("${batch.commit.interval}") private int commitInterval;
     @Value("${batch.slave.cnt}") private int slaveCnt;
 
@@ -52,7 +51,6 @@ public class RealtimeSendJob {
                     .incrementer(simpleIncrementer)
                     .start(realtimeSchdlTasklet())
                     .next(realtimeMasterSendStep())
-                    //.listener(realtimeSendQueJobListener(smtpSender,0L))
                     .build();
 
         }catch(Exception e){
@@ -187,9 +185,9 @@ public class RealtimeSendJob {
                         int cnt = 0;
                         for(Realtime realtime : items){
                             //계속 커넥션 열고 발송하고 닫고 하는 로직
-                            SmtpSender smtpSender = new SmtpSender("R", realtime.getReceiver());
-
-                            smtpSender.send(
+//                            SmtpUtils smtpUtils = new SmtpUtils("R", realtime.getReceiver());
+//
+                            smtpUtils.send("R",
                                 realtime.getSender(),
                                 realtime.getReceiver(),
                                 MimeUtility.encodeText(realtime.getMailTitle(),"EUC-KR", "B"),
@@ -198,9 +196,7 @@ public class RealtimeSendJob {
 
                             cnt++;
                         }
-                        //msg.setFrom(new InternetAddress(items.get(0).getSender()));
-                        //Transport.send(msg);
-                        //smtpSender.start();
+
                         updateSchdlCnt(items.get(0).getSchdlId(), cnt, cnt, 0, 0);
                     }else{
                         log.info("Not Exists Contents File");
