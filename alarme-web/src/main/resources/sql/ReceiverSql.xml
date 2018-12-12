@@ -44,6 +44,12 @@
       VALUES(#{addrGrpName}, #{loginId}, now(), now())
     </insert>
 
+    <update id="updateReceiver" parameterType="Receiver">
+      UPDATE GS_ADDRESS_GRP
+      SET ADDRESS_GRP_NAME = #{addrGrpName}
+      WHERE ADDRESS_GRP_ID = #{addrGrpId}
+    </update>
+
     <delete id="deleteReceiver" parameterType="long">
       /* receiverMapper.deleteReceiver */
       DELETE FROM GS_ADDRESS_GRP

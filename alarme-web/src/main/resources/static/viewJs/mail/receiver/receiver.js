@@ -2,12 +2,12 @@ var receiverObj = (function($, receiver){
 
     receiver.field = {
         grpNameChk : false,
-        dataTable : undefined,
-        editor : undefined
+        dataTable : null,
+        editor : null
     }
     receiver.init = function(){
         receiver.field.dataTable = this.dataTable();
-        this.validation();
+        this.validation('#receiverForm');
         this.setEvent();
     }
 
@@ -65,7 +65,7 @@ var receiverObj = (function($, receiver){
         $('#init').off('click.receiver').on('click.receiver',function(){
             $('#receiverForm input.form-control').val('').attr('disabled', false);
             receiver.field.grpNameChk = false;
-            receiver.validation();
+            receiver.validation('#receiverForm');
         });
 
         if(receiver.field.dataTable){
@@ -91,8 +91,8 @@ var receiverObj = (function($, receiver){
         }
     }
 
-    receiver.validation = function(){
-        $('#receiverForm').validate({
+    receiver.validation = function(id){
+        $(id).validate({
             highlight: function(element) {
                 $(element).closest('.form-group').removeClass('has-success').addClass('has-danger');
                 $(element).closest('.form-check').removeClass('has-success').addClass('has-danger');
@@ -148,7 +148,7 @@ var receiverObj = (function($, receiver){
                     "data":"addrGrpId",
                     render : function(data, type, row){
                         return '<button name="receiverEdit" data-toggle="modal" data-idx="'+row.addrGrpId+'" ' +
-                            'data-grpName="'+row.addrGrpName+'" data-target="#receivEditModal" class="btn btn-primary btn-simple btn-sm" >수정</button>';
+                            'data-grpname="'+row.addrGrpName+'" data-target="#receivEditModal" class="btn btn-primary btn-simple btn-sm" >수정</button>';
                     }
                 },
                 {
