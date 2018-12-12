@@ -1,8 +1,9 @@
-(function($, receiver){
+var receiverObj = (function($, receiver){
 
     receiver.field = {
         grpNameChk : false,
-        dataTable : undefined
+        dataTable : undefined,
+        editor : undefined
     }
     receiver.init = function(){
         receiver.field.dataTable = this.dataTable();
@@ -127,7 +128,11 @@
                 {"data" : "addrGrpName"},
                 {"data" : "addrGrpMbrCnt"},
                 {
-                    "defaultContent":'그룹대상관리'
+                    "data":"addrGrpId",
+                    render : function(data){
+                        return '<button name="pwdChange" data-toggle="modal" data-idx="'+data+'" ' +
+                            'data-target="#groupTgMgModal" class="btn btn-primary btn-simple btn-sm" >그룹대상관리</button>';
+                    }
                 },
                 {"data" : "createdDt",
                     render : function(data){
@@ -140,11 +145,12 @@
                     }
                 },
                 {
-                    "defaultContent":'수정'
+                    "data":"addrGrpId",
+                    render : function(data, type, row){
+                        return '<button name="receiverEdit" data-toggle="modal" data-idx="'+row.addrGrpId+'" ' +
+                            'data-grpName="'+row.addrGrpName+'" data-target="#receivEditModal" class="btn btn-primary btn-simple btn-sm" >수정</button>';
+                    }
                 },
-                // {
-                //     "defaultContent":'<i class="delete tim-icons icon-simple-remove"></i>'
-                // },
                 {
                     "data":"addrGrpId",
                     render : function(data){
@@ -163,4 +169,5 @@
     }
 
     receiver.init();
+    return receiver;
 })(jQuery, {});
