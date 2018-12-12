@@ -15,47 +15,54 @@ import java.util.List;
 @Slf4j
 @Component
 public class SmtpUtils extends Thread{
-
-    private int port = 25;
     //@Value("${mail.smtp.send.log.path}")
-    //private String dirPath = "C:/git/";
-    private String dirPath = "/app/source/engine/logs/send/";
+    private String dirPath = "C:/git/";
+    //private String dirPath = "/app/source/engine/logs/send/";
 
     private Socket socket;
+    private int port = 25;
     private BufferedReader br;
-    private PrintWriter pw, sendLog;
-
+    private PrintWriter pw;
     private String receiver;
 
     public SmtpUtils() {}
-
-    public SmtpUtils(String receiver){
+    public SmtpUtils(String receiver, Socket socket) {
         this.receiver = receiver;
+        this.socket = socket;
     }
 
+    @Override
     public void run(){
-        log.info("###### : receiver : {}", receiver);
-        connect("119.207.76.55");
-        log.info("###### test");
-    }
-
-    public void connect(String receiver){
         try{
-            //socket = new Socket(getMxDomain(receiver), port);
-            socket = new Socket(receiver,port);
-            log.info("socker open : host : {}, port ; {}", getMxDomain(receiver), port);
-            br = new BufferedReader(new InputStreamReader(socket.getInputStream(), "euc-kr"));
-            pw = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), "euc-kr"), true);
+            while (true){
+                connect(this.receiver, this.socket);
+                Thread.sleep(30000);
+            }
         }catch (Exception e){
             e.printStackTrace();
         }
     }
 
-    public void close(){
+    public void connect(String receiver, Socket socket){
+        try{
+            if(socket !=null && socket.isConnected() && !socket.isClosed()){
+                log.info("current connect : {}", receiver);
+            }else{
+                log.info("not connected : {}", receiver);
+
+                socket = new Socket(getMxDomain(receiver), port);
+                br = new BufferedReader(new InputStreamReader(socket.getInputStream(), "euc-kr"));
+                pw = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), "euc-kr"), true);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    public void close(Socket socket){
         try{
             if(br != null) br.close();
             if(pw != null) pw.close();
-            if(sendLog != null) sendLog.close();
             if(socket != null) socket.close();
         }catch (Exception e){
             e.printStackTrace();
@@ -65,7 +72,6 @@ public class SmtpUtils extends Thread{
     public String getMxDomain(String receiver){
         try{
             String domain = receiver.substring(receiver.indexOf("@")+1);
-            log.info("@##### receiver : {}", domain);
 
             Process process = Runtime.getRuntime().exec("nslookup -type=mx " + domain);
             InputStream in = process.getInputStream();
@@ -82,7 +88,6 @@ public class SmtpUtils extends Thread{
             in.close();
 
             log.info("### nslookup : {} ", domainList.get(0).toString());
-
             return domainList.get(0).toString();
         }catch (Exception e){
             e.printStackTrace();
@@ -91,6 +96,7 @@ public class SmtpUtils extends Thread{
     }
 
     public void send(String gubun, String sender, String receiver, String title, String contents){
+        PrintWriter sendLog = null;
         try {
             String fileDir = dirPath;
             if (gubun.equals("C")) {
@@ -143,6 +149,8 @@ public class SmtpUtils extends Thread{
             sendLog.flush();
         } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+            if(sendLog != null) sendLog.close();
         }
     }
 }
