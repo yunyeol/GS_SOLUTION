@@ -14,45 +14,51 @@ import java.util.List;
 
 @Slf4j
 @Component
-public class SmtpUtils extends Thread{
+public class SmtpUtils{
     //@Value("${mail.smtp.send.log.path}")
     private String dirPath = "C:/git/";
     //private String dirPath = "/app/source/engine/logs/send/";
 
-    private Socket socket;
     private int port = 25;
     private BufferedReader br;
     private PrintWriter pw;
     private String receiver;
+    private Socket socket;
 
-    public SmtpUtils() {}
-    public SmtpUtils(String receiver, Socket socket) {
-        this.receiver = receiver;
-        this.socket = socket;
-    }
+    public SmtpUtils() { }
 
-    @Override
-    public void run(){
+    public SmtpUtils(String receiver) {
         try{
+
+            Socket socket = new Socket(getMxDomain(receiver), port);
+            socket.setKeepAlive(true);
+            br = new BufferedReader(new InputStreamReader(socket.getInputStream(), "euc-kr"));
+            pw = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), "euc-kr"), true);
+
             while (true){
-                connect(this.receiver, this.socket);
-                Thread.sleep(30000);
+
             }
         }catch (Exception e){
             e.printStackTrace();
         }
+
     }
 
-    public void connect(String receiver, Socket socket){
+    public void connect(String receiver){
         try{
-            if(socket !=null && socket.isConnected() && !socket.isClosed()){
-                log.info("current connect : {}", receiver);
-            }else{
-                log.info("not connected : {}", receiver);
-
+            if(socket == null){
                 socket = new Socket(getMxDomain(receiver), port);
+                socket.setKeepAlive(true);
                 br = new BufferedReader(new InputStreamReader(socket.getInputStream(), "euc-kr"));
                 pw = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), "euc-kr"), true);
+
+                log.info("###### socket.isConnected() : {}",socket.isConnected() );
+                log.info("###### socket.setKeepAlive() : {}",socket.getKeepAlive() );
+                log.info("###### socket.isClosed() : {}",socket.isClosed() );
+            }else{
+                log.info("###### isConnected() : {}",socket.isConnected() );
+                log.info("###### setKeepAlive() : {}",socket.getKeepAlive() );
+                log.info("###### isClosed() : {}",socket.isClosed() );
             }
         }catch (Exception e){
             e.printStackTrace();

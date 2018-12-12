@@ -24,24 +24,25 @@ public class SmtpSocketApplication {
     @Bean
     @Async
     public void executeThread(){
-        try{
-            //Socket socket = new Socket();
-
-            while(true){
-                Socket socket = null;
+        while(true){
+            try{
                 for(Domain domain : domainConnectService.selectDomainList()){
                     for(int i=0; i<threadCnt; i++){
 //                        if(socket !=null && socket.isConnected() && !socket.isClosed()){
 //                            log.info("current connect : {}", domain.getDomain());
 //                        }else {
-                        Thread t = new SmtpUtils(domain.getDomain(), socket);
-                        t.start();
                        // }
+//                        SmtpUtils smtpUtils = new SmtpUtils(domain.getDomain());
+//                        smtpUtils.run();
+
+                        SmtpUtils smtpUtils = new SmtpUtils(domain.getDomain());
                     }
                 }
+
+                Thread.sleep(10000);
+            }catch (Exception e){
+                e.printStackTrace();
             }
-        }catch (Exception e){
-            e.printStackTrace();
         }
     }
 }
