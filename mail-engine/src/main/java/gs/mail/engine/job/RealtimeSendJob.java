@@ -1,9 +1,13 @@
 package gs.mail.engine.job;
 
 import gs.mail.engine.dto.Realtime;
-import gs.mail.engine.util.SmtpUtils;
+import gs.mail.engine.util.NettySmtpHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.session.SqlSessionFactory;
+import org.jboss.netty.bootstrap.ClientBootstrap;
+import org.jboss.netty.channel.Channel;
+import org.jboss.netty.channel.ChannelFuture;
+import org.jboss.netty.channel.socket.nio.NioClientSocketChannelFactory;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.mybatis.spring.batch.MyBatisCursorItemReader;
 import org.springframework.batch.core.*;
@@ -22,9 +26,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.TaskExecutor;
 
-import javax.mail.internet.MimeUtility;
 import java.io.*;
+import java.net.InetSocketAddress;
 import java.util.*;
+import java.util.concurrent.Executors;
 
 @Slf4j
 @Configuration
@@ -38,8 +43,6 @@ public class RealtimeSendJob {
     @Autowired private SqlSessionFactory sqlSessionFactory;
 
     @Autowired private TaskExecutor taskExecutor;
-
-    @Autowired private SmtpUtils smtpUtils;
 
     @Value("${batch.commit.interval}") private int commitInterval;
     @Value("${batch.slave.cnt}") private int slaveCnt;
@@ -182,17 +185,57 @@ public class RealtimeSendJob {
 
                         String htmlContents = sb.toString();
 
+                        //EventLoopGroup workerGroup = new NioEventLoopGroup();
+
+                        ClientBootstrap b = new ClientBootstrap(new NioClientSocketChannelFactory(
+                                                    Executors.newCachedThreadPool(),
+                                                        Executors.newCachedThreadPool()));
+                        b.setOption("tcpNoDelay", true);
+                        b.setOption("keepAlive", true);
+
+//                        b.setPipelineFactory();
+//                        b.group(workerGroup);
+//                        b.channel(NioSocketChannel.class);
+//                        b.option(ChannelOption.TCP_NODELAY, true);
+//                        b.handler(new ChannelInitializer<SocketChannel>() {
+//                            @Override
+//                            public void initChannel(SocketChannel ch) throws Exception {
+//                                ch.pipeline().addLast(new NettySmtpHandler());
+//                            }
+//                        });
+
                         int cnt = 0;
                         for(Realtime realtime : items){
+                            // Start the client.
+                            ChannelFuture f = b.connect(new InetSocketAddress("119.207.76.55", 25));
+                            Channel channel = f.awaitUninterruptibly().getChannel();
+
+                            log.info("### : {}",realtime.toString());
+                            log.info("#### : {}",realtime.getReceiver().substring(realtime.getReceiver().indexOf("@")+1));
+                            //channel.writeAndFlush("HELO "+realtime.getReceiver().substring(realtime.getReceiver().indexOf("@")+1));
+                            channel.write("HELO");
+                            channel.write("MAIL FROM:"+realtime.getSender());
+                            channel.write("RCPT TO:"+realtime.getReceiver());
+                            channel.write("DATA");
+                            channel.write("subject:"+realtime.getMailTitle());
+                            channel.write("from:"+realtime.getSender());
+                            channel.write("to:"+realtime.getReceiver());
+                            channel.write("date:"+ new Date());
+                            channel.write(htmlContents.replace("${CONTENTS}", realtime.getMailContents()));
+                            channel.write(".");
+                            channel.write("quit");
+                            //channel.flush();
+
+                            f.getChannel().close();
                             //계속 커넥션 열고 발송하고 닫고 하는 로직
 //                            SmtpUtils smtpUtils = new SmtpUtils("R", realtime.getReceiver());
 //
-                            smtpUtils.send("R",
-                                realtime.getSender(),
-                                realtime.getReceiver(),
-                                MimeUtility.encodeText(realtime.getMailTitle(),"EUC-KR", "B"),
-                                MimeUtility.encodeText(htmlContents.replace("${CONTENTS}", realtime.getMailContents()),"EUC-KR", "B")
-                            );
+//                            smtpUtils.send("R",
+//                                realtime.getSender(),
+//                                realtime.getReceiver(),
+//                                MimeUtility.encodeText(realtime.getMailTitle(),"EUC-KR", "B"),
+//                                MimeUtility.encodeText(htmlContents.replace("${CONTENTS}", realtime.getMailContents()),"EUC-KR", "B")
+//                            );
 
                             cnt++;
                         }
