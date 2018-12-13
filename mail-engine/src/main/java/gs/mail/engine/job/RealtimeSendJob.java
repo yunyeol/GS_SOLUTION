@@ -2,12 +2,13 @@ package gs.mail.engine.job;
 
 import gs.mail.engine.dto.Realtime;
 import gs.mail.engine.util.NettySmtpHandler;
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.*;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.SocketChannel;
+import io.netty.channel.socket.nio.NioSocketChannel;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.session.SqlSessionFactory;
-import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.channel.Channel;
-import org.jboss.netty.channel.ChannelFuture;
-import org.jboss.netty.channel.socket.nio.NioClientSocketChannelFactory;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.mybatis.spring.batch.MyBatisCursorItemReader;
 import org.springframework.batch.core.*;
@@ -27,9 +28,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.TaskExecutor;
 
 import java.io.*;
-import java.net.InetSocketAddress;
 import java.util.*;
-import java.util.concurrent.Executors;
 
 @Slf4j
 @Configuration
@@ -185,30 +184,24 @@ public class RealtimeSendJob {
 
                         String htmlContents = sb.toString();
 
-                        //EventLoopGroup workerGroup = new NioEventLoopGroup();
+                        EventLoopGroup workerGroup = new NioEventLoopGroup();
 
-                        ClientBootstrap b = new ClientBootstrap(new NioClientSocketChannelFactory(
-                                                    Executors.newCachedThreadPool(),
-                                                        Executors.newCachedThreadPool()));
-                        b.setOption("tcpNoDelay", true);
-                        b.setOption("keepAlive", true);
-
-//                        b.setPipelineFactory();
-//                        b.group(workerGroup);
-//                        b.channel(NioSocketChannel.class);
-//                        b.option(ChannelOption.TCP_NODELAY, true);
-//                        b.handler(new ChannelInitializer<SocketChannel>() {
-//                            @Override
-//                            public void initChannel(SocketChannel ch) throws Exception {
-//                                ch.pipeline().addLast(new NettySmtpHandler());
-//                            }
-//                        });
+                        Bootstrap b = new Bootstrap();
+                        b.group(workerGroup);
+                        b.channel(NioSocketChannel.class);
+                        b.option(ChannelOption.TCP_NODELAY, true);
+                        b.handler(new ChannelInitializer<SocketChannel>() {
+                            @Override
+                            public void initChannel(SocketChannel ch) throws Exception {
+                                ch.pipeline().addLast(new NettySmtpHandler());
+                            }
+                        });
 
                         int cnt = 0;
                         for(Realtime realtime : items){
                             // Start the client.
-                            ChannelFuture f = b.connect(new InetSocketAddress("119.207.76.55", 25));
-                            Channel channel = f.awaitUninterruptibly().getChannel();
+                            ChannelFuture f = b.connect("119.207.76.55", 25).sync();
+                            Channel channel = f
 
                             log.info("### : {}",realtime.toString());
                             log.info("#### : {}",realtime.getReceiver().substring(realtime.getReceiver().indexOf("@")+1));
@@ -226,7 +219,7 @@ public class RealtimeSendJob {
                             channel.write("quit");
                             //channel.flush();
 
-                            f.getChannel().close();
+                            f.channel().closeFuture().sync();
                             //계속 커넥션 열고 발송하고 닫고 하는 로직
 //                            SmtpUtils smtpUtils = new SmtpUtils("R", realtime.getReceiver());
 //
