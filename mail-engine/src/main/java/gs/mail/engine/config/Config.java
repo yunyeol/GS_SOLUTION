@@ -44,6 +44,7 @@ import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
+import javax.sql.DataSource;
 import java.util.Properties;
 
 
@@ -147,7 +148,7 @@ public class Config {
         jobRepositoryFactoryBean.setTransactionManager(transactionManager());
         jobRepositoryFactoryBean.setIsolationLevelForCreate("ISOLATION_REPEATABLE_READ");
         jobRepositoryFactoryBean.setDataSource(dataSource());
-        jobRepositoryFactoryBean.setDatabaseType("MYSQL");
+        jobRepositoryFactoryBean.setDatabaseType("mysql");
         return jobRepositoryFactoryBean.getObject();
     }
 

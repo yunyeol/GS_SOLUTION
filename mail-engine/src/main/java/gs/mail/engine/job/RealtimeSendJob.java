@@ -7,6 +7,9 @@ import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.codec.string.StringDecoder;
+import io.netty.handler.codec.string.StringEncoder;
+import io.netty.util.CharsetUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionTemplate;
@@ -32,7 +35,7 @@ import java.util.*;
 
 @Slf4j
 @Configuration
-public class RealtimeSendJob {
+public class RealtimeSendJob extends SendJobProperties{
 
     @Autowired private JobBuilderFactory jobBuilderFactory;
     @Autowired private StepBuilderFactory stepBuilderFactory;
@@ -62,9 +65,6 @@ public class RealtimeSendJob {
         return null;
     }
 
-    /**
-     * realtimeSchdlTasklet
-     */
     @Bean
     public Step realtimeSchdlTasklet()  {
         try {
@@ -76,7 +76,6 @@ public class RealtimeSendJob {
                         param.put("schdlId", schdlId);
 
                         List<Realtime> todaySchdl = sqlSessionTemplate.selectList("SQL.RealitmeSend.selectRealtimeTodaySchdl", param);
-
                         if(todaySchdl.size() == 0){
                             sqlSessionTemplate.insert("SQL.RealitmeSend.insertRealtimeTodaySchdl", param);
                         }
@@ -89,15 +88,12 @@ public class RealtimeSendJob {
         return null;
     }
 
-    /**
-     * realtimeMasterSendStep
-     */
     @Bean
     public Step realtimeMasterSendStep() {
         try{
             return stepBuilderFactory.get("realtimeMasterSendStep")
                     .partitioner(realtimeSlaveSendStep())
-                    .partitioner("realtimeSlavePartitioner", realtimePartitioner(0L))
+                    .partitioner("realtimePatitioner", realtimePartitioner(0L))
                     .gridSize(slaveCnt)
                     .taskExecutor(taskExecutor)
                     .build();
@@ -107,13 +103,10 @@ public class RealtimeSendJob {
         return null;
     }
 
-    /**
-     * realtimeSlaveSendStep
-     */
     @Bean
     public Step realtimeSlaveSendStep(){
         try{
-            return stepBuilderFactory.get("realtimeSendStep")
+            return stepBuilderFactory.get("realtimeSlaveSendStep")
                     .<Realtime, Realtime>chunk(commitInterval)
                     .reader(realtimeSendQueueReader(0L,0L, 0L))
                     .processor(realtimeSendQueueProcessor(0L,0L))
@@ -156,7 +149,6 @@ public class RealtimeSendJob {
                 paramMap.put("queueMaxId",queueMaxId);
 
                 sqlSessionTemplate.insert("SQL.RealitmeSend.insertRealtimeQueRaw", paramMap);
-
                 sqlSessionTemplate.delete("SQL.RealitmeSend.deleteMailQueue",paramMap);
                 return item;
             }
@@ -169,6 +161,21 @@ public class RealtimeSendJob {
         ItemWriter<Realtime> writer = new ItemWriter<Realtime>() {
             @Override
             public void write(List<? extends Realtime> items) {
+                EventLoopGroup workerGroup = new NioEventLoopGroup(3);
+
+                Bootstrap bootstrap = new Bootstrap();
+                bootstrap.group(workerGroup);
+                bootstrap.channel(NioSocketChannel.class);
+                bootstrap.option(ChannelOption.TCP_NODELAY, true);
+                bootstrap.handler(new ChannelInitializer<SocketChannel>() {
+                    @Override
+                    public void initChannel(SocketChannel ch) throws Exception {
+                        ch.pipeline()
+                                .addLast(new StringDecoder(CharsetUtil.UTF_8), new StringEncoder(CharsetUtil.UTF_8))
+                                .addLast(new NettySmtpHandler());
+                    }
+                });
+
                 try{
                     StringBuffer sb = new StringBuffer();
                     File file = new File(items.get(0).getFilePath());
@@ -184,54 +191,26 @@ public class RealtimeSendJob {
 
                         String htmlContents = sb.toString();
 
-                        EventLoopGroup workerGroup = new NioEventLoopGroup();
-
-                        Bootstrap b = new Bootstrap();
-                        b.group(workerGroup);
-                        b.channel(NioSocketChannel.class);
-                        b.option(ChannelOption.TCP_NODELAY, true);
-                        b.handler(new ChannelInitializer<SocketChannel>() {
-                            @Override
-                            public void initChannel(SocketChannel ch) throws Exception {
-                                ch.pipeline().addLast(new NettySmtpHandler());
-                            }
-                        });
-
+                        //Channel channel = bootstrap.connect("119.207.76.55", port).sync().channel();
+                        ChannelFuture future = null;
                         int cnt = 0;
+                        List<String> domainList = new ArrayList<>();
+                        //for(int i=0; i<items.size(); i++){
                         for(Realtime realtime : items){
-                            // Start the client.
-                            ChannelFuture f = b.connect("119.207.76.55", 25).sync();
-                            Channel channel = f
+                            log.info("###### : {}", getMxDomain(realtime.getReceiver()));
+                            Channel channel = bootstrap.connect(getMxDomain(realtime.getReceiver()), 25).sync().channel();
+                            //Channel channel = bootstrap.connect("119.207.76.55", 25).sync().channel();
+                            realtime.setContents(htmlContents.replace("${CONTENTS}", realtime.getContents()));
 
-                            log.info("### : {}",realtime.toString());
-                            log.info("#### : {}",realtime.getReceiver().substring(realtime.getReceiver().indexOf("@")+1));
-                            //channel.writeAndFlush("HELO "+realtime.getReceiver().substring(realtime.getReceiver().indexOf("@")+1));
-                            channel.write("HELO");
-                            channel.write("MAIL FROM:"+realtime.getSender());
-                            channel.write("RCPT TO:"+realtime.getReceiver());
-                            channel.write("DATA");
-                            channel.write("subject:"+realtime.getMailTitle());
-                            channel.write("from:"+realtime.getSender());
-                            channel.write("to:"+realtime.getReceiver());
-                            channel.write("date:"+ new Date());
-                            channel.write(htmlContents.replace("${CONTENTS}", realtime.getMailContents()));
-                            channel.write(".");
-                            channel.write("quit");
-                            //channel.flush();
+                            log.info("### : {}, {}, {}, {}, {}",
+                                    realtime.toString(), realtime.getContents(), realtime.getTitle(), realtime.getReceiver(), realtime.getSender());
 
-                            f.channel().closeFuture().sync();
-                            //계속 커넥션 열고 발송하고 닫고 하는 로직
-//                            SmtpUtils smtpUtils = new SmtpUtils("R", realtime.getReceiver());
-//
-//                            smtpUtils.send("R",
-//                                realtime.getSender(),
-//                                realtime.getReceiver(),
-//                                MimeUtility.encodeText(realtime.getMailTitle(),"EUC-KR", "B"),
-//                                MimeUtility.encodeText(htmlContents.replace("${CONTENTS}", realtime.getMailContents()),"EUC-KR", "B")
-//                            );
-
+                            sendMail(future, channel, realtime);
                             cnt++;
+                            
                         }
+                        //future = channel.writeAndFlush("quit" + System.lineSeparator());
+                        //future.channel().closeFuture().sync();
 
                         updateSchdlCnt(items.get(0).getSchdlId(), cnt, cnt, 0, 0);
                     }else{
@@ -256,7 +235,7 @@ public class RealtimeSendJob {
 
     @Bean
     @JobScope
-    public Partitioner realtimePartitioner(@Value("#{jobParameters['schdlId']}") Long schdlId){
+    protected Partitioner realtimePartitioner(@Value("#{jobParameters['schdlId']}") Long schdlId){
         Partitioner partitioner = new Partitioner() {
             @Override
             public Map<String, ExecutionContext> partition(int gridSize) {
@@ -265,10 +244,10 @@ public class RealtimeSendJob {
                 Map<String, Object> paramMap = new HashMap<String, Object>();
                 paramMap.put("schdlId", schdlId != null ? schdlId : 0);
 
-                selectQuery = sqlSessionTemplate.selectOne("SQL.RealitmeSend.selectMailQueueMinMax", paramMap);
-
                 long minValue = 0;
                 long maxValue = 0;
+
+                selectQuery = sqlSessionTemplate.selectOne("SQL.RealitmeSend.selectMailQueueMinMax", paramMap);
 
                 if(selectQuery != null && selectQuery.get("queueMinId") != null){
                     minValue = selectQuery.get("queueMinId");
@@ -316,7 +295,7 @@ public class RealtimeSendJob {
         paramMap.put("schdlId", schdlId);
         paramMap.put("sendCnt", sendCnt);
         paramMap.put("targetCnt", targetCnt);
-        paramMap.put("succesCnt", succesCnt);
+        paramMap.put("successCnt", succesCnt);
         paramMap.put("failCnt", failCnt);
         sqlSessionTemplate.insert("SQL.RealitmeSend.updateSchdlCnt", paramMap);
     }

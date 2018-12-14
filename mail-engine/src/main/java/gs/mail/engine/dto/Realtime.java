@@ -3,13 +3,15 @@ package gs.mail.engine.dto;
 import lombok.Data;
 import org.apache.ibatis.type.Alias;
 
+import java.io.Serializable;
+
 @Data
 @Alias("Realtime")
-public class Realtime {
+public class Realtime extends Send implements Serializable {
     private long queId;
     private long schdlId;
     private String schdlName;
-    private String sender;
+    //private String sender;
     private String filePath;
     private String sendGubun;
     private String sendType;
@@ -18,9 +20,9 @@ public class Realtime {
     private long masterSchdlId;
     private String uuid;
     private String sendFlag;
-    private String receiver;
-    private String mailTitle;
-    private String mailContents;
+    //private String receiver;
+    //private String mailTitle;
+    //private String mailContents;
     private String map1;
     private String map2;
     private String map3;
@@ -34,5 +36,4 @@ public class Realtime {
     private String targetYn;
     private String reserveDate;
     private String regDate;
-
 }

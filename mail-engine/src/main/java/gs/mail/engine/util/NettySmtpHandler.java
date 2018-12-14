@@ -11,7 +11,8 @@ import java.nio.charset.Charset;
 public class NettySmtpHandler extends SimpleChannelInboundHandler  {
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Object msg) throws Exception {
-        ByteBuf byteBuf = (ByteBuf) msg;
-        log.info("message : {} ",byteBuf.toString(Charset.defaultCharset()));
+        //ByteBuf byteBuf = (ByteBuf) msg;
+        //log.info("message : {} ",byteBuf.toString(Charset.defaultCharset()));
+        log.info("message : {} ",msg.toString());
     }
 }

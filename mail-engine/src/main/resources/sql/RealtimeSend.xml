@@ -65,8 +65,8 @@
 
                 GMQ.RECEIVER receiver,
                 GMQ.UUID uuid,
-                GMQ.TITLE mailTitle,
-                GMQ.CONTENTS mailContents,
+                GMQ.TITLE title,
+                GMQ.CONTENTS contents,
                 GMQ.MAP1 map1,
                 GMQ.MAP2 map2,
                 GMQ.MAP3 map3,
@@ -102,7 +102,7 @@
         UPDATE GS_SEND_SCHDL
         SET TARGET_CNT = TARGET_CNT + ${targetCnt},
             SEND_CNT = SEND_CNT + ${sendCnt},
-            SUCCESS_CNT = SUCCESS_CNT + ${succesCnt},
+            SUCCESS_CNT = SUCCESS_CNT + ${successCnt},
             FAIL_CNT = FAIL_CNT + ${failCnt}
         WHERE SCHDL_ID = ${schdlId}
     </update>
