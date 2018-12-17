@@ -129,8 +129,8 @@ var receiverObj = (function($, receiver){
                 {
                     "data":"addrGrpId",
                     render : function(data){
-                        return '<button name="pwdChange" data-toggle="modal" data-idx="'+data+'" ' +
-                            'data-target="#groupTgMgModal" class="btn btn-primary btn-simple btn-sm" >그룹대상관리</button>';
+                        return '<button name="receiverDetail" data-toggle="modal" data-idx="'+data+'" ' +
+                            'data-target="#receivDetailModal" class="btn btn-primary btn-simple btn-sm" >그룹대상관리</button>';
                     }
                 },
                 {"data" : "createdDt",

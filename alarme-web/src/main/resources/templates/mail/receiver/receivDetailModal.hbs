@@ -1,0 +1,55 @@
+<!-- Modal -->
+<div class="modal modal-black fade bd-example-modal-lg" id="receivDetailModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <input type="hidden" id="receiverAddrGrpId">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="receivDetailModalLabel">그룹 대상 관리</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                    <i class="tim-icons icon-simple-remove"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form class="form-inline">
+                    <!--메일<input class="form-control" type="text" name="receivDetailGrpName" maxlength="10" required>-->
+                    <!--이름<input class="form-control" type="text" name="receivDetailGrpName" maxlength="10" required>-->
+                    <!--전화번호<input class="form-control" type="text" name="receivDetailGrpName" maxlength="10" required>-->
+                    <!--메일-->
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text">
+                                    <i class="tim-icons icon-email-85"></i>
+                                </div>
+                            </div>
+                            <input type="email" required="" name="email" class="form-control" placeholder="Email...">
+                        </div>
+                    <!--이름-->
+                         &nbsp;&nbsp;
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text">
+                                    <i class="tim-icons icon-caps-small"></i>
+                                </div>
+                            </div>
+                            <input type="text" name="lastname" placeholder="Name..." class="form-control">
+                        </div>
+                    <!--전화번호-->
+                        &nbsp;&nbsp;
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text">
+                                    <i class="tim-icons icon-mobile"></i>
+                                </div>
+                            </div>
+                            <input type="number" name="number" class="form-control" placeholder="TelNumber...">
+                        </div>
+                        &nbsp;&nbsp;
+                    <a href="#" role="button" class="btn btn-primary btn-sm" title="add" >추가</a>
+                </form>
+            <div class="modal-footer">
+                <!--<button type="button" class="btn btn-secondary" data-dismiss="modal">취소</button>-->
+                <!--<button type="button" id="receivModEditButt" class="btn btn-primary">수정</button>-->
+            </div>
+        </div>
+    </div>
+</div>

@@ -22,8 +22,6 @@
             var addrGrpName = $('input[name="receivEditGrpName"]').val();
             var form = $('#receiverEditValidation');
 
-            console.log('gogo');
-
             if( form.valid() ){
                 if( !receiverModal.field.addrGrpId ) {
                     console.log('수정 불가');
@@ -33,8 +31,6 @@
                 var params = {};
                 params.addrGrpId = receiverModal.field.addrGrpId;
                 params.addrGrpName = addrGrpName;
-
-                console.log(params);
 
                 var sCallBack = function(resultData) {
                     if( resultData && resultData.data ){
