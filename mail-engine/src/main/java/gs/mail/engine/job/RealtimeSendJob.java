@@ -36,7 +36,7 @@ import java.util.*;
 
 @Slf4j
 @Configuration
-public class RealtimeSendJob extends SendJobProperties{
+public class RealtimeSendJob{
 
     @Autowired private JobBuilderFactory jobBuilderFactory;
     @Autowired private StepBuilderFactory stepBuilderFactory;
@@ -151,6 +151,7 @@ public class RealtimeSendJob extends SendJobProperties{
 
                 sqlSessionTemplate.insert("SQL.RealitmeSend.insertRealtimeQueRaw", paramMap);
                 sqlSessionTemplate.delete("SQL.RealitmeSend.deleteMailQueue",paramMap);
+
                 return item;
             }
         };
@@ -179,29 +180,30 @@ public class RealtimeSendJob extends SendJobProperties{
 
                         String htmlContents = sb.toString();
 
-                        Map<String, Object> paramMap = new HashMap<String, Object>();
-                        paramMap.put("queueMinId",queueMinId);
-                        paramMap.put("queueMaxId",queueMaxId);
-                        log.info("######## queueMinId : {}", queueMinId);
-                        log.info("######## queueMaxId : {}", queueMaxId);
-                        List<Realtime> domainList = sqlSessionTemplate.selectList("SQL.RealitmeSend.selectDomainList", paramMap);
+                        List<String> domainList = new ArrayList<String>();
+                        for(Realtime realtime : items){
+                            String domain = realtime.getReceiver();
+                            if(!domainList.contains(domain.substring(domain.lastIndexOf("@")+1))){
+                                domainList.add(domain.substring(domain.lastIndexOf("@")+1));
+                            }
+                        }
 
                         NettyClientConnect nettyClientConnect = new NettyClientConnect();
                         Channel channel = null;
-                        for(Realtime realtime : domainList){
-                            log.info("########## : domain {}", realtime.getDomain());
-                            channel = nettyClientConnect.connect(realtime.getDomain());
+                        for(int i=0; i<domainList.size(); i++){
+                            channel = nettyClientConnect.connect(domainList.get(i).toString());
                         }
 
                         int cnt = 0;
                         for(Realtime realtime : items){
-                        //for(int i=0; i<items.size(); i++){
-                            realtime.setContents(htmlContents.replace("${CONTENTS}", realtime.getContents()));
+                            //realtime.setContents(htmlContents.replace("${CONTENTS}", realtime.getContents()));
                             log.info("### : {}, {}, {}, {}, {}",
                                     realtime.toString(), realtime.getContents(), realtime.getTitle(), realtime.getReceiver(), realtime.getSender());
+
                             nettyClientConnect.send(realtime, channel);
                             cnt++;
                         }
+                        channel.closeFuture().sync();
 
                         updateSchdlCnt(items.get(0).getSchdlId(), cnt, cnt, 0, 0);
                     }else{

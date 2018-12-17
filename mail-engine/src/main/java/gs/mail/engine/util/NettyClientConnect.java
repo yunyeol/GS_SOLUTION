@@ -1,7 +1,6 @@
 package gs.mail.engine.util;
 
 import gs.mail.engine.dto.Send;
-import gs.mail.engine.job.SendJobProperties;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -54,13 +53,12 @@ public class NettyClientConnect {
 
     public Channel connect(String domain){
         try{
-            EventLoopGroup workerGroup = new NioEventLoopGroup(3, new DefaultThreadFactory("worker", true));
+            EventLoopGroup workerGroup = new NioEventLoopGroup(5, new DefaultThreadFactory("worker", true));
 
             Bootstrap bootstrap = new Bootstrap();
             bootstrap.group(workerGroup);
             bootstrap.channel(NioSocketChannel.class);
             bootstrap.option(ChannelOption.TCP_NODELAY, true);
-            bootstrap.option(ChannelOption.SO_KEEPALIVE, true);
             bootstrap.handler(new ChannelInitializer<SocketChannel>() {
                 @Override
                 public void initChannel(SocketChannel ch) throws Exception {

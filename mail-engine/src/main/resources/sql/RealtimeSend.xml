@@ -48,7 +48,7 @@
     ]]>
     </select>
 
-    <select id="selectDomainList"  parameterType="Long" resultType="Realtime">
+    <select id="selectDomainList" parameterType="Long" resultType="Realtime">
     <![CDATA[
         SELECT
             SUBSTRING_INDEX(GMQ.RECEIVER, '@', -1) domain
