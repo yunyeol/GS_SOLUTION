@@ -4,14 +4,19 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="receivEditModalLabel">그룹 이름</h5>
+                <h5 class="modal-title" id="receivEditModalLabel">그룹 이름 수정</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
                     <i class="tim-icons icon-simple-remove"></i>
                 </button>
             </div>
             <div class="modal-body">
                 <form id="receiverEditValidation" novalidate="novalidate">
-                    <input class="form-control" type="text" name="receivEditGrpName" maxlength="10" required>
+                    <div class="form-group has-label">
+                        <label>
+                            <strong>그룹 이름</strong>
+                        </label>
+                         <input class="form-control" type="text" name="receivEditGrpName" maxlength="10" required>
+                    </div>
                 </form>
             </div>
             <div class="modal-footer">

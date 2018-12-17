@@ -13,5 +13,5 @@ public interface ReceiverMapper {
     int getReceivGrpNameCnt(@Param("addrGrpName") String addrGrpName);
     int insertReceiver(Receiver receiver);
     int updateReceiver(Receiver receiver);
-    int deleteReceiver(Long id);
+    int deleteReceiver(@Param("addrGrpId") Long addrGrpId);
 }

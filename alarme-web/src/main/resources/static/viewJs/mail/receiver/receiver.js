@@ -2,8 +2,7 @@ var receiverObj = (function($, receiver){
 
     receiver.field = {
         grpNameChk : false,
-        dataTable : null,
-        editor : null
+        dataTable : null
     }
     receiver.init = function(){
         receiver.field.dataTable = this.dataTable();
@@ -92,7 +91,7 @@ var receiverObj = (function($, receiver){
     }
 
     receiver.validation = function(id){
-        $(id).validate({
+        return $(id).validate({
             highlight: function(element) {
                 $(element).closest('.form-group').removeClass('has-success').addClass('has-danger');
                 $(element).closest('.form-check').removeClass('has-success').addClass('has-danger');

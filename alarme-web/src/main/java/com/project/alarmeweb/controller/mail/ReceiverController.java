@@ -24,7 +24,7 @@ public class ReceiverController extends BaseController {
     public ModelAndView receiver(){ return new ModelAndView("mail/receiver/receiver"); }
 
     @RequestMapping(value={"/mail/receiver/group/checkname"}, produces=MediaType.APPLICATION_JSON_VALUE, method = {RequestMethod.GET})
-    public ResponseEntity getReceiverCheckGrpName(@RequestParam Map<String, Object> params){
+    public ResponseEntity getReceiverCheckGrpName(@RequestParam Map<String, String> params){
         Map resultData = new HashMap();
         int cnt = receiverService.getReceivGrpNameCnt(params);
         resultData.put("data", (cnt > 0) ? "Y" : "N" );

@@ -13,7 +13,7 @@ public class ReceiverServiceImpl implements ReceiverService {
     @Autowired private ReceiverMapper receiverMapper;
 
     @Override
-    public int getReceivGrpNameCnt(Map<String, Object> params) { return receiverMapper.getReceivGrpNameCnt((String)params.get("addrGrpName")); }
+    public int getReceivGrpNameCnt(Map<String, String> params) { return receiverMapper.getReceivGrpNameCnt(params.get("addrGrpName")); }
 
     @Override
     public List<Receiver> getReceiverList() {
@@ -31,7 +31,5 @@ public class ReceiverServiceImpl implements ReceiverService {
     }
 
     @Override
-    public int removeReceiver(Long addrGrpId) {
-        return receiverMapper.deleteReceiver(addrGrpId);
-    }
+    public int removeReceiver(Long addrGrpId) { return receiverMapper.deleteReceiver(addrGrpId); }
 }
