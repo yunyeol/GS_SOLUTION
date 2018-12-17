@@ -1,6 +1,7 @@
 package gs.mail.engine.job;
 
 import gs.mail.engine.dto.Realtime;
+import gs.mail.engine.util.NettyClientConnect;
 import gs.mail.engine.util.NettySmtpHandler;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
@@ -110,7 +111,7 @@ public class RealtimeSendJob extends SendJobProperties{
                     .<Realtime, Realtime>chunk(commitInterval)
                     .reader(realtimeSendQueueReader(0L,0L, 0L))
                     .processor(realtimeSendQueueProcessor(0L,0L))
-                    .writer(realtimeSendQueueWriter())
+                    .writer(realtimeSendQueueWriter(0L,0L))
                     .build();
         }catch (Exception e){
             e.printStackTrace();
@@ -157,25 +158,12 @@ public class RealtimeSendJob extends SendJobProperties{
     }
 
     @Bean
-    public ItemWriter<Realtime> realtimeSendQueueWriter() {
+    @StepScope
+    public ItemWriter<Realtime> realtimeSendQueueWriter(@Value("#{stepExecutionContext['queueMinId']}") Long queueMinId,
+                                                        @Value("#{stepExecutionContext['queueMaxId']}") Long queueMaxId) {
         ItemWriter<Realtime> writer = new ItemWriter<Realtime>() {
             @Override
             public void write(List<? extends Realtime> items) {
-                EventLoopGroup workerGroup = new NioEventLoopGroup(3);
-
-                Bootstrap bootstrap = new Bootstrap();
-                bootstrap.group(workerGroup);
-                bootstrap.channel(NioSocketChannel.class);
-                bootstrap.option(ChannelOption.TCP_NODELAY, true);
-                bootstrap.handler(new ChannelInitializer<SocketChannel>() {
-                    @Override
-                    public void initChannel(SocketChannel ch) throws Exception {
-                        ch.pipeline()
-                                .addLast(new StringDecoder(CharsetUtil.UTF_8), new StringEncoder(CharsetUtil.UTF_8))
-                                .addLast(new NettySmtpHandler());
-                    }
-                });
-
                 try{
                     StringBuffer sb = new StringBuffer();
                     File file = new File(items.get(0).getFilePath());
@@ -191,26 +179,29 @@ public class RealtimeSendJob extends SendJobProperties{
 
                         String htmlContents = sb.toString();
 
-                        //Channel channel = bootstrap.connect("119.207.76.55", port).sync().channel();
-                        ChannelFuture future = null;
-                        int cnt = 0;
-                        List<String> domainList = new ArrayList<>();
-                        //for(int i=0; i<items.size(); i++){
-                        for(Realtime realtime : items){
-                            log.info("###### : {}", getMxDomain(realtime.getReceiver()));
-                            Channel channel = bootstrap.connect(getMxDomain(realtime.getReceiver()), 25).sync().channel();
-                            //Channel channel = bootstrap.connect("119.207.76.55", 25).sync().channel();
-                            realtime.setContents(htmlContents.replace("${CONTENTS}", realtime.getContents()));
+                        Map<String, Object> paramMap = new HashMap<String, Object>();
+                        paramMap.put("queueMinId",queueMinId);
+                        paramMap.put("queueMaxId",queueMaxId);
+                        log.info("######## queueMinId : {}", queueMinId);
+                        log.info("######## queueMaxId : {}", queueMaxId);
+                        List<Realtime> domainList = sqlSessionTemplate.selectList("SQL.RealitmeSend.selectDomainList", paramMap);
 
+                        NettyClientConnect nettyClientConnect = new NettyClientConnect();
+                        Channel channel = null;
+                        for(Realtime realtime : domainList){
+                            log.info("########## : domain {}", realtime.getDomain());
+                            channel = nettyClientConnect.connect(realtime.getDomain());
+                        }
+
+                        int cnt = 0;
+                        for(Realtime realtime : items){
+                        //for(int i=0; i<items.size(); i++){
+                            realtime.setContents(htmlContents.replace("${CONTENTS}", realtime.getContents()));
                             log.info("### : {}, {}, {}, {}, {}",
                                     realtime.toString(), realtime.getContents(), realtime.getTitle(), realtime.getReceiver(), realtime.getSender());
-
-                            sendMail(future, channel, realtime);
+                            nettyClientConnect.send(realtime, channel);
                             cnt++;
-                            
                         }
-                        //future = channel.writeAndFlush("quit" + System.lineSeparator());
-                        //future.channel().closeFuture().sync();
 
                         updateSchdlCnt(items.get(0).getSchdlId(), cnt, cnt, 0, 0);
                     }else{

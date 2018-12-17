@@ -36,4 +36,6 @@ public class Realtime extends Send implements Serializable {
     private String targetYn;
     private String reserveDate;
     private String regDate;
+
+    private String domain;
 }

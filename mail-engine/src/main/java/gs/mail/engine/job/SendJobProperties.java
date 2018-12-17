@@ -19,30 +19,30 @@ public class SendJobProperties {
     @Autowired DomainConnectService domainConnectService;
     private int port = 25;
 
-    protected String getMxDomain(String receiver){
-        try{
-            String domain = receiver.substring(receiver.indexOf("@")+1);
-
-            Process process = Runtime.getRuntime().exec("nslookup -type=mx " + domain);
-            InputStream in = process.getInputStream();
-            BufferedReader br = new BufferedReader(new InputStreamReader(in));
-
-            List<String> domainList = new ArrayList();
-            String line = "";
-            while ((line = br.readLine()) != null){
-                if(line.contains("internet address")){
-                    domainList.add(line.substring(line.indexOf("internet address") + 19));
-                }
-            }
-            br.close();
-            in.close();
-
-            return domainList.get(0).toString();
-        }catch (Exception e){
-            e.printStackTrace();
-            return null;
-        }
-    }
+//    protected String getMxDomain(String receiver){
+//        try{
+//            String domain = receiver.substring(receiver.indexOf("@")+1);
+//
+//            Process process = Runtime.getRuntime().exec("nslookup -type=mx " + domain);
+//            InputStream in = process.getInputStream();
+//            BufferedReader br = new BufferedReader(new InputStreamReader(in));
+//
+//            List<String> domainList = new ArrayList();
+//            String line = "";
+//            while ((line = br.readLine()) != null){
+//                if(line.contains("internet address")){
+//                    domainList.add(line.substring(line.indexOf("internet address") + 19));
+//                }
+//            }
+//            br.close();
+//            in.close();
+//
+//            return domainList.get(0).toString();
+//        }catch (Exception e){
+//            e.printStackTrace();
+//            return null;
+//        }
+//    }
 
     protected void sendMail(ChannelFuture future, Channel channel, Send send){
         try{
