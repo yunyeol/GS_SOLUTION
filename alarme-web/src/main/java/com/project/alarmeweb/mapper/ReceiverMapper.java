@@ -14,4 +14,8 @@ public interface ReceiverMapper {
     int insertReceiver(Receiver receiver);
     int updateReceiver(Receiver receiver);
     int deleteReceiver(@Param("addrGrpId") Long addrGrpId);
+    List<Receiver> getReceiverDeatil(@Param("addrGrpId") Long addrGrpId);
+    int insertReceiverDetail(Receiver receiver);
+    int updateReceiverDetail(Receiver receiver);
+    int deleteReceiverDetail(@Param("addrMbrId") Long addrMbrId);
 }

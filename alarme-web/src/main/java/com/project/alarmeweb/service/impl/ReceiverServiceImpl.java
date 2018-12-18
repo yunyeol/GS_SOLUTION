@@ -32,4 +32,16 @@ public class ReceiverServiceImpl implements ReceiverService {
 
     @Override
     public int removeReceiver(Long addrGrpId) { return receiverMapper.deleteReceiver(addrGrpId); }
+
+    @Override
+    public List<Receiver> getReceiverDeatil(Long addrGrpId) { return receiverMapper.getReceiverDeatil(addrGrpId); }
+
+    @Override
+    public int addReceiverDetail(Receiver receiver) { return receiverMapper.insertReceiverDetail(receiver); }
+
+    @Override
+    public int modifyReceiverDetail(Receiver receiver) { return receiverMapper.updateReceiverDetail(receiver); }
+
+    @Override
+    public int removeReceiverDetail(Long addrMbrId) { return receiverMapper.deleteReceiverDetail(addrMbrId); }
 }

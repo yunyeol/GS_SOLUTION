@@ -10,7 +10,17 @@
         <result property="createdDt" 		column="REG_DATE"/>
         <result property="modifiedDt" 		column="UPT_DATE"/>
     </resultMap>
+    <resultMap id="receiverDetailResult" type="Receiver">
+        <id 	property="addrMbrId" 		column="ADDRESS_MBR_ID"/>
+        <result property="addrGrpId" 		column="ADDRESS_GRP_ID"/>
+        <result property="addrGrpName" 		column="ADDRESS_GRP_NAME"/>
+        <result property="name"      		column="NAME"/>
+        <result property="address" 	        column="ADDRESS"/>
+        <result property="createdDt" 		column="REG_DATE"/>
+        <result property="modifiedDt" 		column="UPT_DATE"/>
+    </resultMap>
 
+    <!-- receiver sql -->
     <sql id="columns">
         GAG.ADDRESS_GRP_ID ADDRESS_GRP_ID,
         GAG.ADDRESS_GRP_NAME ADDRESS_GRP_NAME,
@@ -21,11 +31,10 @@
     <select id="getReceiverList" resultMap="receiverResult">
         /* receiverMapper.getGroupList */
         SELECT
-        <include refid="columns" />
+          <include refid="columns" />
         FROM GS_ADDRESS_GRP GAG
         LEFT JOIN GS_ADDRESS_MBR GAM
         ON (GAG.ADDRESS_GRP_ID = GAM.ADDRESS_GRP_ID)
-        <include refid="condition" />
         GROUP BY GAG.ADDRESS_GRP_ID,GAG.REG_DATE, GAG.UPT_DATE, GAM.ADDRESS_GRP_ID
     </select>
 
@@ -54,6 +63,38 @@
       /* receiverMapper.deleteReceiver */
       DELETE FROM GS_ADDRESS_GRP
       WHERE ADDRESS_GRP_ID = #{addrGrpId}
+    </delete>
+
+    <!-- receiverDetail sql -->
+    <select id="getReceiverDeatil" resultMap="receiverDetailResult">
+        SELECT
+            ADDRESS_MBR_ID,
+            ADDRESS_GRP_ID,
+            (SELECT ADDRESS_GRP_NAME FROM GS_ADDRESS_GRP WHERE ADDRESS_GRP_ID = GAM.ADDRESS_GRP_ID) ADDRESS_GRP_NAME,
+            NAME,
+            ADDRESS,
+            DATA1,
+            REG_DATE,
+            UPT_DATE
+        FROM
+            GS_ADDRESS_MBR GAM
+        WHERE ADDRESS_GRP_ID = ${addrGrpId};
+    </select>
+
+    <insert id="insertReceiverDetail">
+        INSERT INTO GS_ADDRESS_MBR
+        (ADDRESS_GRP_ID, NAME, ADDRESS, DATA1, DATA2, DATA3, REG_DATE, UPT_DATE)
+        VALUES(#{addrMbrId}, #{name}, #{address}, #{telNumber}, '', '', now(), now());
+
+    </insert>
+    <update id="updateReceiverDetail" parameterType="Receiver">
+        UPDATE GS_ADDRESS_MBR
+        SET NAME=#{name}, ADDRESS=#{address}, DATA1=#{telNumber}
+        WHERE ADDRESS_MBR_ID=#{addrMbrId};
+    </update>
+    <delete id="deleteReceiverDetail" parameterType="long">
+        DELETE FROM GS_ADDRESS_MBR
+        WHERE ADDRESS_MBR_ID=#{addrMbrId};
     </delete>
 
     <sql id="condition">

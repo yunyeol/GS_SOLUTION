@@ -3,6 +3,7 @@ package com.project.alarmeweb.controller.mail;
 import com.project.alarmeweb.controller.BaseController;
 import com.project.alarmeweb.dto.Receiver;
 import com.project.alarmeweb.service.ReceiverService;
+import com.project.alarmeweb.util.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -64,4 +65,40 @@ public class ReceiverController extends BaseController {
         return new ResponseEntity(resultData, HttpStatus.OK);
     }
 
+    /** 그룹대상관리 */
+
+    @RequestMapping(value={"/mail/receiver/group/detail"}, produces=MediaType.APPLICATION_JSON_VALUE, method = {RequestMethod.GET})
+    public ResponseEntity getReceiverDetail(@RequestParam(value = "addrGrpId", required = false) Long addrGrpId){
+        Map resultData = new HashMap();
+
+        logger.info("sec 측정 :"+DateUtil.getDate());
+        List<Receiver> receiverList = receiverService.getReceiverDeatil(addrGrpId);
+        logger.info("sec 측정 :"+DateUtil.getDate());
+        resultData.put("data", ( !CollectionUtils.isEmpty(receiverList) ) ? receiverList : new ArrayList<Receiver>()  );
+        return new ResponseEntity(resultData, HttpStatus.OK);
+    }
+
+    @RequestMapping(value={"/mail/receiver/group/detail"}, produces=MediaType.APPLICATION_JSON_VALUE, method = {RequestMethod.POST})
+    public ResponseEntity addReceiverDetail(@RequestBody Receiver receiver){
+        Map resultData = new HashMap();
+        int cnt = receiverService.addReceiverDetail(receiver);
+        resultData.put("data", (cnt > 0) ? "SUCCESS" : "FAIL"  );
+        return new ResponseEntity(resultData, HttpStatus.OK);
+    }
+
+    @RequestMapping(value={"/mail/receiver/group/detail"}, produces=MediaType.APPLICATION_JSON_VALUE, method = {RequestMethod.PUT})
+    public ResponseEntity modifyReceiverDetail(@RequestBody Receiver receiver){
+        Map resultData = new HashMap();
+        int cnt = receiverService.modifyReceiverDetail(receiver);
+        resultData.put("data", (cnt > 0) ? "SUCCESS" : "FAIL"  );
+        return new ResponseEntity(resultData, HttpStatus.OK);
+    }
+
+    @RequestMapping(value={"/mail/receiver/group//detail{id}"}, produces=MediaType.APPLICATION_JSON_VALUE, method = {RequestMethod.DELETE})
+    public ResponseEntity removeReceiverDetail(@PathVariable Long id){
+        Map resultData = new HashMap();
+        int cnt = receiverService.removeReceiverDetail(id);
+        resultData.put("data", (cnt > 0) ? "SUCCESS" : "FAIL"  );
+        return new ResponseEntity(resultData, HttpStatus.OK);
+    }
 }
