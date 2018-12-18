@@ -172,19 +172,19 @@ public class RealtimeSendJob{
 
                         String htmlContents = sb.toString();
 
-                        List<String> domainList = new ArrayList<String>();
-                        for(Realtime realtime : items){
-                            String domain = realtime.getReceiver();
-                            if(!domainList.contains(domain.substring(domain.lastIndexOf("@")+1))){
-                                domainList.add(domain.substring(domain.lastIndexOf("@")+1));
-                            }
-                        }
-
-                        NettyClientConnect nettyClientConnect = new NettyClientConnect();
-                        Channel channel = null;
-                        for(int i=0; i<domainList.size(); i++){
-                            channel = nettyClientConnect.connect(domainList.get(i).toString());
-                        }
+//                        List<String> domainList = new ArrayList<String>();
+//                        for(Realtime realtime : items){
+//                            String domain = realtime.getReceiver();
+//                            if(!domainList.contains(domain.substring(domain.lastIndexOf("@")+1))){
+//                                domainList.add(domain.substring(domain.lastIndexOf("@")+1));
+//                            }
+//                        }
+//
+//                        NettyClientConnect nettyClientConnect = new NettyClientConnect();
+//                        Channel channel = null;
+//                        for(int i=0; i<domainList.size(); i++){
+//                            channel = nettyClientConnect.connect(domainList.get(i).toString());
+//                        }
 
                         int cnt = 0;
                         for(Realtime realtime : items){
@@ -193,10 +193,14 @@ public class RealtimeSendJob{
                             log.info("### : {}, {}, {}, {}, {}",
                                     realtime.toString(), realtime.getContents(), realtime.getTitle(), realtime.getReceiver(), realtime.getSender());
 
-                            nettyClientConnect.send(realtime, channel);
+                            new NettyClientConnect(realtime);
+//                            NettyClientConnect nettyClientConnect = new NettyClientConnect();
+//                            Channel channel = nettyClientConnect.connect(realtime);
+//                            nettyClientConnect.send(realtime, channel);
+//                            channel.closeFuture().sync();
                             cnt++;
                         }
-                        channel.closeFuture().sync();
+
 
                         updateSchdlCnt(items.get(0).getSchdlId(), cnt, cnt, 0, 0);
                     }else{

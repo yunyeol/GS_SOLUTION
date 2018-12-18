@@ -11,8 +11,15 @@ public class NettySmtpHandler extends SimpleChannelInboundHandler  {
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         log.info("#### channelActive()");
     }
+
     @Override
     public void channelRead0(ChannelHandlerContext ctx, Object msg) throws Exception {
         log.info("message : {} ",msg.toString());
     }
+
+    @Override
+    public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
+        ctx.close();
+    }
+
 }

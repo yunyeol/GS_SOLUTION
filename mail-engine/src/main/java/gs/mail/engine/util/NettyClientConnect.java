@@ -12,7 +12,6 @@ import io.netty.util.CharsetUtil;
 import io.netty.util.concurrent.DefaultThreadFactory;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeUtility;
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -25,6 +24,10 @@ import java.util.List;
 public class NettyClientConnect {
 
     private int port = 25;
+
+    public NettyClientConnect(Send send){
+        send(send, connect(send));
+    }
 
     public Channel connect(Send send){
         try{
@@ -44,32 +47,8 @@ public class NettyClientConnect {
                 }
             });
 
-            Channel channel = bootstrap.connect(getMxDomain(send.getReceiver()), port).sync().channel();
-            return channel;
-        }catch(Exception e){
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    public Channel connect(String domain){
-        try{
-            EventLoopGroup workerGroup = new NioEventLoopGroup(5, new DefaultThreadFactory("worker", true));
-
-            Bootstrap bootstrap = new Bootstrap();
-            bootstrap.group(workerGroup);
-            bootstrap.channel(NioSocketChannel.class);
-            bootstrap.option(ChannelOption.TCP_NODELAY, true);
-            bootstrap.handler(new ChannelInitializer<SocketChannel>() {
-                @Override
-                public void initChannel(SocketChannel ch) throws Exception {
-                    ch.pipeline()
-                            .addLast(new StringDecoder(CharsetUtil.UTF_8), new StringEncoder(CharsetUtil.UTF_8))
-                            .addLast(new NettySmtpHandler());
-                }
-            });
-
-            Channel channel = bootstrap.connect(getMxDomain(domain), port).sync().channel();
+            //Channel channel = bootstrap.connect(getMxDomain(send.getReceiver()), port).sync().channel();
+            Channel channel = bootstrap.connect("119.207.76.55", port).sync().channel();
             return channel;
         }catch(Exception e){
             e.printStackTrace();
@@ -79,7 +58,6 @@ public class NettyClientConnect {
 
     public void send(Send send, Channel channel){
         try{
-            //String lineSeparator = System.lineSeparator();
             String lineSeparator = "\r\n";
             String domain = send.getReceiver();
             channel.writeAndFlush("HELO " + domain.substring(domain.indexOf("@")+1) + lineSeparator);
@@ -97,8 +75,7 @@ public class NettyClientConnect {
             channel.writeAndFlush(send.getContents() + lineSeparator);
             channel.writeAndFlush("." + lineSeparator);
             channel.writeAndFlush("QUIT" + lineSeparator);
-            log.info(".");
-            //channel.writeAndFlush("QUIT" + lineSeparator);
+            channel.closeFuture().sync();
         }catch(Exception e){
             e.printStackTrace();
         }
