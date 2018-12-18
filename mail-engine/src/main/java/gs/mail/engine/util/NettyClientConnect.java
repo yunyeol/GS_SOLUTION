@@ -12,6 +12,7 @@ import io.netty.util.CharsetUtil;
 import io.netty.util.concurrent.DefaultThreadFactory;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeUtility;
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -78,21 +79,26 @@ public class NettyClientConnect {
 
     public void send(Send send, Channel channel){
         try{
-            ChannelFuture future = null;
-            String lineSeparator = System.lineSeparator();
+            //String lineSeparator = System.lineSeparator();
+            String lineSeparator = "\r\n";
             String domain = send.getReceiver();
-            future = channel.writeAndFlush("HELO " + domain.substring(domain.indexOf("@")+1) + lineSeparator);
-            future = channel.writeAndFlush("MAIL FROM:"+send.getSender() + lineSeparator);
-            future = channel.writeAndFlush("RCPT TO:"+send.getReceiver() + lineSeparator);
-            future = channel.writeAndFlush("DATA" + lineSeparator);
-            future = channel.writeAndFlush("subject:"+ MimeUtility.encodeText(send.getTitle(),"KSC5601","B") + lineSeparator);
-            future = channel.writeAndFlush("from:"+send.getSender() + lineSeparator);
-            future = channel.writeAndFlush("to:"+send.getReceiver() + lineSeparator);
-            future = channel.writeAndFlush("date:"+ new Date() + lineSeparator);
-            future = channel.writeAndFlush(MimeUtility.encodeText(send.getContents(),"KSC5601","B"));
-            future = channel.writeAndFlush(lineSeparator);
-            future = channel.writeAndFlush("." + lineSeparator);
-
+            channel.writeAndFlush("HELO " + domain.substring(domain.indexOf("@")+1) + lineSeparator);
+            channel.writeAndFlush("MAIL FROM:<"+send.getSender() +">"+ lineSeparator);
+            channel.writeAndFlush("RCPT TO:<"+send.getReceiver() +">"+ lineSeparator);
+            channel.writeAndFlush("DATA" + lineSeparator);
+            channel.writeAndFlush("Mime-Version: 1.0"+ lineSeparator);
+            channel.writeAndFlush("Content-Type:text/html;charset=UTF-8"+ lineSeparator);
+            channel.writeAndFlush("Content-Transfer-Encoding:8bit"+ lineSeparator);
+            channel.writeAndFlush("Subject:"+ MimeUtility.encodeText(send.getTitle(),"KSC5601","B") + lineSeparator);
+            channel.writeAndFlush("From:"+send.getSender() + lineSeparator);
+            channel.writeAndFlush("To:"+send.getReceiver() + lineSeparator);
+            channel.writeAndFlush("Date:"+ new Date() + lineSeparator);
+            channel.writeAndFlush(lineSeparator);
+            channel.writeAndFlush(send.getContents() + lineSeparator);
+            channel.writeAndFlush("." + lineSeparator);
+            channel.writeAndFlush("QUIT" + lineSeparator);
+            log.info(".");
+            //channel.writeAndFlush("QUIT" + lineSeparator);
         }catch(Exception e){
             e.printStackTrace();
         }

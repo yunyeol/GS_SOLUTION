@@ -2,15 +2,7 @@ package gs.mail.engine.job;
 
 import gs.mail.engine.dto.Realtime;
 import gs.mail.engine.util.NettyClientConnect;
-import gs.mail.engine.util.NettySmtpHandler;
-import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
-import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.SocketChannel;
-import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.codec.string.StringDecoder;
-import io.netty.handler.codec.string.StringEncoder;
-import io.netty.util.CharsetUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionTemplate;
@@ -196,7 +188,8 @@ public class RealtimeSendJob{
 
                         int cnt = 0;
                         for(Realtime realtime : items){
-                            //realtime.setContents(htmlContents.replace("${CONTENTS}", realtime.getContents()));
+                            realtime.setContents(htmlContents.replace("${CONTENTS}", new String(realtime.getContents().getBytes("UTF-8"))));
+
                             log.info("### : {}, {}, {}, {}, {}",
                                     realtime.toString(), realtime.getContents(), realtime.getTitle(), realtime.getReceiver(), realtime.getSender());
 

@@ -8,4 +8,5 @@ public class Send {
     protected String sender;
     protected String title;
     protected String contents;
+    private String uuid;
 }

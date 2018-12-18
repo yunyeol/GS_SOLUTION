@@ -48,18 +48,6 @@
     ]]>
     </select>
 
-    <select id="selectDomainList" parameterType="Long" resultType="Realtime">
-    <![CDATA[
-        SELECT
-            SUBSTRING_INDEX(GMQ.RECEIVER, '@', -1) domain
-        FROM GS_MAIL_QUEUE GMQ
-        WHERE GMQ.TARGET_YN = 'Y'
-        AND GMQ.RESERVE_DATE < NOW()
-        AND GMQ.ID BETWEEN ${queueMinId} AND ${queueMaxId}
-        GROUP BY SUBSTRING_INDEX(GMQ.RECEIVER, '@', -1);
-    ]]>
-    </select>
-
     <select id="selectMailQueueList" parameterType="Long" resultType="Realtime">
     <![CDATA[
         SELECT * FROM (

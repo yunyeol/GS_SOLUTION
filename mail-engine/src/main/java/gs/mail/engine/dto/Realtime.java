@@ -18,7 +18,7 @@ public class Realtime extends Send implements Serializable {
     private String activeYn;
 
     private long masterSchdlId;
-    private String uuid;
+    //private String uuid;
     private String sendFlag;
     //private String receiver;
     //private String mailTitle;
