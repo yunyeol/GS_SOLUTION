@@ -1,6 +1,7 @@
 package com.project.alarmeweb.controller.mail;
 
 import com.project.alarmeweb.controller.BaseController;
+import com.project.alarmeweb.dto.PageMaker;
 import com.project.alarmeweb.dto.Receiver;
 import com.project.alarmeweb.service.ReceiverService;
 import com.project.alarmeweb.util.DateUtil;
@@ -68,13 +69,12 @@ public class ReceiverController extends BaseController {
     /** 그룹대상관리 */
 
     @RequestMapping(value={"/mail/receiver/group/detail"}, produces=MediaType.APPLICATION_JSON_VALUE, method = {RequestMethod.GET})
-    public ResponseEntity getReceiverDetail(@RequestParam(value = "addrGrpId", required = false) Long addrGrpId){
+    public ResponseEntity getReceiverDetail(@RequestParam(value = "addrGrpId", required = false) Long addrGrpId, @RequestParam(value = "currIdx", required = false) int currIdx){
         Map resultData = new HashMap();
-
         logger.info("sec 측정 :"+DateUtil.getDate());
-        List<Receiver> receiverList = receiverService.getReceiverDeatil(addrGrpId);
         logger.info("sec 측정 :"+DateUtil.getDate());
-        resultData.put("data", ( !CollectionUtils.isEmpty(receiverList) ) ? receiverList : new ArrayList<Receiver>()  );
+        PageMaker receiverList = receiverService.getReceiverDeatil(addrGrpId, currIdx);
+        resultData.put("data", ( receiverList != null ) ? receiverList : PageMaker.getInstance()  );
         return new ResponseEntity(resultData, HttpStatus.OK);
     }
 

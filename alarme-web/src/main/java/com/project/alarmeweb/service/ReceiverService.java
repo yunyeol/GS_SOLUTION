@@ -1,5 +1,6 @@
 package com.project.alarmeweb.service;
 
+import com.project.alarmeweb.dto.PageMaker;
 import com.project.alarmeweb.dto.Receiver;
 import org.apache.ibatis.annotations.Param;
 
@@ -12,7 +13,7 @@ public interface ReceiverService {
     int addReceiver(Receiver receiver);
     int modifyReceiver(Receiver receiver);
     int removeReceiver(Long addrGrpId);
-    List<Receiver> getReceiverDeatil(Long addrGrpId);
+    PageMaker getReceiverDeatil(Long addrGrpId, int currIdx);
     int addReceiverDetail(Receiver receiver);
     int modifyReceiverDetail(Receiver receiver);
     int removeReceiverDetail(@Param("addrMbrId") Long addrMbrId);

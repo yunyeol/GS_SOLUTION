@@ -1,6 +1,7 @@
 var receiverObj = (function($, receivDetailModal){
     receivDetailModal.field = {
-        addrGrpId : null
+        addrGrpId : null,
+        currIdx : 0
     }
 
     receivDetailModal.init = function(){
@@ -11,9 +12,44 @@ var receiverObj = (function($, receivDetailModal){
         if(receiverObj && receiverObj.dataTable){
             receiverObj.field.dataTable.off('click.receiverDetailModal').on('click.receiverDetailModal','button[name="receiverDetail"]',function(e){
                 receivDetailModal.field.addrGrpId = $(e.currentTarget).data('idx');
-                receivDetailModal.dataTable();
+                receivDetailModal.field.currIdx = 1;
+
+                var sCallBack = function(resultData) {
+
+                    if( resultData && resultData.data ){
+                        // 여기부터 진행...
+                    }
+                    receiver.field.grpNameChk = ( resultData && resultData.data === 'N' ) ? true : false;
+                    if( receiver.field.grpNameChk ){
+                        alert('그룹이름 : '+grpName+'은 사용 가능합니다.');
+                        $('#receiverForm input.form-control').attr( 'disabled', true );
+                    }else{
+                        alert('그룹이름 : '+grpName+'은 존재합니다. 사용 불가');
+                    }
+                }
+
+                alarmeCommon.ajaxCall('get','/mail/receiver/group/checkname',params,null,null,sCallBack,null);
+
+                receivDetailModal.setPaging();
             });
         }
+    }
+
+    receivDetailModal.setPaging = function(){
+        $('#pagination').twbsPagination({
+            totalPages: 10,  // 전체 page블럭 수
+            visiblePages: 5,  // 출력될 page 블럭수 상수로 지정해 줘도 되고, 변수로 지정해줘도 된다.
+            prev: "PREVIOUS",
+            next: "NEXT",
+            first: 'FIRST',
+            last: 'LAST',
+            onPageClick: function (event, page) {
+                console.log(event);
+                console.log(page);
+                // $('#page-content').text('Page ' + page);
+                // paging(page);
+            }
+        });
     }
 
     receivDetailModal.dataTable = function(){

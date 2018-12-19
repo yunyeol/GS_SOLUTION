@@ -1,10 +1,15 @@
 package com.project.alarmeweb.service.impl;
 
+import com.project.alarmeweb.dto.PageMaker;
 import com.project.alarmeweb.dto.Receiver;
 import com.project.alarmeweb.mapper.ReceiverMapper;
 import com.project.alarmeweb.service.ReceiverService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -34,7 +39,22 @@ public class ReceiverServiceImpl implements ReceiverService {
     public int removeReceiver(Long addrGrpId) { return receiverMapper.deleteReceiver(addrGrpId); }
 
     @Override
-    public List<Receiver> getReceiverDeatil(Long addrGrpId) { return receiverMapper.getReceiverDeatil(addrGrpId); }
+    public PageMaker getReceiverDeatil(Long addrGrpId, int currIdx) {
+
+        PageMaker pageMaker = PageMaker.getInstance();
+        pageMaker.setPaging(currIdx);
+
+        Map params = new HashMap<String, Object>();
+        params.put("isPaging", "Y");
+        params.put("startRow",pageMaker.getStartRow());
+        params.put("endRow",pageMaker.getEndRow());
+
+        List<Receiver> receivDetailList = receiverMapper.getReceiverDeatil(addrGrpId);
+
+        pageMaker.setContentList( !CollectionUtils.isEmpty(receivDetailList) ? receivDetailList : new ArrayList<Receiver>() );
+
+        return pageMaker;
+    }
 
     @Override
     public int addReceiverDetail(Receiver receiver) { return receiverMapper.insertReceiverDetail(receiver); }
