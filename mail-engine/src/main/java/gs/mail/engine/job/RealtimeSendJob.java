@@ -2,6 +2,7 @@ package gs.mail.engine.job;
 
 import gs.mail.engine.dto.Realtime;
 import gs.mail.engine.util.NettyClientConnect;
+import gs.mail.engine.util.SmtpUtils;
 import io.netty.channel.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.session.SqlSessionFactory;
@@ -193,7 +194,8 @@ public class RealtimeSendJob{
                             log.info("### : {}, {}, {}, {}, {}",
                                     realtime.toString(), realtime.getContents(), realtime.getTitle(), realtime.getReceiver(), realtime.getSender());
 
-                            new NettyClientConnect(realtime);
+                            //new NettyClientConnect(realtime);
+                            new SmtpUtils("R",realtime);
 //                            NettyClientConnect nettyClientConnect = new NettyClientConnect();
 //                            Channel channel = nettyClientConnect.connect(realtime);
 //                            nettyClientConnect.send(realtime, channel);

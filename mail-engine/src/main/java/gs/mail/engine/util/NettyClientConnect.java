@@ -26,10 +26,6 @@ public class NettyClientConnect {
     private int port = 25;
 
     public NettyClientConnect(Send send){
-        send(send, connect(send));
-    }
-
-    public Channel connect(Send send){
         try{
             EventLoopGroup workerGroup = new NioEventLoopGroup(3, new DefaultThreadFactory("worker", true));
 
@@ -47,14 +43,40 @@ public class NettyClientConnect {
                 }
             });
 
-            //Channel channel = bootstrap.connect(getMxDomain(send.getReceiver()), port).sync().channel();
-            Channel channel = bootstrap.connect("119.207.76.55", port).sync().channel();
-            return channel;
-        }catch(Exception e){
+            Channel channel = bootstrap.connect(getMxDomain(send.getReceiver()), port).sync().channel();
+
+            send(send, channel);
+        }catch (Exception e){
             e.printStackTrace();
         }
-        return null;
     }
+
+//    public Channel connect(Send send){
+//        try{
+//            EventLoopGroup workerGroup = new NioEventLoopGroup(3, new DefaultThreadFactory("worker", true));
+//
+//            Bootstrap bootstrap = new Bootstrap();
+//            bootstrap.group(workerGroup);
+//            bootstrap.channel(NioSocketChannel.class);
+//            bootstrap.option(ChannelOption.TCP_NODELAY, true);
+//            bootstrap.option(ChannelOption.SO_KEEPALIVE, true);
+//            bootstrap.handler(new ChannelInitializer<SocketChannel>() {
+//                @Override
+//                public void initChannel(SocketChannel ch) throws Exception {
+//                    ch.pipeline()
+//                            .addLast(new StringDecoder(CharsetUtil.UTF_8), new StringEncoder(CharsetUtil.UTF_8))
+//                            .addLast(new NettySmtpHandler());
+//                }
+//            });
+//
+//            Channel channel = bootstrap.connect(getMxDomain(send.getReceiver()), port).sync().channel();
+//            //Channel channel = bootstrap.connect("119.207.76.55", port).sync().channel();
+//            return channel;
+//        }catch(Exception e){
+//            e.printStackTrace();
+//        }
+//        return null;
+//    }
 
     public void send(Send send, Channel channel){
         try{
@@ -78,6 +100,8 @@ public class NettyClientConnect {
             channel.closeFuture().sync();
         }catch(Exception e){
             e.printStackTrace();
+        }finally {
+            channel.close();
         }
     }
 
