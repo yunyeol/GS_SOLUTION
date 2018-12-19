@@ -26,23 +26,25 @@ public class SmtpUtils{
         Socket socket = null;
         BufferedReader br = null;
         PrintWriter pw = null;
+        PrintStream ps = null;
 
         try{
             socket = new Socket(getMxDomain(send.getReceiver()), port);
             br = new BufferedReader(new InputStreamReader(socket.getInputStream(), "euc-kr"));
-            pw = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), "euc-kr"), true);
+            pw = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), "UTF-8"), true);
+            ps = new PrintStream(socket.getOutputStream(), true);
 
-            send(br, pw, gubun, send);
+            send(br, pw, gubun, send, ps);
         }catch (Exception e){
             e.printStackTrace();
         }finally {
-//            try{
-//                if(br != null) br.close();
-//                if(pw != null) pw.close();
-//                if(socket != null) socket.close();
-//            }catch (Exception e){
-//                e.printStackTrace();
-//            }
+            try{
+                if(br != null) br.close();
+                if(pw != null) pw.close();
+                if(socket != null) socket.close();
+            }catch (Exception e){
+                e.printStackTrace();
+            }
         }
     }
 
@@ -71,7 +73,7 @@ public class SmtpUtils{
         }
     }
 
-    public void send(BufferedReader br, PrintWriter pw, String gubun, Send send){
+    public void send(BufferedReader br, PrintWriter pw, String gubun, Send send, PrintStream ps){
         PrintWriter sendLog = null;
 
         try {
@@ -95,32 +97,48 @@ public class SmtpUtils{
 
             sendLog = new PrintWriter(new BufferedWriter(new FileWriter(file, true)), true);
 
-            pw.println("HELO "+send.getReceiver().substring(send.getReceiver().indexOf("@")+1) );
+            //pw.println("HELO "+send.getReceiver().substring(send.getReceiver().indexOf("@")+1) );
+            ps.print("HELO "+send.getReceiver().substring(send.getReceiver().indexOf("@")+1) +"\r\n");
             sendLog.print("HELO SEND :: RES :"+br.readLine()+" || ");
 
-            pw.println("MAIL FROM: <"+send.getSender()+">" );
+            //pw.println("MAIL FROM: <"+send.getSender()+">" );
+            ps.print("MAIL FROM: <"+send.getSender()+">" +"\r\n");
             sendLog.print("MAIL FROM :: RES :"+br.readLine()+" || ");
 
-            pw.println("RCPT TO:<"+send.getReceiver()+">" );
+            //pw.println("RCPT TO:<"+send.getReceiver()+">" );
+            ps.print("RCPT TO:<"+send.getReceiver()+">" +"\r\n");
             sendLog.print("RCPT TO :: RES :"+br.readLine()+" || ");
 
-            pw.println("DATA" );
+            //pw.println("DATA" );
+            ps.print("DATA" +"\r\n");
             sendLog.print("DATA :: RES :"+br.readLine()+" || ");
-            pw.println("Content-Type:text/html;");
-            pw.println("Subject:"+send.getTitle());
-            pw.println("From:"+send.getSender());
-            pw.println("To:"+send.getReceiver());
-            pw.println("Date: "+new Date());
-            pw.println();
-            pw.println(send.getContents());
-            pw.println(".");
+//            pw.println("Mime-Version: 1.0");
+//            pw.println("Content-Type:text/html;");
+//            pw.println("Content-Transfer-Encoding:8bit");
+//            pw.println("Subject:"+send.getTitle());
+//            pw.println("From:"+send.getSender());
+//            pw.println("To:"+send.getReceiver());
+//            pw.println("Date: "+new Date());
+//            pw.println();
+//            pw.println(send.getContents());
+//            pw.println(".");
+            ps.print("Mime-Version: 1.0"+"\r\n");
+            ps.print("Content-Type:text/html;"+"\r\n");
+            ps.print("Content-Transfer-Encoding:8bit"+"\r\n");
+            ps.print("Subject:"+send.getTitle()+"\r\n");
+            ps.print("From:"+send.getSender()+"\r\n");
+            ps.print("To:"+send.getReceiver()+"\r\n");
+            ps.print("Date: "+new Date()+"\r\n"+"\r\n");
+            ps.print(send.getContents()+"\r\n");
+            ps.print("."+"\r\n");
+
             sendLog.print("DATA SEND :: RES :"+br.readLine()+" || ");
 
             sendLog.print("QUIT");
             sendLog.println();
-//            pw.println("QUIT");
-//            pw.flush();
-            sendLog.flush();
+            //pw.println("QUIT");
+            ps.print("QUIT"+"\r\n");
+
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
