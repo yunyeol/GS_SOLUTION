@@ -29,11 +29,12 @@ public class SmtpUtils extends Thread{
     @Override
     public void run(){
         try {
-            Socket socket = connect(this.ip, this.port);
+            connect(this.ip, this.port);
 
             while (true){
-                log.info("##### ping");
-                ping(socket);
+                ping(this.ip, socket);
+                log.info("### ping ");
+
                 Thread.sleep(10000);
             }
 
@@ -49,7 +50,12 @@ public class SmtpUtils extends Thread{
         this.port = port;
     }
 
-    public Socket connect(String ip, int port){
+    public void setParams(String ip, int port){
+        this.ip = ip;
+        this.port = port;
+    }
+
+    public void connect(String ip, int port){
 
 //        BufferedReader br = null;
 //        PrintStream ps = null;
@@ -57,10 +63,9 @@ public class SmtpUtils extends Thread{
         try{
             //socket = new Socket(getMxDomain(send.getReceiver()), port);
             socket = new Socket(ip, port);
+            log.info("#####");
 //            br = new BufferedReader(new InputStreamReader(socket.getInputStream(), "euc-kr"));
 //            ps = new PrintStream(socket.getOutputStream(), true, "euc-kr");
-
-            return socket;
         }catch (Exception e){
             e.printStackTrace();
         }finally {
@@ -72,13 +77,12 @@ public class SmtpUtils extends Thread{
 //                e.printStackTrace();
 //            }
         }
-        return null;
     }
 
-    public void ping(Socket socket){
+    public void ping(String ip, Socket socket){
         try{
             PrintStream ps = new PrintStream(socket.getOutputStream(), true, "euc-kr");
-            ps.print("PING");
+            ps.print("EHLO " + ip);
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -151,7 +155,7 @@ public class SmtpUtils extends Thread{
            // sendLog.print("DATA SEND :: RES :"+br.readLine()+" || ");
             //sendLog.print("QUIT");
             //sendLog.println();
-            ps.print("QUIT"+carriageReturn);
+            //ps.print("QUIT"+carriageReturn);
         } catch (IOException e) {
             e.printStackTrace();
         } finally {

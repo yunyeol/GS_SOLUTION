@@ -24,14 +24,17 @@ public class SmtpApplication {
 
     @Autowired private DomainConnectService domainConnectService;
     private int port = 25;
+    @Autowired private SmtpUtils smtpUtils;
 
     @Bean
     @Async
     public void run(){
         try{
             for(Domain domain : domainConnectService.selectDomainList()){
-                SmtpUtils smtpUtils = new SmtpUtils(getMxDomain(domain.getDomain()), port);
-                smtpUtils.start();
+                //SmtpUtils smtpUtils = new SmtpUtils(getMxDomain(domain.getDomain()), port);
+                smtpUtils.setParams("61.34.243.120", port);
+                smtpUtils.run();
+                log.info("@@@@@@@@@ socket start");
             }
 
         }catch (Exception e){

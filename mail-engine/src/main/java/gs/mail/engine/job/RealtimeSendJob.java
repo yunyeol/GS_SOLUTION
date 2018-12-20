@@ -147,6 +147,9 @@ public class RealtimeSendJob{
                 sqlSessionTemplate.insert("SQL.RealitmeSend.insertRealtimeQueRaw", paramMap);
                 sqlSessionTemplate.delete("SQL.RealitmeSend.deleteMailQueue",paramMap);
 
+                log.info("####### : {}",queueMinId);
+                log.info("####### : {}",queueMaxId);
+
                 return item;
             }
         };
