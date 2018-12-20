@@ -11,12 +11,11 @@ case "$1" in
 	start)
 		if test -s "$APP_PID"
 		then
-			echo "Already $SERVER_NAME Running !" 
+			echo "Already $SERVER_NAME Running !"
 		else
 			echo -n "Starting $SERVER_NAME Agent :"
 			echo
-			$JAVA_HOME/java -jar -D$SERVER_NAME -Xmx$HIP_MEMORY -Xms$HIP_MEMORY -XX:+UseParallelGC -XX:+UseCompressedOops -XX:+PrintFlagsFinal engine-0.0.1-SNAPSHOT.jar 	 > /dev/null 2>&1 &
-			echo $! > $APP_PID
+			 $JAVA_HOME/java -jar -D$SERVER_NAME -Xmx$HIP_MEMORY -Xms$HIP_MEMORY -XX:+UseG1GC -XX:+DisableExplicitGC -Xloggc:/app/source/engine/logs/gc.log  engine-0.0.1-SNAPSHOT.jar        > /dev/null 2>&1 &
 			echo
 		fi
 		;;
@@ -24,7 +23,7 @@ case "$1" in
 	run)
 		echo -n "Start $SERVER_NAME Foreground"
 		echo
-		$JAVA_HOME/java -jar -D$SERVER_NAME -Xmx$HIP_MEMORY -Xms$HIP_MEMORY -XX:+UseParallelGC -XX:+UseCompressedOops -XX:+PrintFlagsFinal engine-0.0.1-SNAPSHOT.jar	
+		$JAVA_HOME/java -jar -D$SERVER_NAME -Xmx$HIP_MEMORY -Xms$HIP_MEMORY -XX:+UseParallelGC -XX:+UseCompressedOops -XX:+PrintFlagsFinal engine-0.0.1-SNAPSHOT.jar
 	;;
 
 	stop)
@@ -36,7 +35,7 @@ case "$1" in
 			kill $SERVER_PID
 			rm -f $APP_PID
 		else
-			echo "No pid file found !" 
+			echo "No pid file found !"
 		fi
 		echo
 	;;

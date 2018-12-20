@@ -8,6 +8,7 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
+import io.netty.handler.stream.ChunkedWriteHandler;
 import io.netty.util.CharsetUtil;
 import io.netty.util.concurrent.DefaultThreadFactory;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +28,7 @@ public class NettyClientConnect {
 
     public NettyClientConnect(Send send){
         try{
-            EventLoopGroup workerGroup = new NioEventLoopGroup(3, new DefaultThreadFactory("worker", true));
+            EventLoopGroup workerGroup = new NioEventLoopGroup(1, new DefaultThreadFactory("worker", true));
 
             Bootstrap bootstrap = new Bootstrap();
             bootstrap.group(workerGroup);
@@ -39,7 +40,8 @@ public class NettyClientConnect {
                 public void initChannel(SocketChannel ch) throws Exception {
                     ch.pipeline()
                             .addLast(new StringDecoder(CharsetUtil.UTF_8), new StringEncoder(CharsetUtil.UTF_8))
-                            .addLast(new NettySmtpHandler());
+                            .addLast(new NettySmtpHandler())
+                            .addLast("ChunkedWriteHandler",new ChunkedWriteHandler());
                 }
             });
 
