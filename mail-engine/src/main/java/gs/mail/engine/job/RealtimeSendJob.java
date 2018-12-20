@@ -43,6 +43,8 @@ public class RealtimeSendJob{
     @Value("${batch.commit.interval}") private int commitInterval;
     @Value("${batch.slave.cnt}") private int slaveCnt;
 
+    @Autowired private SmtpUtils smtpUtils;
+
     @Bean
     public Job realtimeSendJobDetail() {
         try{
@@ -194,8 +196,10 @@ public class RealtimeSendJob{
                             log.info("### : {}, {}, {}, {}, {}",
                                     realtime.toString(), realtime.getContents(), realtime.getTitle(), realtime.getReceiver(), realtime.getSender());
 
+                            smtpUtils.send("R", realtime);
                             //new NettyClientConnect(realtime);
-                            new SmtpUtils("R",realtime);
+//                            SmtpUtils smtpUtils = new SmtpUtils("R",realtime);
+//                            smtpUtils.start();
 //                            NettyClientConnect nettyClientConnect = new NettyClientConnect();
 //                            Channel channel = nettyClientConnect.connect(realtime);
 //                            nettyClientConnect.send(realtime, channel);
