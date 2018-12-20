@@ -118,9 +118,7 @@ public class SmtpUtils{
 
             sendLog.print("QUIT");
             sendLog.println();
-//            pw.println("QUIT");
-//            pw.flush();
-            sendLog.flush();
+            pw.println("QUIT");
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
