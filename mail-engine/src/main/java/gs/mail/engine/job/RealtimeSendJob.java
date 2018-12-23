@@ -1,9 +1,10 @@
 package gs.mail.engine.job;
 
 import gs.mail.engine.dto.Realtime;
-import gs.mail.engine.util.NettyClientConnect;
-import gs.mail.engine.util.SmtpUtils;
-import io.netty.channel.*;
+import gs.mail.engine.dto.Send;
+import gs.mail.engine.util.SmtpConnect;
+import gs.mail.engine.util.SmtpSend;
+import gs.mail.engine.util.SmtpTest;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionTemplate;
@@ -25,11 +26,13 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.TaskExecutor;
 
 import java.io.*;
+import java.net.Socket;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Slf4j
 @Configuration
-public class RealtimeSendJob{
+public class RealtimeSendJob extends SmtpSend {
 
     @Autowired private JobBuilderFactory jobBuilderFactory;
     @Autowired private StepBuilderFactory stepBuilderFactory;
@@ -42,8 +45,6 @@ public class RealtimeSendJob{
 
     @Value("${batch.commit.interval}") private int commitInterval;
     @Value("${batch.slave.cnt}") private int slaveCnt;
-
-    @Autowired private SmtpUtils smtpUtils;
 
     @Bean
     public Job realtimeSendJobDetail() {
@@ -146,10 +147,6 @@ public class RealtimeSendJob{
 
                 sqlSessionTemplate.insert("SQL.RealitmeSend.insertRealtimeQueRaw", paramMap);
                 sqlSessionTemplate.delete("SQL.RealitmeSend.deleteMailQueue",paramMap);
-
-                log.info("####### : {}",queueMinId);
-                log.info("####### : {}",queueMaxId);
-
                 return item;
             }
         };
@@ -178,20 +175,6 @@ public class RealtimeSendJob{
 
                         String htmlContents = sb.toString();
 
-//                        List<String> domainList = new ArrayList<String>();
-//                        for(Realtime realtime : items){
-//                            String domain = realtime.getReceiver();
-//                            if(!domainList.contains(domain.substring(domain.lastIndexOf("@")+1))){
-//                                domainList.add(domain.substring(domain.lastIndexOf("@")+1));
-//                            }
-//                        }
-//
-//                        NettyClientConnect nettyClientConnect = new NettyClientConnect();
-//                        Channel channel = null;
-//                        for(int i=0; i<domainList.size(); i++){
-//                            channel = nettyClientConnect.connect(domainList.get(i).toString());
-//                        }
-
                         int cnt = 0;
                         for(Realtime realtime : items){
                             realtime.setContents(htmlContents.replace("${CONTENTS}", new String(realtime.getContents().getBytes("UTF-8"))));
@@ -199,14 +182,8 @@ public class RealtimeSendJob{
                             log.info("### : {}, {}, {}, {}, {}",
                                     realtime.toString(), realtime.getContents(), realtime.getTitle(), realtime.getReceiver(), realtime.getSender());
 
-                            smtpUtils.send("R", realtime);
-                            //new NettyClientConnect(realtime);
-//                            SmtpUtils smtpUtils = new SmtpUtils("R",realtime);
-//                            smtpUtils.start();
-//                            NettyClientConnect nettyClientConnect = new NettyClientConnect();
-//                            Channel channel = nettyClientConnect.connect(realtime);
-//                            nettyClientConnect.send(realtime, channel);
-//                            channel.closeFuture().sync();
+                            send("R", realtime);
+
                             cnt++;
                         }
 
