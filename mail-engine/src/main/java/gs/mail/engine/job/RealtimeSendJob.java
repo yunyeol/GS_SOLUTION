@@ -1,10 +1,7 @@
 package gs.mail.engine.job;
 
 import gs.mail.engine.dto.Realtime;
-import gs.mail.engine.dto.Send;
-import gs.mail.engine.util.SmtpConnect;
-import gs.mail.engine.util.SmtpSend;
-import gs.mail.engine.util.SmtpTest;
+import gs.mail.engine.util.SmtpSocket;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionTemplate;
@@ -26,13 +23,11 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.TaskExecutor;
 
 import java.io.*;
-import java.net.Socket;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Slf4j
 @Configuration
-public class RealtimeSendJob extends SmtpSend {
+public class RealtimeSendJob extends SmtpSocketContents {
 
     @Autowired private JobBuilderFactory jobBuilderFactory;
     @Autowired private StepBuilderFactory stepBuilderFactory;
@@ -43,8 +38,11 @@ public class RealtimeSendJob extends SmtpSend {
 
     @Autowired private TaskExecutor taskExecutor;
 
+    @Value("${mail.smtp.send.log.path}") String dirPath;
     @Value("${batch.commit.interval}") private int commitInterval;
     @Value("${batch.slave.cnt}") private int slaveCnt;
+
+    private int port = 25;
 
     @Bean
     public Job realtimeSendJobDetail() {
@@ -175,6 +173,25 @@ public class RealtimeSendJob extends SmtpSend {
 
                         String htmlContents = sb.toString();
 
+                        List<String> domainList = new ArrayList<String>();
+                        for(Realtime realtime : items) {
+                            if(!domainList.contains(realtime.getDomain())){
+                                domainList.add(realtime.getDomain());
+                            }
+                        }
+
+                        SmtpSocket smtpSocket = new SmtpSocket();
+//                        Socket socket = null;
+//                        for(int i=0; i<domainList.size(); i++){
+//                            socket = smtpSocket.socketConnect(domainList.get(i), port);
+//                        }
+
+                        log.info("######### socket isClose : {}",socket.isClosed());
+                        log.info("######### socket isConnected : {}",socket.isConnected());
+                        if(socket.isClosed() && !socket.isConnected()){
+                            Thread.sleep(30000);
+                        }
+
                         int cnt = 0;
                         for(Realtime realtime : items){
                             realtime.setContents(htmlContents.replace("${CONTENTS}", new String(realtime.getContents().getBytes("UTF-8"))));
@@ -182,13 +199,13 @@ public class RealtimeSendJob extends SmtpSend {
                             log.info("### : {}, {}, {}, {}, {}",
                                     realtime.toString(), realtime.getContents(), realtime.getTitle(), realtime.getReceiver(), realtime.getSender());
 
-                            send("R", realtime);
-
+                            smtpSocket.socketSend(socket, realtime);
                             cnt++;
                         }
-
-
                         updateSchdlCnt(items.get(0).getSchdlId(), cnt, cnt, 0, 0);
+//                        for(Realtime realtime : items){
+//                            smtpSocketConn.socketResult("R",dirPath, socket, realtime);
+//                        }
                     }else{
                         log.info("Not Exists Contents File");
                         updateSchdlCnt(items.get(0).getSchdlId(), 0, 0, 0, items.size());

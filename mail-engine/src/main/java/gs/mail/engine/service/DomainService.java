@@ -4,6 +4,6 @@ import gs.mail.engine.dto.Domain;
 
 import java.util.List;
 
-public interface DomainConnectService {
+public interface DomainService {
     List<Domain> selectDomainList();
 }

@@ -4,6 +4,7 @@ package gs.mail.engine.job.scheduler;
 
 import gs.mail.engine.job.scheduler.executor.CampaignSendExecutor;
 import gs.mail.engine.job.scheduler.executor.RealtimeSendExecutor;
+import gs.mail.engine.job.scheduler.executor.SmtpSocketExecutor;
 import gs.mail.engine.job.scheduler.executor.TargetExecutor;
 import org.quartz.*;
 import org.quartz.spi.JobFactory;
@@ -19,6 +20,7 @@ public class QuartzJobScheduler {
     @Value("${cron.mail.campaign}") private String campaignCron;
     @Value("${cron.mail.realtime}") private String realtimeCron;
     @Value("${cron.mail.target}") private String targetCron;
+    @Value("${cron.mail.smtp}") private String smtpCron;
 
     @Bean
     public SchedulerFactoryBean quartzScheduler(@Autowired JobFactory jobFactory) throws SchedulerException {
@@ -45,8 +47,14 @@ public class QuartzJobScheduler {
         CronTrigger campaignTrigger = TriggerBuilder.newTrigger().forJob("CampaignSendExecutor").withIdentity("CampaignSendTrigger")
                 .withSchedule(CronScheduleBuilder.cronSchedule(campaignCron)).build();
 
-        schedulerFactoryBean.setJobDetails(realtimeSendJob, targetJob, campaignJob);
-        schedulerFactoryBean.setTriggers(realtimeSendTrigger, targetTrigger, campaignTrigger);
+        //SMTP 소켓 접속
+        JobDetail smtpSocketJob = JobBuilder.newJob(SmtpSocketExecutor.class).withIdentity("SmtpSocketExecutor")
+                .storeDurably(true).build();
+        CronTrigger smtpSocketTrigger = TriggerBuilder.newTrigger().forJob("SmtpSocketExecutor").withIdentity("smtpSocketTrigger")
+                .withSchedule(CronScheduleBuilder.cronSchedule(smtpCron)).build();
+
+        schedulerFactoryBean.setJobDetails(realtimeSendJob, targetJob, campaignJob, smtpSocketJob);
+        schedulerFactoryBean.setTriggers(realtimeSendTrigger, targetTrigger, campaignTrigger, smtpSocketTrigger);
 
         return schedulerFactoryBean;
     }
