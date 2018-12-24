@@ -11,7 +11,7 @@ public class PageMaker {
 //    private int startPage;
 //    private int endPage;
     private int startRow;
-    private int endRow;
+    private int limitRow;
     private int totPage;
     private int totCnt;
 
@@ -26,8 +26,8 @@ public class PageMaker {
     public void setStartRow(int currIdx){
         this.startRow = ( currIdx == 1 ) ? 0 : (currIdx-1) * this.ROW_GROUP;
     }
-    public void setEndRow(){
-        this.endRow = this.ROW_GROUP;
+    public void setLimitRow(){
+        this.limitRow = this.ROW_GROUP;
     }
     public void setTotPage(){
        this.totPage = (int)Math.ceil((double)this.getTotCnt() / this.ROW_GROUP) ;
@@ -36,7 +36,7 @@ public class PageMaker {
 //        this.setStartPage(currIdx);
 //        this.setEndPage(currIdx);
         this.setStartRow(currIdx);
-        this.setEndRow(currIdx);
+        this.setLimitRow();
     }
     public static PageMaker getInstance(){
         return new PageMaker();

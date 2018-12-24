@@ -78,29 +78,36 @@
             UPT_DATE
         FROM
             GS_ADDRESS_MBR GAM
-        WHERE ADDRESS_GRP_ID = ${addrGrpId};
+        WHERE ADDRESS_GRP_ID = #{addrGrpId}
+        <if test='isPaging != null and isPaging == "Y"'>
+        LIMIT #{startRow},#{limitRow}
+        </if>
+    </select>
+
+    <select id="getReceiverDeatilCnt" resultType="int">
+      SELECT COUNT(1) FROM GS_ADDRESS_MBR
+      WHERE ADDRESS_GRP_ID = #{addrGrpId}
     </select>
 
     <insert id="insertReceiverDetail">
         INSERT INTO GS_ADDRESS_MBR
         (ADDRESS_GRP_ID, NAME, ADDRESS, DATA1, DATA2, DATA3, REG_DATE, UPT_DATE)
-        VALUES(#{addrMbrId}, #{name}, #{address}, #{telNumber}, '', '', now(), now());
-
+        VALUES(#{addrMbrId}, #{name}, #{address}, #{telNumber}, '', '', now(), now())
     </insert>
     <update id="updateReceiverDetail" parameterType="Receiver">
         UPDATE GS_ADDRESS_MBR
         SET NAME=#{name}, ADDRESS=#{address}, DATA1=#{telNumber}
-        WHERE ADDRESS_MBR_ID=#{addrMbrId};
+        WHERE ADDRESS_MBR_ID=#{addrMbrId}
     </update>
     <delete id="deleteReceiverDetail" parameterType="long">
         DELETE FROM GS_ADDRESS_MBR
-        WHERE ADDRESS_MBR_ID=#{addrMbrId};
+        WHERE ADDRESS_MBR_ID=#{addrMbrId}
     </delete>
 
     <sql id="condition">
         <where>
             <if test=" addrGrpName != null and addrGrpName != '' ">
-                ADDRESS_GRP_NAME = #{addrGrpName};
+                ADDRESS_GRP_NAME = #{addrGrpName}
             </if>
         </where>
     </sql>
