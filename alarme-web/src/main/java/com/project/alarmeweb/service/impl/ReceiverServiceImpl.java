@@ -46,11 +46,13 @@ public class ReceiverServiceImpl implements ReceiverService {
 
         Map params = new HashMap<String, Object>();
         params.put("isPaging", "Y");
+        params.put("addrGrpId", addrGrpId);
         params.put("startRow",pageMaker.getStartRow());
-        params.put("endRow",pageMaker.getEndRow());
+        params.put("limitRow",pageMaker.getLimitRow());
 
-        List<Receiver> receivDetailList = receiverMapper.getReceiverDeatil(addrGrpId);
-
+        List<Receiver> receivDetailList = receiverMapper.getReceiverDeatil(params);
+        pageMaker.setTotCnt( receiverMapper.getReceiverDeatilCnt(addrGrpId) );
+        pageMaker.setTotPage();
         pageMaker.setContentList( !CollectionUtils.isEmpty(receivDetailList) ? receivDetailList : new ArrayList<Receiver>() );
 
         return pageMaker;
