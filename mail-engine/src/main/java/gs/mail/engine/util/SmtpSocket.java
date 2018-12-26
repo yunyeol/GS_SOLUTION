@@ -13,18 +13,20 @@ import java.util.List;
 @Slf4j
 public class SmtpSocket {
 
-    public Socket socketConnect(String domain, int port){
+    protected static Socket socket;
+
+    protected void socketConnect(String domain, int port){
         try {
             //Socket socket = new Socket(getMxDomain(domain), port);
-            Socket socket = new Socket("119.207.76.55", port);
-            return socket;
+            //if( socket == null) {
+                socket = new Socket("119.207.76.55", port);
+            //}
         }catch (Exception e){
             e.printStackTrace();
         }
-        return null;
     }
 
-    public void socketSend(Socket socket, Send send){
+    protected void socketSend(Socket socket, Send send){
         String carriageReturn = "\r\n";
         PrintStream ps = null;
         try {
@@ -71,7 +73,7 @@ public class SmtpSocket {
         }
     }
 
-    public void socketResult(String gubun , String dirPath, Socket socket, Send send){
+    protected void socketResult(String gubun , String dirPath, Socket socket, Send send){
         PrintWriter sendLog = null;
 
         try {

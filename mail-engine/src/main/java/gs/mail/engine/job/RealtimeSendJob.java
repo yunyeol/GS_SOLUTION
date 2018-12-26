@@ -23,11 +23,12 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.TaskExecutor;
 
 import java.io.*;
+import java.net.Socket;
 import java.util.*;
 
 @Slf4j
 @Configuration
-public class RealtimeSendJob extends SmtpSocketContents {
+public class RealtimeSendJob extends SmtpSocket {
 
     @Autowired private JobBuilderFactory jobBuilderFactory;
     @Autowired private StepBuilderFactory stepBuilderFactory;
@@ -180,17 +181,14 @@ public class RealtimeSendJob extends SmtpSocketContents {
                             }
                         }
 
-                        SmtpSocket smtpSocket = new SmtpSocket();
-//                        Socket socket = null;
-//                        for(int i=0; i<domainList.size(); i++){
-//                            socket = smtpSocket.socketConnect(domainList.get(i), port);
-//                        }
-
-                        log.info("######### socket isClose : {}",socket.isClosed());
-                        log.info("######### socket isConnected : {}",socket.isConnected());
-                        if(socket.isClosed() && !socket.isConnected()){
-                            Thread.sleep(30000);
+                        Socket socket = null;
+                        for(int i=0; i<domainList.size(); i++){
+                            //socketConnect(domainList.get(i).toString(), port);
+                            socket = new Socket("119.207.76.55", port);
                         }
+
+//                        log.info("######### socket isClose : {}",socket.isClosed());
+//                        log.info("######### socket isConnected : {}",socket.isConnected());
 
                         int cnt = 0;
                         for(Realtime realtime : items){
@@ -199,7 +197,7 @@ public class RealtimeSendJob extends SmtpSocketContents {
                             log.info("### : {}, {}, {}, {}, {}",
                                     realtime.toString(), realtime.getContents(), realtime.getTitle(), realtime.getReceiver(), realtime.getSender());
 
-                            smtpSocket.socketSend(socket, realtime);
+                            socketSend(socket, realtime);
                             cnt++;
                         }
                         updateSchdlCnt(items.get(0).getSchdlId(), cnt, cnt, 0, 0);

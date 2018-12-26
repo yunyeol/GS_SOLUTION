@@ -4,7 +4,6 @@ package gs.mail.engine.job.scheduler;
 
 import gs.mail.engine.job.scheduler.executor.CampaignSendExecutor;
 import gs.mail.engine.job.scheduler.executor.RealtimeSendExecutor;
-import gs.mail.engine.job.scheduler.executor.SmtpSocketExecutor;
 import gs.mail.engine.job.scheduler.executor.TargetExecutor;
 import org.quartz.*;
 import org.quartz.spi.JobFactory;
@@ -47,14 +46,8 @@ public class QuartzJobScheduler {
         CronTrigger campaignTrigger = TriggerBuilder.newTrigger().forJob("CampaignSendExecutor").withIdentity("CampaignSendTrigger")
                 .withSchedule(CronScheduleBuilder.cronSchedule(campaignCron)).build();
 
-        //SMTP 소켓 접속
-        JobDetail smtpSocketJob = JobBuilder.newJob(SmtpSocketExecutor.class).withIdentity("SmtpSocketExecutor")
-                .storeDurably(true).build();
-        CronTrigger smtpSocketTrigger = TriggerBuilder.newTrigger().forJob("SmtpSocketExecutor").withIdentity("smtpSocketTrigger")
-                .withSchedule(CronScheduleBuilder.cronSchedule(smtpCron)).build();
-
-        schedulerFactoryBean.setJobDetails(realtimeSendJob, targetJob, campaignJob, smtpSocketJob);
-        schedulerFactoryBean.setTriggers(realtimeSendTrigger, targetTrigger, campaignTrigger, smtpSocketTrigger);
+        schedulerFactoryBean.setJobDetails(realtimeSendJob, targetJob, campaignJob);
+        schedulerFactoryBean.setTriggers(realtimeSendTrigger, targetTrigger, campaignTrigger);
 
         return schedulerFactoryBean;
     }
