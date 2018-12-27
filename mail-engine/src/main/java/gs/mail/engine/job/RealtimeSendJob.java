@@ -181,14 +181,15 @@ public class RealtimeSendJob extends SmtpSocket {
                             }
                         }
 
-                        Socket socket = null;
-                        for(int i=0; i<domainList.size(); i++){
-                            //socketConnect(domainList.get(i).toString(), port);
+//                        Socket socket = null;
+//                        for(int i=0; i<domainList.size(); i++){
+//                            //socketConnect(domainList.get(i).toString(), port);
+//                            socket = new Socket("119.207.76.55", port);
+//                        }
+
+                        if(socket == null || socket.isClosed()){
                             socket = new Socket("119.207.76.55", port);
                         }
-
-//                        log.info("######### socket isClose : {}",socket.isClosed());
-//                        log.info("######### socket isConnected : {}",socket.isConnected());
 
                         int cnt = 0;
                         for(Realtime realtime : items){
@@ -197,7 +198,7 @@ public class RealtimeSendJob extends SmtpSocket {
                             log.info("### : {}, {}, {}, {}, {}",
                                     realtime.toString(), realtime.getContents(), realtime.getTitle(), realtime.getReceiver(), realtime.getSender());
 
-                            socketSend(socket, realtime);
+                            socketSend("R", dirPath, socket, realtime);
                             cnt++;
                         }
                         updateSchdlCnt(items.get(0).getSchdlId(), cnt, cnt, 0, 0);

@@ -11,38 +11,49 @@ import java.util.Date;
 import java.util.List;
 
 @Slf4j
-public class SmtpSocket {
+public class SmtpSocket extends Thread{
 
     protected static Socket socket;
 
-    protected void socketConnect(String domain, int port){
-        try {
-            //Socket socket = new Socket(getMxDomain(domain), port);
-            //if( socket == null) {
-                socket = new Socket("119.207.76.55", port);
-            //}
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-    }
-
-    protected void socketSend(Socket socket, Send send){
+    protected void socketSend(String gubun, String dirPath, Socket socket, Send send){
         String carriageReturn = "\r\n";
         PrintStream ps = null;
+        PrintWriter sendLog = null;
+
         try {
             ps = new PrintStream(socket.getOutputStream(), true, "euc-kr");
+            BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream(), "euc-kr"));
+
+            String fileDir = dirPath;
+            if (gubun.equals("C")) {
+                fileDir = fileDir + "campaign";
+            } else if (gubun.equals("R")) {
+                fileDir = fileDir + "realtime";
+            }
+
+            Date today = new Date();
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHH");
+
+            File dir = new File(fileDir);
+            if (!dir.exists()) {
+                dir.mkdirs();
+            }
+
+            log.info("#### dirPathtest : {}", dirPath);
+            File file = new File(fileDir + "/sendLog_" + sdf.format(today) + ".log");
+            sendLog = new PrintWriter(new BufferedWriter(new FileWriter(file, true)), true);
 
             ps.print("HELO "+send.getReceiver().substring(send.getReceiver().indexOf("@")+1)+carriageReturn );
-            //sendLog.print("HELO_RES:"+br.readLine()+" || ");
+            sendLog.print("HELO_RES:"+br.readLine()+" || ");
 
             ps.print("MAIL FROM: <"+send.getSender()+">"+carriageReturn);
-            //sendLog.print("MAIL_FROM_RES:"+br.readLine()+" || ");
+            sendLog.print("MAIL_FROM_RES:"+br.readLine()+" || ");
 
             ps.print("RCPT TO:<"+send.getReceiver()+">"+carriageReturn);
-            //sendLog.print("RCPT_TO_RES:"+br.readLine()+" || ");
+            sendLog.print("RCPT_TO_RES:"+br.readLine()+" || ");
 
             ps.print("DATA"+carriageReturn);
-            //sendLog.print("DATA_RES :"+br.readLine()+" || ");
+            sendLog.print("DATA_RES :"+br.readLine()+" || ");
             ps.print("Mime-Version: 1.0"+carriageReturn);
             ps.print("Content-Type:text/html;charset=euc-kr"+carriageReturn);
             ps.print("Content-Transfer-Encoding:8bit"+carriageReturn);
@@ -54,7 +65,7 @@ public class SmtpSocket {
             ps.print(send.getContents()+carriageReturn);
             ps.print("."+carriageReturn);
 
-            //sendLog.print("DATA_SEND_RES:"+br.readLine()+" || ");
+            sendLog.print("DATA_SEND_RES:"+br.readLine()+" || ");
 
 //            sendLog.print("UUID:"+send.getUuid()+" || ");
 //            while (br.readLine() != null){
@@ -62,10 +73,10 @@ public class SmtpSocket {
 //            }
 //            sendLog.print(carriageReturn);
 
-            // sendLog.print("DATA SEND :: RES :"+br.readLine()+" || ");
-            //sendLog.print("QUIT");
-            //sendLog.println();
-            //ps.print("QUIT"+carriageReturn);
+            sendLog.print("DATA SEND :: RES :"+br.readLine()+" || ");
+            sendLog.print("QUIT");
+            sendLog.println();
+            ps.print("QUIT"+carriageReturn);
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
