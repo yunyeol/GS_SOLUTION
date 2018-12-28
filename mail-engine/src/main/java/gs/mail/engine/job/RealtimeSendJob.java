@@ -28,7 +28,7 @@ import java.util.*;
 
 @Slf4j
 @Configuration
-public class RealtimeSendJob extends SmtpSocket {
+public class RealtimeSendJob {
 
     @Autowired private JobBuilderFactory jobBuilderFactory;
     @Autowired private StepBuilderFactory stepBuilderFactory;
@@ -38,6 +38,8 @@ public class RealtimeSendJob extends SmtpSocket {
     @Autowired private SqlSessionFactory sqlSessionFactory;
 
     @Autowired private TaskExecutor taskExecutor;
+
+    @Autowired private SmtpSocket smtpSocket;
 
     @Value("${mail.smtp.send.log.path}") String dirPath;
     @Value("${batch.commit.interval}") private int commitInterval;
@@ -181,30 +183,29 @@ public class RealtimeSendJob extends SmtpSocket {
                             }
                         }
 
-//                        Socket socket = null;
-//                        for(int i=0; i<domainList.size(); i++){
-//                            //socketConnect(domainList.get(i).toString(), port);
-//                            socket = new Socket("119.207.76.55", port);
-//                        }
-
-                        if(socket == null || socket.isClosed()){
+                        Socket socket = null;
+                        for(int i=0; i<domainList.size(); i++){
+                            //socketConnect(domainList.get(i).toString(), port);
                             socket = new Socket("119.207.76.55", port);
                         }
 
                         int cnt = 0;
+
                         for(Realtime realtime : items){
                             realtime.setContents(htmlContents.replace("${CONTENTS}", new String(realtime.getContents().getBytes("UTF-8"))));
 
                             log.info("### : {}, {}, {}, {}, {}",
                                     realtime.toString(), realtime.getContents(), realtime.getTitle(), realtime.getReceiver(), realtime.getSender());
 
-                            socketSend("R", dirPath, socket, realtime);
+                            //Socket socket = new Socket("119.207.76.55", port);
+                            smtpSocket.socketSend("R", dirPath, socket, realtime);
+
                             cnt++;
                         }
+
                         updateSchdlCnt(items.get(0).getSchdlId(), cnt, cnt, 0, 0);
-//                        for(Realtime realtime : items){
-//                            smtpSocketConn.socketResult("R",dirPath, socket, realtime);
-//                        }
+
+                        if(socket!=null) socket.close();
                     }else{
                         log.info("Not Exists Contents File");
                         updateSchdlCnt(items.get(0).getSchdlId(), 0, 0, 0, items.size());

@@ -17,7 +17,6 @@ public class QuartzJobScheduler {
     @Value("${cron.mail.campaign}") private String campaignCron;
     @Value("${cron.mail.realtime}") private String realtimeCron;
     @Value("${cron.mail.target}") private String targetCron;
-    @Value("${cron.mail.socket}") private String socketCron;
 
 
     @Bean
@@ -45,14 +44,8 @@ public class QuartzJobScheduler {
         CronTrigger campaignTrigger = TriggerBuilder.newTrigger().forJob("CampaignSendExecutor").withIdentity("CampaignSendTrigger")
                 .withSchedule(CronScheduleBuilder.cronSchedule(campaignCron)).build();
 
-        //소켓
-        JobDetail socketJob = JobBuilder.newJob(SocketExecutor.class).withIdentity("SocketExecutor")
-                .storeDurably(true).build();
-        CronTrigger socketTrgger = TriggerBuilder.newTrigger().forJob("SocketExecutor").withIdentity("socketTrgger")
-                .withSchedule(CronScheduleBuilder.cronSchedule(socketCron)).build();
-
-        schedulerFactoryBean.setJobDetails(realtimeSendJob, targetJob, campaignJob, socketJob);
-        schedulerFactoryBean.setTriggers(realtimeSendTrigger, targetTrigger, campaignTrigger, socketTrgger);
+        schedulerFactoryBean.setJobDetails(realtimeSendJob, targetJob, campaignJob);
+        schedulerFactoryBean.setTriggers(realtimeSendTrigger, targetTrigger, campaignTrigger);
 
         return schedulerFactoryBean;
     }
