@@ -15,7 +15,26 @@ import java.util.List;
 @Component
 public class SmtpSocket {
 
-    //protected static Socket socket;
+    protected static Socket socket;
+    protected static int port = 25;
+
+    protected void connection(String domain){
+        try {
+            if(socket != null){
+                BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream(), "euc-kr"));
+                if(br != null && br.readLine() == null){
+                    socket.close();
+                }
+            }
+
+            if((socket == null || socket.isClosed())){
+                //socket = new Socket(getMxDomain(domain), port);
+                socket = new Socket("119.207.76.55", port);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
 
     public String socketPing(Socket socket, Send send){
         String carriageReturn = "\r\n";
@@ -38,14 +57,23 @@ public class SmtpSocket {
         return null;
     }
 
-    public void socketSend(String gubun, String dirPath, Socket socket, Send send){
+    private void setDir(String gubun){
+        try {
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+    }
+
+    protected void socketSend(String gubun, String dirPath, Send send){
         String carriageReturn = "\r\n";
         PrintStream ps = null;
         PrintWriter sendLog = null;
 
         try {
-            ps = new PrintStream(socket.getOutputStream(), true, "euc-kr");
-            //BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream(), "euc-kr"));
+            ps = new PrintStream(socket.getOutputStream(), false, "euc-kr");
+            BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream(), "euc-kr"));
 
             String fileDir = dirPath;
             if (gubun.equals("C")) {
@@ -67,16 +95,20 @@ public class SmtpSocket {
             sendLog = new PrintWriter(new BufferedWriter(new FileWriter(file, true)), true);
             sendLog.print("UUID:"+send.getUuid()+" || ");
             ps.print("HELO "+send.getReceiver().substring(send.getReceiver().indexOf("@")+1)+carriageReturn );
-           // sendLog.print("HELO_RES:"+br.readLine()+" || ");
+            sendLog.print("HELO_RES:"+br.readLine()+" || ");
+            log.info("######### HELO : {}", send.getReceiver().substring(send.getReceiver().indexOf("@")+1)+carriageReturn);
 
             ps.print("MAIL FROM: <"+send.getSender()+">"+carriageReturn);
-           // sendLog.print("MAIL_FROM_RES:"+br.readLine()+" || ");
+            sendLog.print("MAIL_FROM_RES:"+br.readLine()+" || ");
+            log.info("######### MAIL FROM : <{}>", send.getSender()+carriageReturn);
+
 
             ps.print("RCPT TO:<"+send.getReceiver()+">"+carriageReturn);
-            //sendLog.print("RCPT_TO_RES:"+br.readLine()+" || ");
+            sendLog.print("RCPT_TO_RES:"+br.readLine()+" || ");
+            log.info("######### RCPT TO : <{}>", send.getReceiver()+carriageReturn);
 
             ps.print("DATA"+carriageReturn);
-            //sendLog.print("DATA_RES :"+br.readLine()+" || ");
+            sendLog.print("DATA_RES :"+br.readLine()+" || ");
             ps.print("Mime-Version: 1.0"+carriageReturn);
             ps.print("Content-Type:text/html;charset=euc-kr"+carriageReturn);
             ps.print("Content-Transfer-Encoding:8bit"+carriageReturn);
@@ -89,11 +121,11 @@ public class SmtpSocket {
             ps.print("."+carriageReturn);
             //ps.print("QUIT"+carriageReturn);
             ps.flush();
-            //sendLog.print("DATA_SEND_RES:"+br.readLine()+" || ");
+            sendLog.print("DATA_SEND_RES:"+br.readLine()+" || ");
 
-            //sendLog.print("SEND :: RES :"+br.readLine()+" || ");
-            //sendLog.print("QUIT");
-           // sendLog.println();
+            sendLog.print("SEND :: RES :"+br.readLine()+" || ");
+            sendLog.print("QUIT");
+            sendLog.println();
         } catch (IOException e) {
             e.printStackTrace();
         }

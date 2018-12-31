@@ -28,7 +28,7 @@ import java.util.*;
 
 @Slf4j
 @Configuration
-public class RealtimeSendJob {
+public class RealtimeSendJob extends SmtpSocket{
 
     @Autowired private JobBuilderFactory jobBuilderFactory;
     @Autowired private StepBuilderFactory stepBuilderFactory;
@@ -39,13 +39,9 @@ public class RealtimeSendJob {
 
     @Autowired private TaskExecutor taskExecutor;
 
-    @Autowired private SmtpSocket smtpSocket;
-
     @Value("${mail.smtp.send.log.path}") String dirPath;
     @Value("${batch.commit.interval}") private int commitInterval;
     @Value("${batch.slave.cnt}") private int slaveCnt;
-
-    private int port = 25;
 
     @Bean
     public Job realtimeSendJobDetail() {
@@ -183,29 +179,24 @@ public class RealtimeSendJob {
                             }
                         }
 
-                        Socket socket = null;
+//                        Socket socket = null;
                         for(int i=0; i<domainList.size(); i++){
-                            //socketConnect(domainList.get(i).toString(), port);
-                            socket = new Socket("119.207.76.55", port);
+                            connection(domainList.get(i));
                         }
 
                         int cnt = 0;
-
                         for(Realtime realtime : items){
                             realtime.setContents(htmlContents.replace("${CONTENTS}", new String(realtime.getContents().getBytes("UTF-8"))));
 
                             log.info("### : {}, {}, {}, {}, {}",
                                     realtime.toString(), realtime.getContents(), realtime.getTitle(), realtime.getReceiver(), realtime.getSender());
 
-                            //Socket socket = new Socket("119.207.76.55", port);
-                            smtpSocket.socketSend("R", dirPath, socket, realtime);
+                            socketSend("R", dirPath, realtime);
 
                             cnt++;
                         }
 
                         updateSchdlCnt(items.get(0).getSchdlId(), cnt, cnt, 0, 0);
-
-                        if(socket!=null) socket.close();
                     }else{
                         log.info("Not Exists Contents File");
                         updateSchdlCnt(items.get(0).getSchdlId(), 0, 0, 0, items.size());
