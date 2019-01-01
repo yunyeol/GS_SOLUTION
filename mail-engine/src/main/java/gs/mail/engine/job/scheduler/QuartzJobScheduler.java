@@ -17,7 +17,6 @@ public class QuartzJobScheduler {
     @Value("${cron.mail.campaign}") private String campaignCron;
     @Value("${cron.mail.realtime}") private String realtimeCron;
     @Value("${cron.mail.target}") private String targetCron;
-    @Value("${cron.mail.socket}") private String socketCron;
 
     @Bean
     public SchedulerFactoryBean quartzScheduler(@Autowired JobFactory jobFactory) throws SchedulerException {
@@ -44,14 +43,8 @@ public class QuartzJobScheduler {
         CronTrigger campaignTrigger = TriggerBuilder.newTrigger().forJob("CampaignSendExecutor").withIdentity("CampaignSendTrigger")
                 .withSchedule(CronScheduleBuilder.cronSchedule(campaignCron)).build();
 
-        //소켓연동
-        JobDetail socketJob = JobBuilder.newJob(SocketExecutor.class).withIdentity("SocketExecutor")
-                .storeDurably(true).build();
-        CronTrigger socketTrigger = TriggerBuilder.newTrigger().forJob("SocketExecutor").withIdentity("SocketTrigger")
-                .withSchedule(CronScheduleBuilder.cronSchedule(socketCron)).build();
-
-        schedulerFactoryBean.setJobDetails(realtimeSendJob, targetJob, campaignJob, socketJob);
-        schedulerFactoryBean.setTriggers(realtimeSendTrigger, targetTrigger, campaignTrigger, socketTrigger);
+        schedulerFactoryBean.setJobDetails(realtimeSendJob, targetJob, campaignJob);
+        schedulerFactoryBean.setTriggers(realtimeSendTrigger, targetTrigger, campaignTrigger);
 
         return schedulerFactoryBean;
     }

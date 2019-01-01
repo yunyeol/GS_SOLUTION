@@ -172,18 +172,6 @@ public class RealtimeSendJob extends SmtpSocket{
 
                         String htmlContents = sb.toString();
 
-                        List<String> domainList = new ArrayList<String>();
-                        for(Realtime realtime : items) {
-                            if(!domainList.contains(realtime.getDomain())){
-                                domainList.add(realtime.getDomain());
-                            }
-                        }
-
-//                        Socket socket = null;
-                        for(int i=0; i<domainList.size(); i++){
-                            connection(domainList.get(i));
-                        }
-
                         int cnt = 0;
                         for(Realtime realtime : items){
                             realtime.setContents(htmlContents.replace("${CONTENTS}", new String(realtime.getContents().getBytes("UTF-8"))));
@@ -191,8 +179,14 @@ public class RealtimeSendJob extends SmtpSocket{
                             log.info("### : {}, {}, {}, {}, {}",
                                     realtime.toString(), realtime.getContents(), realtime.getTitle(), realtime.getReceiver(), realtime.getSender());
 
-                            socketSend("R", dirPath, realtime);
+                            String domain = realtime.getReceiver().substring(realtime.getReceiver().indexOf("@")+1);
+                            //Socket socket = new Socket(getMxDomain(domain), port);
+                            Socket socket = new Socket("119.207.76.55", port);
+                            socketSend(socket,"R", dirPath, realtime);
 
+                            if(socket != null) {
+                                socket.close();
+                            }
                             cnt++;
                         }
 
@@ -209,7 +203,7 @@ public class RealtimeSendJob extends SmtpSocket{
                             sqlSessionTemplate.update("SQL.RealitmeSend.updateFailSchdlRaw", paramMap);
                         }
                     }
-                }catch(Exception e){
+                }catch(Exception e) {
                     e.printStackTrace();
                 }
             }
@@ -219,7 +213,7 @@ public class RealtimeSendJob extends SmtpSocket{
 
     @Bean
     @JobScope
-    protected Partitioner realtimePartitioner(@Value("#{jobParameters['schdlId']}") Long schdlId){
+    public Partitioner realtimePartitioner(@Value("#{jobParameters['schdlId']}") Long schdlId){
         Partitioner partitioner = new Partitioner() {
             @Override
             public Map<String, ExecutionContext> partition(int gridSize) {

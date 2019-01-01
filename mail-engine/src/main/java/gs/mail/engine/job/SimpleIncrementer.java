@@ -7,8 +7,6 @@ import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.JobParametersIncrementer;
 import org.springframework.stereotype.Component;
 
-import java.util.Map;
-
 @Slf4j
 @Component
 public class SimpleIncrementer implements JobParametersIncrementer {

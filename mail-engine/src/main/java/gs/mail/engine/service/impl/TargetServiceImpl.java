@@ -1,7 +1,6 @@
 package gs.mail.engine.service.impl;
 
 import gs.mail.engine.dto.Target;
-import gs.mail.engine.service.RealtimeSendService;
 import gs.mail.engine.service.TargetService;
 import lombok.extern.slf4j.Slf4j;
 import org.mybatis.spring.SqlSessionTemplate;
