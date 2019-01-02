@@ -50,6 +50,7 @@ public class RealtimeSendJob extends SmtpSocket{
                     .incrementer(simpleIncrementer)
                     .start(realtimeSchdlTasklet())
                     .next(realtimeMasterSendStep())
+                    .listener(realtimeSendListener())
                     .build();
 
         }catch(Exception e){
@@ -181,8 +182,9 @@ public class RealtimeSendJob extends SmtpSocket{
 
                             String domain = realtime.getReceiver().substring(realtime.getReceiver().indexOf("@")+1);
                             //Socket socket = new Socket(getMxDomain(domain), port);
-                            Socket socket = new Socket("119.207.76.55", port);
-                            socketSend(socket,"R", dirPath, realtime);
+                            Socket socket = new Socket("119.207.76.55", port); //humuson
+                            //Socket socket = new Socket("125.209.249.6", port); //naver
+                            String resultCode = socketSend(socket,"R", dirPath, realtime);
 
                             if(socket != null) {
                                 socket.close();
@@ -204,11 +206,33 @@ public class RealtimeSendJob extends SmtpSocket{
                         }
                     }
                 }catch(Exception e) {
+                    updateSchdlCnt(items.get(0).getSchdlId(), 0, 0, 0, items.size());
                     e.printStackTrace();
                 }
             }
         };
         return  writer;
+    }
+
+    @Bean
+    @JobScope
+    public JobExecutionListener realtimeSendListener() throws Exception{
+        JobExecutionListener jobExecutionListener = new JobExecutionListener() {
+            @Override
+            public void beforeJob(JobExecution jobExecution) {
+            }
+
+            @Override
+            public void afterJob(JobExecution jobExecution) {
+                try{
+                    
+                }catch(Exception e){
+                    e.printStackTrace();
+                }
+            }
+        };
+
+        return jobExecutionListener;
     }
 
     @Bean

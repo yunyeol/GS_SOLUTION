@@ -10,18 +10,22 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 
 @Slf4j
 public class SmtpSocket {
     protected static int port = 25;
 
-    protected void socketSend(Socket socket, String gubun, String dirPath, Send send){
-        try{
-            String carriageReturn = "\r\n";
+    protected String socketSend(Socket socket, String gubun, String dirPath, Send send){
+        String carriageReturn = "\r\n";
+        PrintStream ps = null;
+        BufferedReader br = null;
+        PrintWriter sendLog = null;
 
+        try{
             synchronized( this ) {
-                PrintStream ps = new PrintStream(socket.getOutputStream(), true, "euc-kr");
-                BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream(), "euc-kr"));
+                ps = new PrintStream(socket.getOutputStream(), true, "euc-kr");
+                br = new BufferedReader(new InputStreamReader(socket.getInputStream(), "euc-kr"));
 
                 String fileDir = dirPath;
                 if (gubun.equals("C")) {
@@ -39,7 +43,7 @@ public class SmtpSocket {
                 }
 
                 File file = new File(fileDir + "/sendLog_" + sdf.format(today) + ".log");
-                PrintWriter sendLog = new PrintWriter(new BufferedWriter(new FileWriter(file, true)), true);
+                sendLog = new PrintWriter(new BufferedWriter(new FileWriter(file, true)), true);
 
                 sendLog.print("UUID:"+send.getUuid()+" || ");
                 ps.print("HELO "+send.getReceiver().substring(send.getReceiver().indexOf("@")+1)+carriageReturn );
@@ -63,7 +67,7 @@ public class SmtpSocket {
                 ps.print(carriageReturn);
                 ps.print(send.getContents()+carriageReturn);
                 ps.print("."+carriageReturn);
-                //ps.print("QUIT"+carriageReturn);
+                ps.print("QUIT"+carriageReturn);
                 ps.flush();
 
                 sendLog.print("DATA_SEND_RES:"+br.readLine()+" || ");
@@ -71,10 +75,21 @@ public class SmtpSocket {
                 sendLog.print("SEND :: RES :"+br.readLine()+" || ");
                 sendLog.print("QUIT");
                 sendLog.println();
+
+                return br.readLine();
             }
         }catch (Exception e){
             e.printStackTrace();
+        }finally {
+//            try {
+//                if(sendLog != null) sendLog.close();
+//                if(br != null) br.close();
+//                if(ps != null) ps.close();
+//            }catch (Exception e){
+//                e.printStackTrace();
+//            }
         }
+        return null;
     }
 
     public String getMxDomain(String receiver){
@@ -88,14 +103,24 @@ public class SmtpSocket {
             List<String> domainList = new ArrayList();
             String line = "";
             while ((line = br.readLine()) != null){
-                if(line.contains("internet address")){
-                    domainList.add(line.substring(line.indexOf("internet address") + 19));
+                if(line.contains("mail exchanger")){
+                    String searchDomain = line.substring(line.indexOf("mail exchanger") + 20, line.length()-1);
+                    String dotRemoveDomain = domain.substring(0, domain.indexOf("."));
+                    if(dotRemoveDomain.equals("gmail")){
+                        dotRemoveDomain = "google";
+                    }
+
+                    if(searchDomain.contains(dotRemoveDomain)){
+                        domainList.add(searchDomain);
+                    }
                 }
             }
             br.close();
             in.close();
 
-            return domainList.get(0).toString();
+            Random random = new Random();
+            log.info("send Domain : {}", domainList.get(random.nextInt(domainList.size())));
+            return domainList.get(random.nextInt(domainList.size()));
         }catch (Exception e){
             e.printStackTrace();
             return null;
