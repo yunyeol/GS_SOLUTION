@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="SQL.Send">
+    <select id="selectResultFileInfo" parameterType="Long" resultType="Send">
+    <![CDATA[
+        SELECT
+            LOG_FILE_NAME logFileName,
+            LINE_NUMBER lineNumber
+        FROM GS_SEND_SCHDL
+        WHERE MASTER_SCHDL_ID = ${schdlId}
+        AND SEND_TYPE='R_S'
+        AND DATE_FORMAT(RESERVE_DATE, '%Y%m%d') = DATE_FORMAT(NOW(), '%Y%m%d');
+    ]]>
+    </select>
+</mapper>
+

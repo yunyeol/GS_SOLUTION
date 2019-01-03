@@ -1,6 +1,7 @@
 package gs.mail.engine.job;
 
 import gs.mail.engine.dto.Realtime;
+import gs.mail.engine.dto.Send;
 import gs.mail.engine.util.SmtpSocket;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.session.SqlSessionFactory;
@@ -24,6 +25,12 @@ import org.springframework.core.task.TaskExecutor;
 
 import java.io.*;
 import java.net.Socket;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.*;
 
 @Slf4j
@@ -185,6 +192,7 @@ public class RealtimeSendJob extends SmtpSocket{
                             Socket socket = new Socket("119.207.76.55", port); //humuson
                             //Socket socket = new Socket("125.209.249.6", port); //naver
                             String resultCode = socketSend(socket,"R", dirPath, realtime);
+                            log.info("resultCode : {}", resultCode);
 
                             if(socket != null) {
                                 socket.close();
@@ -220,12 +228,71 @@ public class RealtimeSendJob extends SmtpSocket{
         JobExecutionListener jobExecutionListener = new JobExecutionListener() {
             @Override
             public void beforeJob(JobExecution jobExecution) {
+
             }
 
             @Override
             public void afterJob(JobExecution jobExecution) {
                 try{
-                    
+                    long schdlId = jobExecution.getJobParameters().getLong("schdlId");
+                    log.info("#### : {}",schdlId);
+
+                    Send send = new Send();
+                    HashMap<String, Object> paramMap = new HashMap<String, Object>();
+                    paramMap.put("schdlId", schdlId);
+                    send = sqlSessionTemplate.selectOne("SQL.Send.selectResultFileInfo", paramMap);
+
+                    RandomAccessFile raf = null;
+                    String line = null;
+                    if(send != null){
+                        log.info("#### selectMap fileName : {}", send.getLogFileName() );
+                        log.info("#### selectMap lineNumber : {}", send.getLineNumber());
+
+                        String fileDir = dirPath;
+//                        if (gubun.equals("C")) {
+//                            fileDir = fileDir + "campaign";
+//                        } else if (gubun.equals("R")) {
+                            fileDir = fileDir + "realtime/";
+                        //}
+
+                        //null 아니면 해당파일을 lineNumber 다음부터 읽는다.
+                        if(send.getLogFileName() != null){
+                            File file = new File(fileDir+send.getLogFileName());
+
+//                            FileChannel fileChannel = FileChannel.open(Paths.get(fileDir+send.getLogFileName()), StandardOpenOption.READ);
+//                            ByteBuffer byteBuffer = ByteBuffer.allocate(1024);
+//                            Charset charset = Charset.defaultCharset();
+//
+//                            int byteCount = -1;
+//                            while((byteCount = fileChannel.read(byteBuffer)) > 0){
+//                                byteBuffer.flip();
+//                                log.info("########## 1 : {}",charset.decode(byteBuffer).toString());
+//                                log.info("########## position : {}",fileChannel.position());
+//                                byteBuffer.clear();
+//                            }
+
+//                            List<String> fileReadList = Files.readAllLines(file.toPath());
+//
+//                            int idx =0;
+//                            log.info("######## : {}", fileReadList.size());
+//                            for(int i=0; i<fileReadList.size(); i++){
+//                                log.info("### fileRead : {}, idx : {}", fileReadList.get(i), idx);
+//                                //log.info("######### line num : {}", Files.lines(file.toPath()));
+//                                idx++;
+//                            }
+////
+//
+//                            log.info("#### : {}",Files.readAllLines(Paths.get(fileDir+send.getLogFileName())).get(9));
+                            Files.lines(Paths.get(fileDir+send.getLogFileName())).skip(5).forEach(log::info);
+
+                        }else{
+                        //null이면 금일 생성된 파일중 가장 처음을 읽는다.
+
+                        }
+                    }else{
+                        log.info("### null");
+                    }
+                    //raf.close();
                 }catch(Exception e){
                     e.printStackTrace();
                 }

@@ -29,9 +29,9 @@ public class SmtpSocket {
 
                 String fileDir = dirPath;
                 if (gubun.equals("C")) {
-                    fileDir = fileDir + "campaign";
+                    fileDir = fileDir + "campaign/";
                 } else if (gubun.equals("R")) {
-                    fileDir = fileDir + "realtime";
+                    fileDir = fileDir + "realtime/";
                 }
 
                 Date today = new Date();
@@ -42,7 +42,7 @@ public class SmtpSocket {
                     dir.mkdirs();
                 }
 
-                File file = new File(fileDir + "/sendLog_" + sdf.format(today) + ".log");
+                File file = new File(fileDir + "sendLog_"+send.getSchdlId()+"_" + sdf.format(today) + ".log");
                 sendLog = new PrintWriter(new BufferedWriter(new FileWriter(file, true)), true);
 
                 sendLog.print("UUID:"+send.getUuid()+" || ");

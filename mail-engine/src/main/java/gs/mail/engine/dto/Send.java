@@ -1,12 +1,18 @@
 package gs.mail.engine.dto;
 
 import lombok.Data;
+import org.apache.ibatis.type.Alias;
 
 @Data
+@Alias("Send")
 public class Send {
-    protected String receiver;
-    protected String sender;
-    protected String title;
-    protected String contents;
+    private long schdlId;
+    private String receiver;
+    private String sender;
+    private String title;
+    private String contents;
     private String uuid;
+
+    private String logFileName;
+    private String lineNumber;
 }
