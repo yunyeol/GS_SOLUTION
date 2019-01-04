@@ -32,6 +32,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.*;
+import java.util.stream.Stream;
 
 @Slf4j
 @Configuration
@@ -235,15 +236,12 @@ public class RealtimeSendJob extends SmtpSocket{
             public void afterJob(JobExecution jobExecution) {
                 try{
                     long schdlId = jobExecution.getJobParameters().getLong("schdlId");
-                    log.info("#### : {}",schdlId);
 
                     Send send = new Send();
                     HashMap<String, Object> paramMap = new HashMap<String, Object>();
                     paramMap.put("schdlId", schdlId);
                     send = sqlSessionTemplate.selectOne("SQL.Send.selectResultFileInfo", paramMap);
 
-                    RandomAccessFile raf = null;
-                    String line = null;
                     if(send != null){
                         log.info("#### selectMap fileName : {}", send.getLogFileName() );
                         log.info("#### selectMap lineNumber : {}", send.getLineNumber());
@@ -257,33 +255,19 @@ public class RealtimeSendJob extends SmtpSocket{
 
                         //null 아니면 해당파일을 lineNumber 다음부터 읽는다.
                         if(send.getLogFileName() != null){
-                            File file = new File(fileDir+send.getLogFileName());
+                            List<String> lineList = new ArrayList<String>();
+                            Files.lines(Paths.get(fileDir+send.getLogFileName())).skip(Long.parseLong(send.getLineNumber())).forEachOrdered(lineList::add);
 
-//                            FileChannel fileChannel = FileChannel.open(Paths.get(fileDir+send.getLogFileName()), StandardOpenOption.READ);
-//                            ByteBuffer byteBuffer = ByteBuffer.allocate(1024);
-//                            Charset charset = Charset.defaultCharset();
-//
-//                            int byteCount = -1;
-//                            while((byteCount = fileChannel.read(byteBuffer)) > 0){
-//                                byteBuffer.flip();
-//                                log.info("########## 1 : {}",charset.decode(byteBuffer).toString());
-//                                log.info("########## position : {}",fileChannel.position());
-//                                byteBuffer.clear();
-//                            }
+                            long idx = Long.parseLong(send.getLineNumber());
+                            for(int i=0; i<lineList.size(); i++){
+                                String[] split = lineList.get(0).split("\\|\\|");
 
-//                            List<String> fileReadList = Files.readAllLines(file.toPath());
-//
-//                            int idx =0;
-//                            log.info("######## : {}", fileReadList.size());
-//                            for(int i=0; i<fileReadList.size(); i++){
-//                                log.info("### fileRead : {}, idx : {}", fileReadList.get(i), idx);
-//                                //log.info("######### line num : {}", Files.lines(file.toPath()));
-//                                idx++;
-//                            }
-////
-//
-//                            log.info("#### : {}",Files.readAllLines(Paths.get(fileDir+send.getLogFileName())).get(9));
-                            Files.lines(Paths.get(fileDir+send.getLogFileName())).skip(5).forEach(log::info);
+                                log.info("########: ! ",split[0]);
+                                log.info("########: ! ",split[1]);
+                                log.info("#########: {}, idx : {}", lineList.get(i), idx);
+                                log.info("#########: {}", lineList.get(i).substring(4), idx);
+                                idx++;
+                            }
 
                         }else{
                         //null이면 금일 생성된 파일중 가장 처음을 읽는다.

@@ -14,5 +14,14 @@
         AND DATE_FORMAT(RESERVE_DATE, '%Y%m%d') = DATE_FORMAT(NOW(), '%Y%m%d');
     ]]>
     </select>
+
+    <update id="updateSendQueRawSendFlag">
+        UPDATE GS_SEND_QUE_RAW
+        SET SEND_FLAG = #{sendFlag},
+             RESULT_CD = #{resultCd},
+             UPT_DATE = NOW()
+        WHERE UUID = #{uuid}
+    </update>
+
 </mapper>
 

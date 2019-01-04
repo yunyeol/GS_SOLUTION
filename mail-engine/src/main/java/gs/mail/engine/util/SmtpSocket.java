@@ -45,18 +45,19 @@ public class SmtpSocket {
                 File file = new File(fileDir + "sendLog_"+send.getSchdlId()+"_" + sdf.format(today) + ".log");
                 sendLog = new PrintWriter(new BufferedWriter(new FileWriter(file, true)), true);
 
-                sendLog.print("UUID:"+send.getUuid()+" || ");
+                sendLog.print("SOCKET_CONN:"+br.readLine()+"||");
+                sendLog.print("UUID:"+send.getUuid()+"||");
                 ps.print("HELO "+send.getReceiver().substring(send.getReceiver().indexOf("@")+1)+carriageReturn );
-                sendLog.print("HELO_RES:"+br.readLine()+" || ");
+                sendLog.print("HELO_RES:"+br.readLine()+"||");
 
                 ps.print("MAIL FROM: <"+send.getSender()+">"+carriageReturn);
-                sendLog.print("MAIL_FROM_RES:"+br.readLine()+" || ");
+                sendLog.print("MAIL_FROM_RES:"+br.readLine()+"||");
 
                 ps.print("RCPT TO:<"+send.getReceiver()+">"+carriageReturn);
-                sendLog.print("RCPT_TO_RES:"+br.readLine()+" || ");
+                sendLog.print("RCPT_TO_RES:"+br.readLine()+"||");
 
                 ps.print("DATA"+carriageReturn);
-                sendLog.print("DATA_RES :"+br.readLine()+" || ");
+                sendLog.print("DATA_RES:"+br.readLine()+"||");
                 ps.print("Mime-Version: 1.0"+carriageReturn);
                 ps.print("Content-Type:text/html;charset=euc-kr"+carriageReturn);
                 ps.print("Content-Transfer-Encoding:8bit"+carriageReturn);
@@ -70,24 +71,14 @@ public class SmtpSocket {
                 ps.print("QUIT"+carriageReturn);
                 ps.flush();
 
-                sendLog.print("DATA_SEND_RES:"+br.readLine()+" || ");
-
-                sendLog.print("SEND :: RES :"+br.readLine()+" || ");
+                sendLog.print("DATA_SEND_RES:"+br.readLine()+"||");
+                sendLog.print("SEND_RES:"+br.readLine()+"||");
                 sendLog.print("QUIT");
                 sendLog.println();
-
                 return br.readLine();
             }
         }catch (Exception e){
             e.printStackTrace();
-        }finally {
-//            try {
-//                if(sendLog != null) sendLog.close();
-//                if(br != null) br.close();
-//                if(ps != null) ps.close();
-//            }catch (Exception e){
-//                e.printStackTrace();
-//            }
         }
         return null;
     }
