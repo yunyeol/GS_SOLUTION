@@ -7,6 +7,7 @@ import org.apache.ibatis.type.Alias;
 @Alias("Send")
 public class Send {
     private long schdlId;
+    private long masterSchdlId;
     private String receiver;
     private String sender;
     private String title;

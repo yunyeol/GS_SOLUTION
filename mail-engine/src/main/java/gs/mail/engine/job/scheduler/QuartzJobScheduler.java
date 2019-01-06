@@ -16,6 +16,7 @@ import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 public class QuartzJobScheduler {
     @Value("${cron.mail.campaign}") private String campaignCron;
     @Value("${cron.mail.realtime}") private String realtimeCron;
+    @Value("${cron.mail.realtime.result}") private String realtimeReultCron;
     @Value("${cron.mail.target}") private String targetCron;
 
     @Bean
@@ -31,6 +32,12 @@ public class QuartzJobScheduler {
         CronTrigger realtimeSendTrigger = TriggerBuilder.newTrigger().forJob("RealtimeSendExecutor").withIdentity("RealtimeSendTrigger")
                                             .withSchedule(CronScheduleBuilder.cronSchedule(realtimeCron)).build();
 
+        //실시간결과
+        JobDetail realtimeResultJob = JobBuilder.newJob(RealtimeResultExecutor.class).withIdentity("RealtimeResultExecutor")
+                                        .storeDurably(true).build();
+        CronTrigger realtimeResultTrigger = TriggerBuilder.newTrigger().forJob("RealtimeResultExecutor").withIdentity("realtimeResultTrigger")
+                                            .withSchedule(CronScheduleBuilder.cronSchedule(realtimeReultCron)).build();
+
         //타게팅
         JobDetail targetJob = JobBuilder.newJob(TargetExecutor.class).withIdentity("TargetExecutor")
                             .storeDurably(true).build();
@@ -43,8 +50,8 @@ public class QuartzJobScheduler {
         CronTrigger campaignTrigger = TriggerBuilder.newTrigger().forJob("CampaignSendExecutor").withIdentity("CampaignSendTrigger")
                 .withSchedule(CronScheduleBuilder.cronSchedule(campaignCron)).build();
 
-        schedulerFactoryBean.setJobDetails(realtimeSendJob, targetJob, campaignJob);
-        schedulerFactoryBean.setTriggers(realtimeSendTrigger, targetTrigger, campaignTrigger);
+        schedulerFactoryBean.setJobDetails(realtimeSendJob, targetJob, campaignJob, realtimeResultJob);
+        schedulerFactoryBean.setTriggers(realtimeSendTrigger, targetTrigger, campaignTrigger, realtimeResultTrigger);
 
         return schedulerFactoryBean;
     }

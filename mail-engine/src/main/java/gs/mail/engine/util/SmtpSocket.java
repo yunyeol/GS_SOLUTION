@@ -1,22 +1,27 @@
 package gs.mail.engine.util;
 
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import gs.mail.engine.dto.Send;
 import lombok.extern.slf4j.Slf4j;
+import org.mybatis.spring.SqlSessionTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.*;
 import java.net.Socket;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 @Slf4j
 public class SmtpSocket {
+    @Autowired private SqlSessionTemplate sqlSessionTemplate;
     protected static int port = 25;
 
-    protected String socketSend(Socket socket, String gubun, String dirPath, Send send){
+    protected void socketSend(Socket socket, String gubun, String dirPath, Send send){
         String carriageReturn = "\r\n";
         PrintStream ps = null;
         BufferedReader br = null;
@@ -35,29 +40,30 @@ public class SmtpSocket {
                 }
 
                 Date today = new Date();
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHH");
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
 
                 File dir = new File(fileDir);
                 if (!dir.exists()) {
                     dir.mkdirs();
                 }
 
-                File file = new File(fileDir + "sendLog_"+send.getSchdlId()+"_" + sdf.format(today) + ".log");
+                File file = new File(fileDir + "sendLog_"+send.getMasterSchdlId()+"_" + sdf.format(today) + ".log");
                 sendLog = new PrintWriter(new BufferedWriter(new FileWriter(file, true)), true);
 
-                sendLog.print("SOCKET_CONN:"+subStringResult(br.readLine())+"||");
-                sendLog.print("UUID:"+send.getUuid()+"||");
+                sendLog.print("{\"SOCKET_CONN\":\""+subStringResult(br.readLine())+"\",");
+                sendLog.print("\"SCHDL_ID\":\""+send.getSchdlId()+"\",");
+                sendLog.print("\"UUID\":\""+send.getUuid()+"\",");
                 ps.print("HELO "+send.getReceiver().substring(send.getReceiver().indexOf("@")+1)+carriageReturn );
-                sendLog.print("HELO_RES:"+subStringResult(br.readLine())+"||");
+                sendLog.print("\"HELO_RES\":\""+subStringResult(br.readLine())+"\",");
 
                 ps.print("MAIL FROM: <"+send.getSender()+">"+carriageReturn);
-                sendLog.print("MAIL_FROM_RES:"+subStringResult(br.readLine())+"||");
+                sendLog.print("\"MAIL_FROM_RES\":\""+subStringResult(br.readLine())+"\",");
 
                 ps.print("RCPT TO:<"+send.getReceiver()+">"+carriageReturn);
-                sendLog.print("RCPT_TO_RES:"+subStringResult(br.readLine())+"||");
+                sendLog.print("\"RCPT_TO_RES\":\""+subStringResult(br.readLine())+"\",");
 
                 ps.print("DATA"+carriageReturn);
-                sendLog.print("DATA_RES:"+subStringResult(br.readLine())+"||");
+                sendLog.print("\"DATA_RES\":\""+subStringResult(br.readLine())+"\",");
                 ps.print("Mime-Version: 1.0"+carriageReturn);
                 ps.print("Content-Type:text/html;charset=euc-kr"+carriageReturn);
                 ps.print("Content-Transfer-Encoding:8bit"+carriageReturn);
@@ -71,16 +77,13 @@ public class SmtpSocket {
                 ps.print("QUIT"+carriageReturn);
                 ps.flush();
 
-                sendLog.print("DATA_SEND_RES:"+subStringResult(br.readLine())+"||");
-                sendLog.print("SEND_RES:"+subStringResult(br.readLine())+"||");
-                sendLog.print("QUIT");
+                sendLog.print("\"DATA_SEND_RES\":\""+subStringResult(br.readLine())+"\",");
+                sendLog.print("\"SEND_RES\":\""+subStringResult(br.readLine())+"\"}");
                 sendLog.println();
-                return br.readLine();
             }
         }catch (Exception e){
             e.printStackTrace();
         }
-        return null;
     }
 
     public String getMxDomain(String receiver){
@@ -124,6 +127,131 @@ public class SmtpSocket {
             return rs.substring(0,9);
         }else{
             return rs.substring(0,3);
+        }
+    }
+
+    protected void socketResult(String gubun, String dirPath, long schdlId){
+        HashMap<String, Object> paramMap = new HashMap<String, Object>();
+        paramMap.put("schdlId", schdlId);
+        String sendFlag = "";
+        String resultCd = "";
+        String uuid = "";
+        Send send = new Send();
+        int successCnt = 0;
+        int failCnt = 0;
+        List<String> todayFileList = new ArrayList<String>();
+
+        Date today = new Date();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+
+        String fileDir = dirPath;
+        if (gubun.equals("C")) {
+            fileDir = fileDir + "campaign/";
+        } else if (gubun.equals("R")) {
+            fileDir = fileDir + "realtime/";
+        }
+
+        File file = new File(fileDir);
+
+        if (file.isDirectory()) {
+            File[] fileList = file.listFiles();
+            for (File tFile : fileList) {
+                if (tFile.getName().equals("sendLog_"+schdlId+"_"+sdf.format(today)+".log")) {
+                    todayFileList.add(tFile.getName());
+                    send.setLogFileName(tFile.getName());
+                }
+            }
+        }
+
+        try{
+            if(!todayFileList.isEmpty()){
+                send = sqlSessionTemplate.selectOne("SQL.Send.selectResultFileInfo", paramMap);
+
+                Collections.sort(todayFileList, new CompareFileNameAsc());
+                send.setLogFileName(todayFileList.get(0));
+
+                long lineNum = Long.parseLong(send.getLineNumber());
+
+                if (send.getLogFileName() != null) {
+                    List<String> lineList = new ArrayList<String>();
+                    Files.lines(Paths.get(fileDir + send.getLogFileName()),Charset.forName("UTF-8"))
+                            .skip(lineNum).forEachOrdered(lineList::add);
+
+                    if(lineList.size() != 0){
+                        for (int i = 0; i < lineList.size() && i < 1000; i++) {
+                            JsonParser parser = new JsonParser();
+                            JsonElement element = parser.parse(lineList.get(i));
+                            uuid = element.getAsJsonObject().get("UUID").getAsString();
+
+                            if (!element.getAsJsonObject().get("SOCKET_CONN").getAsString().contains("220")) {
+                                sendFlag = "41";
+                                resultCd = element.getAsJsonObject().get("SOCKET_CONN").getAsString();
+                                failCnt++;
+                                log.debug("SOCKET_CONN : {}", element.getAsJsonObject().get("SOCKET_CONN").getAsString());
+                            } else if (!element.getAsJsonObject().get("HELO_RES").getAsString().contains("250")) {
+                                sendFlag = "41";
+                                resultCd = element.getAsJsonObject().get("HELO_RES").getAsString();
+                                failCnt++;
+                                log.debug("HELO_RES : {}", element.getAsJsonObject().get("HELO_RES").getAsString());
+                            } else if (!element.getAsJsonObject().get("MAIL_FROM_RES").getAsString().contains("250")) {
+                                sendFlag = "41";
+                                resultCd = element.getAsJsonObject().get("MAIL_FROM_RES").getAsString();
+                                failCnt++;
+                                log.debug("MAIL_FROM_RES : {}", element.getAsJsonObject().get("MAIL_FROM_RES").getAsString());
+                            } else if (!element.getAsJsonObject().get("RCPT_TO_RES").getAsString().contains("250")) {
+                                sendFlag = "41";
+                                resultCd = element.getAsJsonObject().get("RCPT_TO_RES").getAsString();
+                                failCnt++;
+                                log.debug("RCPT_TO_RES : {}", element.getAsJsonObject().get("RCPT_TO_RES").getAsString());
+                            } else if (!element.getAsJsonObject().get("DATA_RES").getAsString().contains("354")) {
+                                sendFlag = "41";
+                                resultCd = element.getAsJsonObject().get("DATA_RES").getAsString();
+                                failCnt++;
+                                log.debug("DATA_RES : {}", element.getAsJsonObject().get("DATA_RES").getAsString());
+                            } else if (!element.getAsJsonObject().get("DATA_SEND_RES").getAsString().contains("250")) {
+                                sendFlag = "41";
+                                resultCd = element.getAsJsonObject().get("DATA_SEND_RES").getAsString();
+                                failCnt++;
+                                log.debug("DATA_SEND_RES : {}", element.getAsJsonObject().get("DATA_SEND_RES").getAsString());
+                            } else if (!element.getAsJsonObject().get("SEND_RES").getAsString().contains("221")) {
+                                sendFlag = "41";
+                                resultCd = element.getAsJsonObject().get("SEND_RES").getAsString();
+                                failCnt++;
+                                log.debug("SEND_RES : {}", element.getAsJsonObject().get("SEND_RES").getAsString());
+                            } else {
+                                sendFlag = "40";
+                                resultCd = element.getAsJsonObject().get("SEND_RES").getAsString();
+                                successCnt++;
+                                log.debug("SEND_RES : {}", element.getAsJsonObject().get("SEND_RES").getAsString());
+                            }
+
+                            paramMap.put("sendFlag", sendFlag);
+                            paramMap.put("resultCd", resultCd);
+                            paramMap.put("uuid", uuid);
+                            paramMap.put("successCnt", successCnt);
+                            paramMap.put("failCnt", failCnt);
+                            sqlSessionTemplate.update("SQL.Send.updateSendQueRawSendFlag", paramMap);
+
+                            lineNum++;
+                        }
+                        paramMap.put("lineNumber", lineNum);
+                        paramMap.put("logFileName", send.getLogFileName());
+                        sqlSessionTemplate.update("SQL.Send.updateSendSchdlFileNumber", paramMap);
+                        sqlSessionTemplate.update("SQL.Send.updateSendSchdlCnt", paramMap);
+                    }
+                }
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    static class CompareFileNameAsc implements Comparator<String>{
+
+        @Override
+        public int compare(String o1, String o2) {
+            // TODO Auto-generated method stub
+            return o1.compareTo(o2);
         }
     }
 }

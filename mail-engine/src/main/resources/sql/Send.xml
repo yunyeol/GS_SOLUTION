@@ -6,7 +6,6 @@
     <select id="selectResultFileInfo" parameterType="Long" resultType="Send">
     <![CDATA[
         SELECT
-            LOG_FILE_NAME logFileName,
             LINE_NUMBER lineNumber
         FROM GS_SEND_SCHDL
         WHERE MASTER_SCHDL_ID = ${schdlId}
@@ -17,10 +16,24 @@
 
     <update id="updateSendQueRawSendFlag">
         UPDATE GS_SEND_QUE_RAW
-        SET SEND_FLAG = #{sendFlag},
-             RESULT_CD = #{resultCd},
-             UPT_DATE = NOW()
+        SET SEND_FLAG = #{sendFlag}, RESULT_CD = #{resultCd}, UPT_DATE = NOW()
         WHERE UUID = #{uuid}
+    </update>
+
+    <update id="updateSendSchdlCnt">
+        UPDATE GS_SEND_SCHDL
+        SET SUCCESS_CNT = SUCCESS_CNT + ${successCnt}, FAIL_CNT = FAIL_CNT + ${failCnt}, UPT_DATE = NOW()
+        WHERE MASTER_SCHDL_ID = ${schdlId}
+        AND SEND_TYPE='R_S'
+        AND DATE_FORMAT(RESERVE_DATE, '%Y%m%d') = DATE_FORMAT(NOW(), '%Y%m%d')
+    </update>
+
+    <update id="updateSendSchdlFileNumber">
+        UPDATE GS_SEND_SCHDL
+        SET LOG_FILE_NAME = #{logFileName}, LINE_NUMBER = ${lineNumber}
+        WHERE MASTER_SCHDL_ID = ${schdlId}
+        AND SEND_TYPE='R_S'
+        AND DATE_FORMAT(RESERVE_DATE, '%Y%m%d') = DATE_FORMAT(NOW(), '%Y%m%d')
     </update>
 
 </mapper>
