@@ -15,9 +15,16 @@ public class Target {
     private int addressMbrId;
     private String mbrName;
     private String mbrAddress;
-    private String data1;
-    private String data2;
-    private String data3;
+    private String map1;
+    private String map2;
+    private String map3;
+    private String map4;
+    private String map5;
+    private String map6;
+    private String map7;
+    private String map8;
+    private String map9;
+    private String map10;
     private String regDate;
 
     private long rawId;
