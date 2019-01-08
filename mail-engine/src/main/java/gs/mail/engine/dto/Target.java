@@ -21,4 +21,7 @@ public class Target {
     private String regDate;
 
     private long rawId;
+
+    private String fileUploadYn;
+    private String targetFilePath;
 }

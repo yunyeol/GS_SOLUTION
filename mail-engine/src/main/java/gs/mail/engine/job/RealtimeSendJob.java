@@ -185,25 +185,24 @@ public class RealtimeSendJob extends SmtpSocket{
                             String domain = realtime.getReceiver().substring(realtime.getReceiver().indexOf("@")+1);
 
                             /** socket */
+                            Socket socket = new Socket(getMxDomain(domain), port);
+                            //Socket socket = new Socket("119.207.76.55", port); //humuson
+                            //Socket socket = new Socket("125.209.249.6", port); //naver
+                            socketSend(socket,"R", dirPath, realtime);
 
-//                            Socket socket = new Socket(getMxDomain(domain), port);
-//                            //Socket socket = new Socket("119.207.76.55", port); //humuson
-//                            //Socket socket = new Socket("125.209.249.6", port); //naver
-//                            socketSend(socket,"R", dirPath, realtime);
-//
-//                            if(socket != null) {
-//                                socket.close();
-//                            }
+                            if(socket != null) {
+                                socket.close();
+                            }
 
 
                             /** nio socket*/
                             //SocketChannel socketChannel = SocketChannel.open(new InetSocketAddress(getMxDomain(domain), port));
-                            SocketChannel socketChannel = SocketChannel.open(new InetSocketAddress("119.207.76.55", port));
-                            socketChannel.configureBlocking(false);
-                            Selector selector = Selector.open();
-                            socketChannel.register(selector, SelectionKey.OP_READ);
-
-                            socketSendByte(socketChannel, "R", dirPath, realtime, selector);
+//                            SocketChannel socketChannel = SocketChannel.open(new InetSocketAddress("119.207.76.55", port));
+//                            socketChannel.configureBlocking(false);
+//                            Selector selector = Selector.open();
+//                            socketChannel.register(selector, SelectionKey.OP_READ);
+//
+//                            socketSendByte(socketChannel, "R", dirPath, realtime, selector);
 
 //                            if(socketChannel !=null){
 //                                socketChannel.close();

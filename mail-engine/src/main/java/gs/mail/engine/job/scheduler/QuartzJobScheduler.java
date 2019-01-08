@@ -18,6 +18,7 @@ public class QuartzJobScheduler {
     @Value("${cron.mail.realtime}") private String realtimeCron;
     @Value("${cron.mail.realtime.result}") private String realtimeReultCron;
     @Value("${cron.mail.target}") private String targetCron;
+    @Value("${cron.mail.file.upload}") private String  fileUploadCron;
 
     @Bean
     public SchedulerFactoryBean quartzScheduler(@Autowired JobFactory jobFactory) throws SchedulerException {
@@ -38,6 +39,12 @@ public class QuartzJobScheduler {
         CronTrigger realtimeResultTrigger = TriggerBuilder.newTrigger().forJob("RealtimeResultExecutor").withIdentity("realtimeResultTrigger")
                                             .withSchedule(CronScheduleBuilder.cronSchedule(realtimeReultCron)).build();
 
+        //파일업로드
+        JobDetail fileUploadJob = JobBuilder.newJob(FileUploadExecutor.class).withIdentity("FileUploadExecutor")
+                                .storeDurably(true).build();
+        CronTrigger fileUploadTrigger = TriggerBuilder.newTrigger().forJob("FileUploadExecutor").withIdentity("FileUploadTrigger")
+                                        .withSchedule(CronScheduleBuilder.cronSchedule(fileUploadCron)).build();
+
         //타게팅
         JobDetail targetJob = JobBuilder.newJob(TargetExecutor.class).withIdentity("TargetExecutor")
                             .storeDurably(true).build();
@@ -50,8 +57,8 @@ public class QuartzJobScheduler {
         CronTrigger campaignTrigger = TriggerBuilder.newTrigger().forJob("CampaignSendExecutor").withIdentity("CampaignSendTrigger")
                 .withSchedule(CronScheduleBuilder.cronSchedule(campaignCron)).build();
 
-        schedulerFactoryBean.setJobDetails(realtimeSendJob, targetJob, campaignJob, realtimeResultJob);
-        schedulerFactoryBean.setTriggers(realtimeSendTrigger, targetTrigger, campaignTrigger, realtimeResultTrigger);
+        schedulerFactoryBean.setJobDetails(realtimeSendJob, targetJob, campaignJob, realtimeResultJob, fileUploadJob);
+        schedulerFactoryBean.setTriggers(realtimeSendTrigger, targetTrigger, campaignTrigger, realtimeResultTrigger, fileUploadTrigger);
 
         return schedulerFactoryBean;
     }
