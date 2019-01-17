@@ -161,9 +161,16 @@ public class TargetJob {
                         Map<String, Object> param = new HashMap<>();
                         param.put("schdlId", schdlId);
                         param.put("address", target.getMbrAddress());
-                        param.put("data1", target.getData1());
-                        param.put("data2", target.getData2());
-                        param.put("data3", target.getData3());
+                        param.put("map1", target.getMap1());
+                        param.put("map2", target.getMap2());
+                        param.put("map3", target.getMap3());
+                        param.put("map4", target.getMap4());
+                        param.put("map5", target.getMap5());
+                        param.put("map6", target.getMap6());
+                        param.put("map7", target.getMap7());
+                        param.put("map8", target.getMap8());
+                        param.put("map9", target.getMap9());
+                        param.put("map10", target.getMap10());
 
                         if(sendType.equals("C_D")){
                             sqlSessionTemplate.insert("SQL.Target.insertSendRaw", param);
@@ -179,9 +186,16 @@ public class TargetJob {
                         jsonObject.put("addressMbrId", target.getAddressMbrId());
                         jsonObject.put("mbrName", target.getMbrName());
                         jsonObject.put("mbrAddress", target.getMbrAddress());
-                        jsonObject.put("data1", target.getData1());
-                        jsonObject.put("data2", target.getData1());
-                        jsonObject.put("data3", target.getData1());
+                        jsonObject.put("map1", target.getMap1());
+                        jsonObject.put("map2", target.getMap2());
+                        jsonObject.put("map3", target.getMap3());
+                        jsonObject.put("map4", target.getMap4());
+                        jsonObject.put("map5", target.getMap5());
+                        jsonObject.put("map6", target.getMap6());
+                        jsonObject.put("map7", target.getMap7());
+                        jsonObject.put("map8", target.getMap8());
+                        jsonObject.put("map9", target.getMap9());
+                        jsonObject.put("map10", target.getMap10());
 
                         jsonArray.put(jsonObject);
                     }
