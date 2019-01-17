@@ -126,21 +126,20 @@ public class SmtpSocket {
         }
     }
 
-    protected void socketSendByte(SocketChannel socketChannel, String gubun, String dirPath, Send send, Selector selector){
+    protected void socketSendByte(SocketChannel socketChannel, String gubun, String dirPath, Send send){
         ByteBuffer byteBuffer = ByteBuffer.allocate(1024);
-        ByteBuffer readByteBuffer = ByteBuffer.allocate(4096);
-        byteBuffer.clear();
+        ByteBuffer readBuffer = ByteBuffer.allocate(1024);
 
         String carriageReturn = "\r\n";
         //PrintStream ps = null;
-        BufferedReader br = null;
-        PrintWriter sendLog = null;
-        Charset charset = Charset.forName("UTF-8");
+        //BufferedReader br = null;
+        //PrintWriter sendLog = null;
+        Charset charset = Charset.forName("euc-kr");
 
         try{
             synchronized( this ) {
                 //ps = new PrintStream(socket.getOutputStream(), true, "euc-kr");
-                  br = new BufferedReader(new InputStreamReader(socketChannel.socket().getInputStream(), "euc-kr"));
+                //br = new BufferedReader(new InputStreamReader(socketChannel.socket().getInputStream(), "euc-kr"));
 
 //                String fileDir = dirPath;
 //                if (gubun.equals("C")) {
@@ -163,108 +162,43 @@ public class SmtpSocket {
 //                sendLog.print("SOCKET_CONN:"+subStringResult(br.readLine())+"||");
 //                sendLog.print("UUID:"+send.getUuid()+"||");
 
-                byteBuffer.put(("HELO "+send.getReceiver().substring(send.getReceiver().indexOf("@")+1)+carriageReturn).getBytes());
+                byteBuffer.clear();
+                byteBuffer.put(charset.encode("HELO "+send.getReceiver().substring(send.getReceiver().indexOf("@")+1)+carriageReturn));
+                byteBuffer.flip();
+                socketChannel.write(byteBuffer);
+                log.info("#### : {}", socketChannel.read(readBuffer));
+
+                byteBuffer.clear();
+                byteBuffer.put(charset.encode("MAIL FROM: <"+send.getSender()+">"+carriageReturn));
+                byteBuffer.flip();
                 socketChannel.write(byteBuffer);
 
-                byteBuffer.wrap(("MAIL FROM: <"+send.getSender()+">"+carriageReturn).getBytes());
+                byteBuffer.clear();
+                byteBuffer.put(charset.encode("RCPT TO:<"+send.getReceiver()+">"+carriageReturn));
+                byteBuffer.flip();
                 socketChannel.write(byteBuffer);
 
-                byteBuffer.put(("RCPT TO:<"+send.getReceiver()+">"+carriageReturn).getBytes());
+                byteBuffer.clear();
+                byteBuffer.put(charset.encode("DATA "+carriageReturn));
+                byteBuffer.flip();
                 socketChannel.write(byteBuffer);
 
-                byteBuffer.put(("DATA "+carriageReturn).getBytes());
+                byteBuffer.clear();
+                byteBuffer.put(charset.encode("Mime-Version: 1.0"+carriageReturn));
+                byteBuffer.put(charset.encode("Content-Type:text/html;charset=euc-kr"+carriageReturn));
+                byteBuffer.put(charset.encode("Content-Transfer-Encoding:8bit"+carriageReturn));
+                byteBuffer.put(charset.encode("Subject:"+send.getTitle()+carriageReturn));
+                byteBuffer.put(charset.encode("From:"+send.getSender()+carriageReturn));
+                byteBuffer.put(charset.encode("To:"+send.getReceiver()+carriageReturn));
+                byteBuffer.put(charset.encode("Date: "+new Date()+carriageReturn));
+                byteBuffer.put(charset.encode(carriageReturn));
+                byteBuffer.put(charset.encode(send.getContents()+carriageReturn));
+                byteBuffer.put(charset.encode("."+carriageReturn));
+                byteBuffer.put(charset.encode("QUIT"+carriageReturn));
+                byteBuffer.flip();
                 socketChannel.write(byteBuffer);
 
-                byteBuffer.put(("Mime-Version: 1.0"+carriageReturn).getBytes());
-                byteBuffer.put(("Content-Type:text/html;charset=euc-kr"+carriageReturn).getBytes());
-                byteBuffer.put(("Content-Transfer-Encoding:8bit"+carriageReturn).getBytes());
-                byteBuffer.put(("Subject:"+send.getTitle()+carriageReturn).getBytes());
-                byteBuffer.put(("From:"+send.getSender()+carriageReturn).getBytes());
-                byteBuffer.put(("To:"+send.getReceiver()+carriageReturn).getBytes());
-                byteBuffer.put(("Date: "+new Date()+carriageReturn).getBytes());
-                byteBuffer.put(carriageReturn.getBytes());
-                byteBuffer.put((send.getContents()+carriageReturn).getBytes());
-                byteBuffer.put(("."+carriageReturn).getBytes());
-                byteBuffer.put(("QUIT"+carriageReturn).getBytes());
-                socketChannel.write(byteBuffer);
-
-                while (true) {
-                    //셀렉터의 select() 메소드로 준비된 이벤트가 있는지 체크.
-                    selector.select();
-
-                    //셀렉터의 SelectedSet 에 저장된 준비된 이벤트 들(SelectionKey들)을 하나씩 처리.
-                    Iterator it = selector.selectedKeys().iterator();
-                    while (it.hasNext()) {
-                        SelectionKey key = (SelectionKey) it.next();
-                        if (key.isReadable()) {
-                            //이미 연결된 클라이언트가 메세지를 보낸 경우.
-                            SocketChannel sc = (SocketChannel) key.channel();
-                            //바이트버퍼 생성.
-                            ByteBuffer buffer = ByteBuffer.allocateDirect(1024);
-                            int read = 0;
-                            try {
-                                //요청한 클라이언트의 소켓채널로부터 데이터를 읽어들임.
-                                read = sc.read(buffer);
-                                log.info(read + " byte 를 읽었습니다.");
-                                if(read < 0){
-                                    socketChannel.close();
-                                }
-                            } catch (IOException e) {
-                                try {
-                                    sc.close();
-                                } catch (IOException e1) {
-                                }
-                            }
-
-                            buffer.flip();
-
-                            String data = "";
-                            data = charset.decode(buffer).toString();
-                            System.out.println("Message - " + data);
-                        }
-                        //이미 처리한 이벤트이므로 반드시 삭제.
-                        it.remove();
-                    }
-                }
-
-                //sendLog.print("HELO_RES:"+subStringResult(br.readLine())+"||");
-
-//                byteBuffer.flip();
-//                log.info("######### : {}", ("MAIL FROM: <"+send.getSender()+">"+carriageReturn).getBytes().length);
-//                byteBuffer.wrap(("MAIL FROM: <"+send.getSender()+">"+carriageReturn).getBytes());
-//                socketChannel.write(byteBuffer);
-//                //sendLog.print("MAIL_FROM_RES:"+subStringResult(br.readLine())+"||");
-//
-//                byteBuffer.flip();
-//                byteBuffer.wrap(("RCPT TO:<"+send.getReceiver()+">"+carriageReturn).getBytes());
-//                log.info("######### : {}", ("RCPT TO:<"+send.getReceiver()+">"+carriageReturn).getBytes().length);
-//                socketChannel.write(byteBuffer);
-//                //sendLog.print("RCPT_TO_RES:"+subStringResult(br.readLine())+"||");
-//
-//                byteBuffer.flip();
-//                byteBuffer.wrap(("DATA"+carriageReturn).getBytes());
-//                log.info("######### : {}", ("DATA"+carriageReturn).getBytes().length);
-//                socketChannel.write(byteBuffer);
-//                byteBuffer.flip();
-//                //sendLog.print("DATA_RES:"+subStringResult(br.readLine())+"||");
-//                byteBuffer.wrap(("Mime-Version: 1.0"+carriageReturn).getBytes());
-//                byteBuffer.wrap(("Content-Type:text/html;charset=euc-kr"+carriageReturn).getBytes());
-//                byteBuffer.wrap(("Content-Transfer-Encoding:8bit"+carriageReturn).getBytes());
-//                byteBuffer.wrap(("Subject:"+send.getTitle()+carriageReturn).getBytes());
-//                byteBuffer.wrap(("From:"+send.getSender()+carriageReturn).getBytes());
-//                byteBuffer.wrap(("To:"+send.getReceiver()+carriageReturn).getBytes());
-//                byteBuffer.wrap(("Date: "+new Date()+carriageReturn).getBytes());
-//                byteBuffer.wrap(carriageReturn.getBytes());
-//                byteBuffer.wrap((send.getContents()+carriageReturn).getBytes());
-//                byteBuffer.wrap(("."+carriageReturn).getBytes());
-//                byteBuffer.wrap(("QUIT"+carriageReturn).getBytes());
-//
-//                socketChannel.write(byteBuffer);
-
-                //sendLog.print("DATA_SEND_RES:"+subStringResult(br.readLine())+"||");
-                //sendLog.print("SEND_RES:"+subStringResult(br.readLine())+"||");
-                //sendLog.print("QUIT");
-                //sendLog.println();
+                //socketChannel.close();
             }
         }catch (Exception e){
             e.printStackTrace();
