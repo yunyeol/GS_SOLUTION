@@ -20,7 +20,7 @@
     </select>
 
     <update id="updateTargetFileNotExists">
-        UPDATE GS_SEND_SCHDL SET SEND_FLAG = '02' WHERE SCHDL_ID = ${schdlId}
+        UPDATE GS_SEND_SCHDL SET SEND_FLAG = '12' WHERE SCHDL_ID = ${schdlId}
     </update>
 
 </mapper>

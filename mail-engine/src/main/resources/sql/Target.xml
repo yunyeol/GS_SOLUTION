@@ -9,7 +9,9 @@
             SCHDL_ID schdlId,
             ADDRESS_GRP_ID addressGrpId,
             SEND_GUBUN sendGubun,
-            SEND_TYPE sendType
+            SEND_TYPE sendType,
+            FILE_UPLOAD_YN fileUploadYn,
+            TARGET_FILE_PATH targetFilePath
         FROM GS_SEND_SCHDL
         WHERE SEND_GUBUN = 'M'
         AND SEND_TYPE IN ('C_D', 'C_F')
@@ -66,9 +68,17 @@
             GSR.ID rawId,
             GSR.SCHDL_ID schdlId,
             GSR.ADDRESS mbrAddress,
-            GSR.DATA1 data1,
-            GSR.DATA2 data2,
-            GSR.DATA3 data3,
+            GSR.NAME mbrName,
+            GSR.MAP1 map1,
+            GSR.MAP2 map2,
+            GSR.MAP3 map3,
+            GSR.MAP4 map4,
+            GSR.MAP5 map5,
+            GSR.MAP6 map6,
+            GSR.MAP7 map7,
+            GSR.MAP8 map8,
+            GSR.MAP9 map9,
+            GSR.MAP10 map10,
             GSR.REG_DATE regDate
         FROM GS_SEND_RAW GSR
         WHERE GSR.SCHDL_ID = ${schdlId}
@@ -114,5 +124,6 @@
         INSERT INTO GS_SEND_RAW(SCHDL_ID, ADDRESS, DATA1, DATA2, DATA3, SEND_GUBUN, SEND_FLAG, REG_DATE)
 		VALUES(${schdlId}, #{address}, #{data1}, #{data2}, #{data3}, 'M', '11', SYSDATE())
     </insert>
+
 </mapper>
 

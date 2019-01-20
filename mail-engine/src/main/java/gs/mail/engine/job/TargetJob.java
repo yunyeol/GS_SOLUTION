@@ -24,6 +24,7 @@ import org.springframework.batch.core.job.flow.JobExecutionDecider;
 import org.springframework.batch.core.partition.support.Partitioner;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -32,6 +33,7 @@ import org.springframework.core.task.TaskExecutor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,6 +51,7 @@ public class TargetJob {
 
     @Value("${batch.commit.interval}") private int commitInterval;
     @Value("${batch.slave.cnt}") private int slaveCnt;
+    @Value("${file.target.path}") private String targetFilePath;
 
     @Autowired private RedisTemplate<String, String> redisTemplate;
 
@@ -63,7 +66,9 @@ public class TargetJob {
                         .to(targetDbMasterStep())
                     .from(targetDbFileDecider())
                         .on("FILE")
-                        .to(targetFileMasterStep())
+                        //.to(targetFileMasterStep())
+                        .to(targetFileTasklet())
+                    //.next()
                     .from(targetDbFileDecider())
                         .on("COMPLETED")
                         .end()
@@ -76,6 +81,34 @@ public class TargetJob {
                     .build();
 
         }catch(Exception e){
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Bean
+    public Step targetFileTasklet()  {
+        try {
+            return stepBuilderFactory.get("targetFileTasklet")
+                    .tasklet((contribution, chunkContext) -> {
+                        log.info("@@@@@@@@@@@@@@@ 123123");
+
+                        long  schdlId = chunkContext.getStepContext().getStepExecution().getJobParameters().getLong("schdlId");
+                        String targetFile = chunkContext.getStepContext().getStepExecution().getJobParameters().getString("targetFilePath");
+
+                        File file = new File(targetFilePath + targetFile);
+                        if(!file.isFile()){
+                            log.info("TargetFile Not Exists!");
+                            Map<String, Object> param = new HashMap<>();
+                            param.put("sendFlag", "12");
+                            param.put("schdlId", schdlId);
+                            sqlSessionTemplate.update("SQL.Target.updateSendSchldFlag", param);
+                        }
+
+                        return RepeatStatus.FINISHED;
+                    })
+                    .build();
+        }catch (Exception e){
             e.printStackTrace();
         }
         return null;
