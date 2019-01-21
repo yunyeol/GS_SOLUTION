@@ -1,6 +1,7 @@
 package gs.mail.engine.job;
 
 import gs.mail.engine.dto.Target;
+import gs.mail.engine.mapper.TargetFileMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.session.ExecutorType;
 import org.apache.ibatis.session.SqlSession;
@@ -24,11 +25,17 @@ import org.springframework.batch.core.job.flow.JobExecutionDecider;
 import org.springframework.batch.core.partition.support.Partitioner;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.file.FlatFileItemReader;
+import org.springframework.batch.item.file.mapping.DefaultLineMapper;
+import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.FileUrlResource;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
@@ -67,7 +74,7 @@ public class TargetJob {
                     .from(targetDbFileDecider())
                         .on("FILE")
                         //.to(targetFileMasterStep())
-                        .to(targetFileTasklet())
+                        .to(targetFileUploadStep())
                     //.next()
                     .from(targetDbFileDecider())
                         .on("COMPLETED")
@@ -87,32 +94,114 @@ public class TargetJob {
     }
 
     @Bean
-    public Step targetFileTasklet()  {
-        try {
-            return stepBuilderFactory.get("targetFileTasklet")
-                    .tasklet((contribution, chunkContext) -> {
-                        log.info("@@@@@@@@@@@@@@@ 123123");
-
-                        long  schdlId = chunkContext.getStepContext().getStepExecution().getJobParameters().getLong("schdlId");
-                        String targetFile = chunkContext.getStepContext().getStepExecution().getJobParameters().getString("targetFilePath");
-
-                        File file = new File(targetFilePath + targetFile);
-                        if(!file.isFile()){
-                            log.info("TargetFile Not Exists!");
-                            Map<String, Object> param = new HashMap<>();
-                            param.put("sendFlag", "12");
-                            param.put("schdlId", schdlId);
-                            sqlSessionTemplate.update("SQL.Target.updateSendSchldFlag", param);
-                        }
-
-                        return RepeatStatus.FINISHED;
-                    })
+    public Step targetFileUploadStep(){
+        try{
+            return stepBuilderFactory.get("targetFileUploadStep")
+                    .<Target, Target>chunk(commitInterval)
+                    .reader(fileItemReader(""))
+                    .writer(fileItemWriter())
                     .build();
         }catch (Exception e){
             e.printStackTrace();
         }
-        return null;
+        return  null;
     }
+
+    @Bean
+    @StepScope
+    public FlatFileItemReader fileItemReader(@Value("#{jobParameters['targetFile']}") String targetFile){
+        try{
+
+            log.info("@@@@@@  : {}", targetFile);
+            FlatFileItemReader<Target> flatFileItemReader = new FlatFileItemReader<Target>();
+            DelimitedLineTokenizer tokenizer = new DelimitedLineTokenizer();
+            DefaultLineMapper<Target> lineMapper = new DefaultLineMapper<>();
+
+            if(targetFile != null){
+                //flatFileItemReader.setLinesToSkip(1);
+                flatFileItemReader.setResource(new FileUrlResource(targetFilePath+targetFile));
+
+                tokenizer.setDelimiter("|");
+                tokenizer.setNames(new String[]{
+                        "address", "name",
+                        "map1", "map2", "map3", "map4", "map5",
+                        "map6", "map7", "map8", "map9", "map10"
+                });
+                tokenizer.setStrict(false);
+                log.info("@@@@@@  : {}", targetFile);
+
+                lineMapper.setLineTokenizer(tokenizer);
+                lineMapper.setFieldSetMapper(new TargetFileMapper());
+            }
+            flatFileItemReader.setLineMapper(lineMapper);
+            //flatFileItemReader.open(new ExecutionContext());
+
+            return flatFileItemReader;
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return  null;
+    }
+
+    @Bean
+    @StepScope
+    public ItemWriter<Target> fileItemWriter() {
+        log.info("333333333");
+        ItemWriter<Target> writer = new ItemWriter<Target>() {
+            @Override
+            public void write(List<? extends Target> items) {
+                try{
+                    log.info("123123 : {}",items.get(0));
+                    for(Target target : items){
+                        log.info("######### getMbrAddress : {}",target.getMbrAddress());
+                        log.info("######### getMbrName : {}",target.getMbrName());
+                        log.info("######### getMap1: {}",target.getMap1());
+                        log.info("######### getMap2: {}",target.getMap2());
+                        log.info("######### getMap3: {}",target.getMap3());
+                        log.info("######### getMap4: {}",target.getMap4());
+                        log.info("######### getMap5: {}",target.getMap5());
+                        log.info("######### getMap6: {}",target.getMap6());
+                        log.info("######### getMap7: {}",target.getMap7());
+                        log.info("######### getMap8: {}",target.getMap8());
+                        log.info("######### getMap9: {}",target.getMap9());
+                        log.info("######### getMap10: {}",target.getMap10());
+                    }
+
+                }catch(Exception e){
+                    e.printStackTrace();
+                }
+            }
+        };
+        return  writer;
+    }
+
+//    @Bean
+//    public Step targetFileTasklet()  {
+//        try {
+//            return stepBuilderFactory.get("targetFileTasklet")
+//                    .tasklet((contribution, chunkContext) -> {
+//                        log.info("@@@@@@@@@@@@@@@ 123123");
+//
+//                        long  schdlId = chunkContext.getStepContext().getStepExecution().getJobParameters().getLong("schdlId");
+//                        String targetFile = chunkContext.getStepContext().getStepExecution().getJobParameters().getString("targetFilePath");
+//
+//                        File file = new File(targetFilePath + targetFile);
+//                        if(!file.isFile()){
+//                            log.info("TargetFile Not Exists!");
+//                            Map<String, Object> param = new HashMap<>();
+//                            param.put("sendFlag", "12");
+//                            param.put("schdlId", schdlId);
+//                            sqlSessionTemplate.update("SQL.Target.updateSendSchldFlag", param);
+//                        }
+//
+//                        return RepeatStatus.FINISHED;
+//                    })
+//                    .build();
+//        }catch (Exception e){
+//            e.printStackTrace();
+//        }
+//        return null;
+//    }
 
     @Bean
     public JobExecutionDecider targetDbFileDecider(){

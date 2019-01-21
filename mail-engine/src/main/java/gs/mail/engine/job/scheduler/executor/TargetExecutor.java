@@ -41,7 +41,7 @@ public class TargetExecutor extends JobParameterContents implements Job {
                 jobDataMap.put("sendType", target.getSendType());
                 jobDataMap.put("sendGubun", target.getSendGubun());
                 jobDataMap.put("fileUploadYn", target.getFileUploadYn());
-                jobDataMap.put("targetFilePath", target.getTargetFilePath());
+                jobDataMap.put("targetFile", target.getTargetFilePath());
                 jobDataMap.put("time", System.currentTimeMillis());
 
                 JobParameters jobParameters = getJobParametersFromJobMap(jobDataMap);
