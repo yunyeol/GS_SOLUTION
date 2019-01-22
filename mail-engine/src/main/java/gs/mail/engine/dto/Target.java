@@ -29,6 +29,5 @@ public class Target {
 
     private long rawId;
 
-    private String fileUploadYn;
-    private String targetFilePath;
+    private String targetFile;
 }

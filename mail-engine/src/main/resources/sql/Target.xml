@@ -10,8 +10,7 @@
             ADDRESS_GRP_ID addressGrpId,
             SEND_GUBUN sendGubun,
             SEND_TYPE sendType,
-            FILE_UPLOAD_YN fileUploadYn,
-            TARGET_FILE_PATH targetFilePath
+            TARGET_FILE targetFile
         FROM GS_SEND_SCHDL
         WHERE SEND_GUBUN = 'M'
         AND SEND_TYPE IN ('C_D', 'C_F')
@@ -44,7 +43,7 @@
             FROM GS_SEND_SCHDL GSS
             INNER JOiN GS_SEND_RAW GSR ON (GSS.SCHDL_ID = GSR.SCHDL_ID)
             WHERE GSS.SEND_TYPE = 'C_F'
-            AND GSR.SEND_FLAG = 10
+            AND GSR.SEND_FLAG = 11
             AND GSS.SCHDL_ID = ${schdlId}
         ) A
     </select>
@@ -83,7 +82,7 @@
         FROM GS_SEND_RAW GSR
         WHERE GSR.SCHDL_ID = ${schdlId}
         AND GSR.SEND_GUBUN = 'M'
-        AND GSR.SEND_FLAG = 10
+        AND GSR.SEND_FLAG = 11
         AND GSR.ID BETWEEN ${addressMinId} AND ${addressMaxId}
     </select>
 
@@ -121,8 +120,10 @@
     </update>
 
     <insert id="insertSendRaw">
-        INSERT INTO GS_SEND_RAW(SCHDL_ID, ADDRESS, DATA1, DATA2, DATA3, SEND_GUBUN, SEND_FLAG, REG_DATE)
-		VALUES(${schdlId}, #{address}, #{data1}, #{data2}, #{data3}, 'M', '11', SYSDATE())
+        INSERT INTO GS_SEND_RAW(SCHDL_ID, ADDRESS, NAME, MAP1, MAP2, MAP3, MAP4, MAP5,
+                                MAP6, MAP7, MAP8, MAP9, MAP10, SEND_GUBUN, SEND_FLAG, REG_DATE)
+		VALUES(${schdlId}, #{address}, #{name}, #{map1}, #{map2}, #{map3}, #{map4}, #{map5},
+		        #{map6}, #{map7}, #{map8}, #{map9}, #{map10}, 'M', '11', SYSDATE())
     </insert>
 
 </mapper>

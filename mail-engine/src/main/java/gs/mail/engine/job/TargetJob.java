@@ -28,19 +28,15 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.mapping.DefaultLineMapper;
 import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
-import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.FileUrlResource;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -71,11 +67,12 @@ public class TargetJob {
                     .start(targetDbFileDecider())
                         .on("DB")
                         .to(targetDbMasterStep())
+
                     .from(targetDbFileDecider())
                         .on("FILE")
-                        //.to(targetFileMasterStep())
                         .to(targetFileUploadStep())
-                    //.next()
+                        .next(targetFileMasterStep())
+
                     .from(targetDbFileDecider())
                         .on("COMPLETED")
                         .end()
@@ -99,7 +96,7 @@ public class TargetJob {
             return stepBuilderFactory.get("targetFileUploadStep")
                     .<Target, Target>chunk(commitInterval)
                     .reader(fileItemReader(""))
-                    .writer(fileItemWriter())
+                    .writer(fileItemWriter(0L))
                     .build();
         }catch (Exception e){
             e.printStackTrace();
@@ -111,8 +108,6 @@ public class TargetJob {
     @StepScope
     public FlatFileItemReader fileItemReader(@Value("#{jobParameters['targetFile']}") String targetFile){
         try{
-
-            log.info("@@@@@@  : {}", targetFile);
             FlatFileItemReader<Target> flatFileItemReader = new FlatFileItemReader<Target>();
             DelimitedLineTokenizer tokenizer = new DelimitedLineTokenizer();
             DefaultLineMapper<Target> lineMapper = new DefaultLineMapper<>();
@@ -128,13 +123,11 @@ public class TargetJob {
                         "map6", "map7", "map8", "map9", "map10"
                 });
                 tokenizer.setStrict(false);
-                log.info("@@@@@@  : {}", targetFile);
 
                 lineMapper.setLineTokenizer(tokenizer);
                 lineMapper.setFieldSetMapper(new TargetFileMapper());
             }
             flatFileItemReader.setLineMapper(lineMapper);
-            //flatFileItemReader.open(new ExecutionContext());
 
             return flatFileItemReader;
         }catch (Exception e){
@@ -145,26 +138,32 @@ public class TargetJob {
 
     @Bean
     @StepScope
-    public ItemWriter<Target> fileItemWriter() {
-        log.info("333333333");
+    public ItemWriter<Target> fileItemWriter(@Value("#{jobParameters['schdlId']}") Long schdlId) {
         ItemWriter<Target> writer = new ItemWriter<Target>() {
             @Override
             public void write(List<? extends Target> items) {
                 try{
-                    log.info("123123 : {}",items.get(0));
+                    Map<String, Object> param = new HashMap<>();
+                    param.put("schdlId", schdlId);
+                    param.put("sendFlag", "11");
+
+                    sqlSessionTemplate.update("SQL.Target.updateSendSchldFlag", param);
+
                     for(Target target : items){
-                        log.info("######### getMbrAddress : {}",target.getMbrAddress());
-                        log.info("######### getMbrName : {}",target.getMbrName());
-                        log.info("######### getMap1: {}",target.getMap1());
-                        log.info("######### getMap2: {}",target.getMap2());
-                        log.info("######### getMap3: {}",target.getMap3());
-                        log.info("######### getMap4: {}",target.getMap4());
-                        log.info("######### getMap5: {}",target.getMap5());
-                        log.info("######### getMap6: {}",target.getMap6());
-                        log.info("######### getMap7: {}",target.getMap7());
-                        log.info("######### getMap8: {}",target.getMap8());
-                        log.info("######### getMap9: {}",target.getMap9());
-                        log.info("######### getMap10: {}",target.getMap10());
+                        param.put("address", target.getMbrAddress());
+                        param.put("name", target.getMbrName());
+                        param.put("map1", target.getMap1());
+                        param.put("map2", target.getMap2());
+                        param.put("map3", target.getMap3());
+                        param.put("map4", target.getMap4());
+                        param.put("map5", target.getMap5());
+                        param.put("map6", target.getMap6());
+                        param.put("map7", target.getMap7());
+                        param.put("map8", target.getMap8());
+                        param.put("map9", target.getMap9());
+                        param.put("map10", target.getMap10());
+
+                        sqlSessionTemplate.insert("SQL.Target.insertSendRaw", param);
                     }
 
                 }catch(Exception e){
@@ -174,34 +173,6 @@ public class TargetJob {
         };
         return  writer;
     }
-
-//    @Bean
-//    public Step targetFileTasklet()  {
-//        try {
-//            return stepBuilderFactory.get("targetFileTasklet")
-//                    .tasklet((contribution, chunkContext) -> {
-//                        log.info("@@@@@@@@@@@@@@@ 123123");
-//
-//                        long  schdlId = chunkContext.getStepContext().getStepExecution().getJobParameters().getLong("schdlId");
-//                        String targetFile = chunkContext.getStepContext().getStepExecution().getJobParameters().getString("targetFilePath");
-//
-//                        File file = new File(targetFilePath + targetFile);
-//                        if(!file.isFile()){
-//                            log.info("TargetFile Not Exists!");
-//                            Map<String, Object> param = new HashMap<>();
-//                            param.put("sendFlag", "12");
-//                            param.put("schdlId", schdlId);
-//                            sqlSessionTemplate.update("SQL.Target.updateSendSchldFlag", param);
-//                        }
-//
-//                        return RepeatStatus.FINISHED;
-//                    })
-//                    .build();
-//        }catch (Exception e){
-//            e.printStackTrace();
-//        }
-//        return null;
-//    }
 
     @Bean
     public JobExecutionDecider targetDbFileDecider(){
@@ -283,6 +254,7 @@ public class TargetJob {
                         Map<String, Object> param = new HashMap<>();
                         param.put("schdlId", schdlId);
                         param.put("address", target.getMbrAddress());
+                        param.put("name", target.getMbrName());
                         param.put("map1", target.getMap1());
                         param.put("map2", target.getMap2());
                         param.put("map3", target.getMap3());
@@ -328,7 +300,7 @@ public class TargetJob {
                     param.put("addressGrpId", addressGrpId);
                     param.put("sendFlag", "10");
 
-                    redisTemplate.opsForValue().set(String.valueOf(schdlId)+"_"+items.get(0).getMbrAddress()
+                    redisTemplate.opsForValue().set(String.valueOf(schdlId)+"_"+items.get(0).getMbrAddress()+"_"+items.get(0).getRawId()
                                                     ,jsonArray.toString());
 
                     param.put("targetCnt", items.size());
@@ -360,9 +332,9 @@ public class TargetJob {
                 Map<String, Object> paramMap = new HashMap<String, Object>();
                 paramMap.put("schdlId", schdlId != null ? schdlId : 0);
                 paramMap.put("addressGrpId", addressGrpId != null ? addressGrpId : 0);
-                paramMap.put("sendFlag", "11");
+                //paramMap.put("sendFlag", "11");
 
-                sqlSessionTemplate.update("SQL.Target.updateSendSchldFlag", paramMap);
+                //sqlSessionTemplate.update("SQL.Target.updateSendSchldFlag", paramMap);
 
                 if(sendType.equals("C_D")){
                     selectQuery = sqlSessionTemplate.selectOne("SQL.Target.selectTargetDbMinMax", paramMap);
