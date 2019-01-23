@@ -4,13 +4,11 @@ import com.project.alarmeweb.controller.BaseController;
 import com.project.alarmeweb.dto.PageMaker;
 import com.project.alarmeweb.dto.Receiver;
 import com.project.alarmeweb.service.ReceiverService;
-import com.project.alarmeweb.util.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -37,8 +35,7 @@ public class ReceiverController extends BaseController {
     @RequestMapping(value={"/mail/receiver/group"}, produces=MediaType.APPLICATION_JSON_VALUE, method = {RequestMethod.GET})
     public ResponseEntity getReceiver(){
         Map resultData = new HashMap();
-        List<Receiver> receiverList = receiverService.getReceiverList();
-        resultData.put("data", ( !CollectionUtils.isEmpty(receiverList) ) ? receiverList : new ArrayList<Receiver>()  );
+        resultData.put("data", Optional.ofNullable(receiverService.getReceiverList()).orElse(new ArrayList<>()) );
         return new ResponseEntity(resultData, HttpStatus.OK);
     }
 
@@ -71,9 +68,8 @@ public class ReceiverController extends BaseController {
     @RequestMapping(value={"/mail/receiver/group/detail"}, produces=MediaType.APPLICATION_JSON_VALUE, method = {RequestMethod.GET})
     public ResponseEntity getReceiverDetail(@RequestParam(value = "addrGrpId", required = false) Long addrGrpId, @RequestParam(value = "currIdx", required = false) int currIdx){
         Map resultData = new HashMap();
-        logger.info("sec 측정 :"+DateUtil.getDate());
-        logger.info("sec 측정 :"+DateUtil.getDate());
         PageMaker receiverList = receiverService.getReceiverDeatil(addrGrpId, currIdx);
+
         resultData.put("data", ( receiverList != null ) ? receiverList : PageMaker.getInstance()  );
         return new ResponseEntity(resultData, HttpStatus.OK);
     }
@@ -94,7 +90,7 @@ public class ReceiverController extends BaseController {
         return new ResponseEntity(resultData, HttpStatus.OK);
     }
 
-    @RequestMapping(value={"/mail/receiver/group//detail{id}"}, produces=MediaType.APPLICATION_JSON_VALUE, method = {RequestMethod.DELETE})
+    @RequestMapping(value={"/mail/receiver/group//detail/{id}"}, produces=MediaType.APPLICATION_JSON_VALUE, method = {RequestMethod.DELETE})
     public ResponseEntity removeReceiverDetail(@PathVariable Long id){
         Map resultData = new HashMap();
         int cnt = receiverService.removeReceiverDetail(id);
