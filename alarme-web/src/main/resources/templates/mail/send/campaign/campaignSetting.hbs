@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" class="perfect-scrollbar-off">
+<head>
+    {{> header }}
+</head>
+
+<body class="sidebar-mini">
+    <div class="wrapper">
+        {{> left mailActive="active" menuExpand="true" mailCampaignMenuActive="active" mailMenuShow="show"}}
+        <div class="main-panel ps ps--active-y">
+            {{> top title="Campaign"}}
+
+            <div class="content">
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Campaign 설정</h4>
+                    </div>
+                </div>
+
+                <div class="card card-timeline card-plain">
+                    <div class="card-body">
+                        <ul class="timeline timeline-simple">
+                            <li class="timeline-inverted">
+                                <div class="timeline-badge danger">
+                                    <i class="tim-icons icon-chat-33"></i>
+                                </div>
+                                <div class="timeline-panel">
+                                    <div class="timeline-heading">
+                                        <span class="badge badge-danger">캠페인 기본 정보</span>
+                                    </div>
+                                    <div class="timeline-body">
+										<form class="form-horizontal">
+											<div class="row">
+												<label class="col-3 col-form-label">캠페인명</label>
+												<div class="col-md-9">
+													<div class="form-group">
+														<input type="text" class="form-control" id="schdlName" name="schdlName" value="{{campaignInfo.schdlName}}">
+													</div>
+												</div>
+											</div>
+											<div class="row">
+												<label class="col-3 col-form-label">메일 제목</label>
+												<div class="col-md-9">
+													<div class="form-group">
+														<input type="text" class="form-control" id="subject" name="subject" value="{{campaignInfo.subject}}">
+													</div>
+												</div>
+											</div>
+											<div class="row">
+												<label class="col-3 col-form-label">발신자 이메일</label>
+												<div class="col-md-9">
+													<div class="form-group">
+														<input type="text" class="form-control" id="sender" name="sender" value="{{campaignInfo.sender}}">
+													</div>
+												</div>
+											</div>
+											<div class="row">
+												<label class="col-3 col-form-label">발신자 이름(선택사항)</label>
+												<div class="col-md-9">
+													<div class="form-group">
+														<input type="text" class="form-control" id="senderName" name="senderName" value="{{campaignInfo.senderName}}">
+													</div>
+												</div>
+											</div>
+										</form>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="timeline-inverted">
+                                <div class="timeline-badge success">
+                                    <i class="tim-icons icon-caps-small"></i>
+                                </div>
+                                <div class="timeline-panel">
+                                    <div class="timeline-heading">
+                                        <span class="badge badge-success">발송메시지 작성</span>
+                                    </div>
+                                    <div class="timeline-body">
+                                        <textarea style="resize: none;" name="contents" id="contents"></textarea>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="timeline-inverted">
+                                <div class="timeline-badge warning">
+                                    <i class="tim-icons icon-single-02"></i>
+                                </div>
+                                <div class="timeline-panel">
+                                    <div class="timeline-heading">
+                                        <span class="badge badge-warning">발송 대상자 추출</span>
+                                    </div>
+                                    <div class="timeline-body">
+                                    	<div class="card-body">
+                                    		<ul class="nav nav-pills nav-pills-primary">
+                                    			<li class="nav-item">
+                                    				<a class="nav-link active" data-toggle="tab" name="tgtTab" type="C_F" href="#fileTgt">File</a>
+                                    			</li>
+                                    			<li class="nav-item">
+                                    				<a class="nav-link" data-toggle="tab" name="tgtTab" type="C_D" href="#dbTgt">DB</a>
+                                    			</li>
+                                    		</ul>
+                                    		<div class="tab-content tab-space">
+                                    			<div class="tab-pane active" id="fileTgt">
+                                    				타겟팅 파일을 업로드 하세요.
+                                    				<br>
+                                    				<form method="POST" enctype="multipart/form-data" id="targetFileForm" action="fileUpload">
+	                                    				<input type="file" id="targetFile" name="targetFile">
+	                                    				<!-- <button class="btn btn-primary btn-sm" id="uploadTgtFile">업로드</button> -->
+	                                    				<input type="button" value="업로드" class="btn btn-primary btn-sm" id="uploadTgtFile">
+	                                    			</form>
+                                    			</div>
+                                    			<div class="tab-pane" id="dbTgt">
+                                    				타겟팅 할 주소록을 선택하세요.
+                                    				<br>
+                                    				<select class="selectpicker" data-style="btn btn-info" id="addressGrpList">
+                                    					{{#addressGrpList}}
+                                    						<option value="{{addressGrpId}}">{{addressGrpName}}</option>
+                                    					{{/addressGrpList}}
+                                    				</select>
+                                    			</div>
+                                    		</div>
+                                    		<button class="btn btn-primary btn-sm float-right" id="startTgt">타겟팅 시작</button>
+                                    	</div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="timeline-inverted">
+                                <div class="timeline-badge info">
+                                    <i class="tim-icons icon-time-alarm"></i>
+                                </div>
+                                <div class="timeline-panel">
+                                    <div class="timeline-heading">
+                                        <span class="badge badge-info">발송 예약</span>
+                                    </div>
+                                    <div class="timeline-body">
+                                    	발송 예약 시간을 설정하세요.
+										<div class="form-group">
+											<div class="row">
+												<div class="col-1" style="text-align: right;">
+													<i class="tim-icons icon-calendar-60" style="color: #FFFFFF; font-size: 1.5em;"></i>
+												</div>
+												<div class="col-5">
+													<input type="text" class="form-control datepicker" id="reserveDate" name="reserveDate" value="{{campaignInfo.reserveDate}}">
+												</div>
+												<div class="col-1" style="text-align: right;">
+													<i class="tim-icons icon-watch-time" style="color: #FFFFFF; font-size: 1.5em;"></i>
+												</div>
+												<div class="col-5">
+													<input type="text" class="form-control timepicker" id="reserveTime" name="reserveTime" value="{{campaignInfo.reserveTime}}">
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</li>
+                            <div class="row">
+                                <div class="col-sm-10"></div>
+                                <div class="col-sm-2" >
+                                    <button type="button" style="float:right;" name="campaignSave" class="btn btn-primary " >저장</button>
+                                </div>
+                            </div>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <input type="hidden" id="loginId" value="{{loginId}}">
+    <input type="hidden" id="schdlId" value="{{campaignInfo.schdlId}}">
+    <input type="hidden" id="sendType" value="{{campaignInfo.sendType}}">
+    <input type="hidden" id="sendFlag" value="{{campaignInfo.sendFlag}}">
+
+    {{> footer }}
+
+    <script type="text/javascript" src="/viewJs/mail/send/campaign/campaignSetting.js"></script>
+    <script type="text/javascript" src="/js/plugins/bootstrap-datetimepicker.js"></script>
+</body>
+</html>

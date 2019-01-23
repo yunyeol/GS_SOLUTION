@@ -1,0 +1,33 @@
+{{#campaignList}}
+<div class="card" style="border:1px solid #e14eca">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-1">
+                <ul class="nav nav-pills nav-pills-primary flex-column">
+                    <li class="nav-item">
+                        <button type="button" name="campaignSetting" schdlId = "{{schdlId}}" class="btn btn-primary btn-icon btn-simple btn-sm" >
+                            <i class="tim-icons icon-settings"></i>
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button type="button" name="campaignDelete" class="btn btn-primary btn-icon btn-simple btn-sm" >
+                            <i class="tim-icons icon-trash-simple"></i>
+                        </button>
+                    </li>
+                </ul>
+            </div>
+            <div class="col-md-10 tab-content">
+                <div class="" id="">
+                        <h5>스케줄 아이디 : {{schdlId}}</h5>
+                </div>
+                <div class="" id="">
+                    <h5>파일경로 : {{filePath}}</h5>
+                </div>
+                <div class="" id="">
+                    <h5>상태 : {{sendFlagStr}}</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{{/campaignList}}

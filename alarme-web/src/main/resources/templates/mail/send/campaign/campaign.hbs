@@ -5,6 +5,7 @@
 </head>
 
 <body class="sidebar-mini">
+    
     <div class="wrapper">
         {{> left mailActive="active" menuExpand="true" mailCampaignMenuActive="active" mailMenuShow="show"}}
         <div class="main-panel ps ps--active-y">
@@ -13,22 +14,32 @@
             <div class="content">
                 <div class="card">
                     <div class="card-header">
-                        <div class="row">
-                            <h4 class="col-sm-11">
-                                Campaign
-                            </h4>
-                        </div>
+                        <h4>Campaign</h4>
                     </div>
                     <div class="card-body">
-                        <div class="col-sm-12">
+                        <div class="row">
+                            <div class="col-sm-12 col-md-10">
+                                <button type="button" name="campaignSetting" class="btn btn-primary btn-simple btn-sm" onclick="location.href='/mail/send/campaign/setting'">Campaign 설정</button>
+                            </div>
+                            <div class="col-sm-12 col-md-2">
+                                <input type="input" name="search" class="form-control" placeholder="Search records">
+                            </div>
+                        </div>
+                        <br>
 
+                        <div class="row">
+                            <div class="col-sm-12 col-md-6">
+                                {{> mail/send/campaign/campaignDashBoard campaignList=campaignList}}
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
+    
     {{> footer }}
+    
+    <script type="text/javascript" src="/viewJs/mail/send/campaign/campaign.js"></script>
 </body>
 </html>

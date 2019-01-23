@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.project.alarmeweb.mapper.CampaignMapper">
+	
+	<select id="getCurrentDBDatetime" resultType="Campaign">
+	<![CDATA[
+		SELECT
+			DATE_FORMAT(NOW(), '%Y/%m/%d') reserveDate,
+			DATE_FORMAT(NOW(), '%H:%i') reserveTime
+	]]>
+	</select>
+
+	<select id="selectCampaignList" resultType="Campaign">
+	<![CDATA[
+		SELECT
+			SCHDL_ID schdlId,
+            SCHDL_NAME schdlName,
+            SENDER sender,
+            FILE_PATH filePath,
+            SEND_GUBUN sendGubun,
+            SEND_TYPE sendType,
+            SEND_FLAG sendFlag,
+            REG_DATE regDate
+        FROM
+        	GS_SEND_SCHDL
+        WHERE
+        	SEND_TYPE LIKE 'C%'
+	]]>
+	</select>
+	
+	<select id="selectCampaignInfo" resultType="Campaign">
+	<![CDATA[
+		SELECT
+			SCHDL_ID schdlId,
+			SCHDL_NAME schdlName,
+			SUBJECT subject,
+			ADDRESS_GRP_ID addressGrpId,
+			SENDER sender,
+			SENDER_NAME senderName,
+			FILE_PATH filePath,
+			SEND_TYPE sendType,
+			SEND_FLAG sendFlag,
+			TARGET_CNT targetCnt,
+			DIVIDE_CNT divideCnt,
+			DATE_FORMAT(RESERVE_DATE, '%Y/%m/%d') reserveDate,
+			DATE_FORMAT(RESERVE_DATE, '%H:%m') reserveTime
+		FROM
+			GS_SEND_SCHDL
+		WHERE
+			SCHDL_ID = #{schdlId}
+	]]>
+	<!-- AND SENDER = #{loginId} -->
+	</select>
+	
+	<select id="selectAddressGrpList" resultType="AddressGrp">
+	<![CDATA[
+		SELECT
+			ADDRESS_GRP_ID addressGrpId,
+			ADDRESS_GRP_NAME addressGrpName
+		FROM
+			GS_ADDRESS_GRP
+	]]>
+    </select>
+	
+    <insert id="insertCampaignSchdl" parameterType="Campaign" useGeneratedKeys="true" keyProperty="campaign.schdlId">
+    <![CDATA[
+		INSERT INTO GS_SEND_SCHDL (
+			SCHDL_NAME,
+			SUBJECT,
+			SENDER,
+			SENDER_NAME,
+			FILE_PATH,
+			SEND_GUBUN,
+			SEND_TYPE,
+			SEND_FLAG,
+			RESERVE_DATE,
+			REG_DATE
+		)
+		VALUES (
+			#{campaign.schdlName},
+			#{campaign.subject},
+			#{campaign.sender},
+			#{campaign.senderName},
+			#{campaign.filePath},
+			'M',
+			#{campaign.sendType},
+			#{campaign.sendFlag},
+	]]>
+			<choose>
+				<when test='campaign.reserveDate != null and campaign.reserveDate != ""
+					and campaign.reserveTime != null and campaign.reserveTime != ""'>
+					STR_TO_DATE(CONCAT(#{campaign.reserveDate}, ' ', #{campaign.reserveTime}), '%Y/%m/%d %H:%i'),
+				</when>
+				<otherwise>
+					DATE_ADD(NOW(), INTERVAL 1 MINUTE),
+				</otherwise>
+			</choose>
+	<![CDATA[
+			NOW()
+		)
+	]]>
+    </insert>
+    
+    <update id="updateCampaignSchdl" parameterType="Campaign">
+    <![CDATA[
+    	UPDATE
+    		GS_SEND_SCHDL
+    	SET
+    		SCHDL_NAME = #{campaign.schdlName},
+    		SUBJECT = #{campaign.subject},
+    		SENDER = #{campaign.sender},
+    		SENDER_NAME = #{campaign.senderName},
+			SEND_TYPE = #{campaign.sendType},
+	]]>
+			<choose>
+				<when test='campaign.reserveDate != null and campaign.reserveDate != ""
+					and campaign.reserveTime != null and campaign.reserveTime != ""'>
+					RESERVE_DATE = STR_TO_DATE(CONCAT(#{campaign.reserveDate}, ' ', #{campaign.reserveTime}), '%Y/%m/%d %H:%i')
+				</when>
+				<otherwise>
+					RESERVE_DATE = DATE_ADD(NOW(), INTERVAL 1 MINUTE)
+				</otherwise>
+			</choose>
+	<![CDATA[
+		WHERE
+			SCHDL_ID = #{campaign.schdlId}
+    ]]>
+    </update>
+    
+    <update id="updateSchdlFilePath" parameterType="Campaign">
+    <![CDATA[
+    	UPDATE
+    		GS_SEND_SCHDL
+    	SET
+    		FILE_PATH = #{campaign.filePath}
+    	WHERE
+    		SCHDL_ID = #{campaign.schdlId}
+    ]]>
+    </update>
+    
+    <update id="updateTargetFilePath" parameterType="Campaign">
+    <![CDATA[
+    	UPDATE
+    		GS_SEND_SCHDL
+    	SET
+    		TARGET_FILE_PATH = #{campaign.targetFilePath}
+    	WHERE
+    		SCHDL_ID = #{campaign.schdlId}
+    ]]>
+    </update>
+    
+	<update id="updateSchdlSendFlag" parameterType="Campaign">
+	<![CDATA[
+		UPDATE
+			GS_SEND_SCHDL
+		SET
+			SEND_FLAG = #{campaign.sendFlag}
+	]]>
+	<if test='campaign.sendFlag != null and campaign.sendFlag == "20"'>
+		<choose>
+			<when test='campaign.reserveDate != null and campaign.reserveDate != ""'>
+				, RESERVE_DATE = STR_TO_DATE(CONCAT(#{campaign.reserveDate}, ' ', #{campaign.reserveTime}), '%Y/%m/%d %H:%i')
+			</when>
+			<otherwise>
+				, RESERVE_DATE = DATE_ADD(NOW(), INTERVAL 1 MINUTE)
+			</otherwise>
+		</choose>
+	</if>
+	<![CDATA[
+		WHERE
+			SCHDL_ID = #{campaign.schdlId}
+	]]>
+	</update>
+    
+</mapper>

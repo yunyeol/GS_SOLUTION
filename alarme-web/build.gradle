@@ -46,6 +46,7 @@ dependencies {
     testImplementation('org.springframework.boot:spring-boot-starter-test')
     testImplementation('org.springframework.security:spring-security-test')
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.5'
+    compile group: 'commons-io', name: 'commons-io', version: '2.6'
 
     compile 'pl.allegro.tech.boot:handlebars-spring-boot-starter:0.3.0'
 
