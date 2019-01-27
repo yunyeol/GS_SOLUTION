@@ -68,35 +68,57 @@
     <!-- receiverDetail sql -->
     <select id="getReceiverDeatil" resultMap="receiverDetailResult">
         SELECT
-            ADDRESS_MBR_ID,
-            ADDRESS_GRP_ID,
-            (SELECT ADDRESS_GRP_NAME FROM GS_ADDRESS_GRP WHERE ADDRESS_GRP_ID = GAM.ADDRESS_GRP_ID) ADDRESS_GRP_NAME,
-            NAME,
-            ADDRESS,
-            DATA1,
-            REG_DATE,
-            UPT_DATE
+            GAM.ADDRESS_MBR_ID,
+            GAM.ADDRESS_GRP_ID,
+            GRP.ADDRESS_GRP_NAME,
+            GAM.NAME,
+            GAM.ADDRESS,
+            GAM.DATA1,
+            GAM.REG_DATE,
+            GAM.UPT_DATE
         FROM
             GS_ADDRESS_MBR GAM
-        WHERE ADDRESS_GRP_ID = #{addrGrpId}
+        LEFT JOIN GS_ADDRESS_GRP GRP
+        ON (GAM.ADDRESS_GRP_ID = GRP.ADDRESS_GRP_ID)
+        WHERE GAM.ADDRESS_GRP_ID = #{addrGrpId}
+        <include refid="searchCondition" />
         <if test='isPaging != null and isPaging == "Y"'>
         LIMIT #{startRow},#{limitRow}
         </if>
     </select>
 
     <select id="getReceiverDeatilCnt" resultType="int">
-      SELECT COUNT(1) FROM GS_ADDRESS_MBR
-      WHERE ADDRESS_GRP_ID = #{addrGrpId}
+        SELECT
+            COUNT(1)
+        FROM
+            GS_ADDRESS_MBR GAM
+        LEFT JOIN GS_ADDRESS_GRP GRP
+        ON (GAM.ADDRESS_GRP_ID = GRP.ADDRESS_GRP_ID)
+        WHERE GAM.ADDRESS_GRP_ID = #{addrGrpId}
+        <include refid="searchCondition" />
+    </select>
+
+    <select id="getReceivDetCheckRowCnt" resultType="int">
+        SELECT
+            COUNT(1)
+        FROM
+            GS_ADDRESS_MBR GAM
+        LEFT JOIN GS_ADDRESS_GRP GRP
+        ON (GAM.ADDRESS_GRP_ID = GRP.ADDRESS_GRP_ID)
+        WHERE GAM.ADDRESS_GRP_ID = #{addrGrpId}
+        AND GAM.ADDRESS = #{address}
+        AND GAM.NAME = #{name}
+        AND GAM.DATA1 = #{data1}
     </select>
 
     <insert id="insertReceiverDetail">
         INSERT INTO GS_ADDRESS_MBR
         (ADDRESS_GRP_ID, NAME, ADDRESS, DATA1, DATA2, DATA3, REG_DATE, UPT_DATE)
-        VALUES(#{addrMbrId}, #{name}, #{address}, #{telNumber}, '', '', now(), now())
+        VALUES(#{addrGrpId}, #{name}, #{address}, #{data1}, '', '', now(), now())
     </insert>
     <update id="updateReceiverDetail" parameterType="Receiver">
         UPDATE GS_ADDRESS_MBR
-        SET NAME=#{name}, ADDRESS=#{address}, DATA1=#{telNumber}
+        SET NAME=#{name}, ADDRESS=#{address}, DATA1=#{data1}
         WHERE ADDRESS_MBR_ID=#{addrMbrId}
     </update>
     <delete id="deleteReceiverDetail" parameterType="long">
@@ -104,6 +126,16 @@
         WHERE ADDRESS_MBR_ID=#{addrMbrId}
     </delete>
 
+    <sql id="searchCondition">
+        <if test=" keyword != null and keyword != '' ">
+            AND (
+                GRP.ADDRESS_GRP_NAME LIKE CONCAT('%',#{keyword},'%')
+                OR GAM.NAME LIKE CONCAT('%',#{keyword},'%')
+                OR GAM.ADDRESS LIKE CONCAT('%',#{keyword},'%')
+                OR GAM.DATA1 LIKE CONCAT('%',#{keyword},'%')
+            )
+        </if>
+    </sql>
     <sql id="condition">
         <where>
             <if test=" addrGrpName != null and addrGrpName != '' ">

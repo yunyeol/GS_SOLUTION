@@ -4,14 +4,12 @@ import com.project.alarmeweb.dto.PageMaker;
 import com.project.alarmeweb.dto.Receiver;
 import com.project.alarmeweb.mapper.ReceiverMapper;
 import com.project.alarmeweb.service.ReceiverService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class ReceiverServiceImpl implements ReceiverService {
@@ -39,21 +37,41 @@ public class ReceiverServiceImpl implements ReceiverService {
     public int removeReceiver(Long addrGrpId) { return receiverMapper.deleteReceiver(addrGrpId); }
 
     @Override
-    public PageMaker getReceiverDeatil(Long addrGrpId, int currIdx) {
-
+    public PageMaker getReceiverDeatil(Long addrGrpId, int currIdx, String selected, String keyword) {
         PageMaker pageMaker = PageMaker.getInstance();
-        pageMaker.setPaging(currIdx);
-
-        Map params = new HashMap<String, Object>();
-        params.put("isPaging", "Y");
+        Map<String, Object> params = new HashMap<>();
         params.put("addrGrpId", addrGrpId);
-        params.put("startRow",pageMaker.getStartRow());
-        params.put("limitRow",pageMaker.getLimitRow());
+        if( !"-1".equals(selected) ){
+            pageMaker.setPaging(currIdx, Integer.parseInt(selected));
+            params.put("isPaging", "Y");
+            params.put("startRow",pageMaker.getStartRow());
+            params.put("limitRow",pageMaker.getLimitRow());
+        }
+        if(StringUtils.isNotEmpty(keyword)){
+            params.put("keyword", keyword);
+        }
 
+        //All or isNotAll
         List<Receiver> receivDetailList = receiverMapper.getReceiverDeatil(params);
-        pageMaker.setTotCnt( receiverMapper.getReceiverDeatilCnt(addrGrpId) );
-        pageMaker.setTotPage();
-        pageMaker.setContentList( !CollectionUtils.isEmpty(receivDetailList) ? receivDetailList : new ArrayList<Receiver>() );
+
+        if( !CollectionUtils.isEmpty(receivDetailList) ){
+            if( !"-1".equals(selected) ){
+                pageMaker.setTotCnt( receiverMapper.getReceiverDeatilCnt(params)  );
+                pageMaker.setTotPage(true, Integer.parseInt(selected));
+                pageMaker.setStartShowRow(currIdx, Integer.parseInt(selected));
+                if( pageMaker.getTotPage() == currIdx ){
+                    pageMaker.setEndShowRow(pageMaker.getTotCnt());
+                }else{
+                    pageMaker.setEndShowRow(currIdx, Integer.parseInt(selected));
+                }
+            }else{
+                pageMaker.setShowPaging(0,0,-1,1,receivDetailList.size());
+            }
+
+            pageMaker.setContentList(receivDetailList);
+        }else{
+            pageMaker.setShowPaging(0,0,-1,0,0);
+        }
 
         return pageMaker;
     }
@@ -66,4 +84,7 @@ public class ReceiverServiceImpl implements ReceiverService {
 
     @Override
     public int removeReceiverDetail(Long addrMbrId) { return receiverMapper.deleteReceiverDetail(addrMbrId); }
+
+    @Override
+    public int getReceivDetCheckRowCnt(Receiver receiver) { return receiverMapper.getReceivDetCheckRowCnt(receiver); }
 }

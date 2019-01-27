@@ -5,38 +5,52 @@ import java.util.List;
 
 @Data
 public class PageMaker {
-
-    private static final int PAGE_GROUP = 5;
-    private static final int ROW_GROUP = 10;
-//    private int startPage;
-//    private int endPage;
     private int startRow;
     private int limitRow;
     private int totPage;
     private int totCnt;
-
+    private int startShowRow;
+    private int endShowRow;
     List<?> contentList;
 
-//    public void setStartPage(int currIdx){
-//        this.startPage = ( currIdx / this.PAGE_GROUP ) * this.PAGE_GROUP + 1;
-//    }
-//    public void setEndPage(int currIdx){
-//        this.endPage = ( currIdx / this.PAGE_GROUP ) * this.PAGE_GROUP + this.PAGE_GROUP;
-//    }
-    public void setStartRow(int currIdx){
-        this.startRow = ( currIdx == 1 ) ? 0 : (currIdx-1) * this.ROW_GROUP;
+    public void setStartShowRow(int currIdx, int rowValue){
+        this.startShowRow = ( (currIdx-1) * rowValue ) + 1;
     }
-    public void setLimitRow(){
-        this.limitRow = this.ROW_GROUP;
+    public void setEndShowRow(int currIdx, int rowValue){
+        this.endShowRow =  ( (currIdx-1) * rowValue ) + rowValue;
     }
-    public void setTotPage(){
-       this.totPage = (int)Math.ceil((double)this.getTotCnt() / this.ROW_GROUP) ;
+    public void setStartShowRow(int rowValue){
+        this.startShowRow = rowValue;
     }
-    public void setPaging(int currIdx){
-//        this.setStartPage(currIdx);
-//        this.setEndPage(currIdx);
-        this.setStartRow(currIdx);
-        this.setLimitRow();
+    public void setEndShowRow(int rowValue){
+        this.endShowRow =  rowValue;
+    }
+    public void setStartRow(int currIdx, int rowGroup){
+        this.startRow = ( currIdx == 1 ) ? 0 : (currIdx-1) * rowGroup;
+    }
+    public void setLimitRow(int rowGroup){
+        this.limitRow = rowGroup;
+    }
+    public void setTotPage(boolean isSelected, int value){
+        this.totPage = (isSelected) ? (int)Math.ceil((double)this.getTotCnt() / value) : value;
+    }
+    public void setTotPage(int totalPage){
+        this.totPage = totalPage;
+    }
+    public void setPaging(int currIdx, int rowGroup){
+        this.setStartRow(currIdx, rowGroup);
+        this.setLimitRow(rowGroup);
+    }
+    public void setShowPaging(int totCnt, int totPage, int currIdx, int startShowRowVal, int endShowRowVal){
+        this.setTotCnt(totCnt);
+        this.setTotPage(totPage);
+        if( currIdx > -1 ){
+            this.setStartShowRow(currIdx,startShowRowVal);
+            this.setEndShowRow(currIdx,endShowRowVal);
+        }else{
+            this.setStartShowRow(startShowRowVal);
+            this.setEndShowRow(endShowRowVal);
+        }
     }
     public static PageMaker getInstance(){
         return new PageMaker();

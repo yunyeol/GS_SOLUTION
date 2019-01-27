@@ -66,11 +66,21 @@ public class ReceiverController extends BaseController {
     /** 그룹대상관리 */
 
     @RequestMapping(value={"/mail/receiver/group/detail"}, produces=MediaType.APPLICATION_JSON_VALUE, method = {RequestMethod.GET})
-    public ResponseEntity getReceiverDetail(@RequestParam(value = "addrGrpId", required = false) Long addrGrpId, @RequestParam(value = "currIdx", required = false) int currIdx){
+    public ResponseEntity getReceiverDetail(@RequestParam(value = "addrGrpId", required = false) Long addrGrpId, @RequestParam(value = "keyword", required = false) String keyword,
+                                            @RequestParam(value = "currIdx", required = false) int currIdx, @RequestParam(value = "selected", required = false, defaultValue = "10") String selected){
+
         Map resultData = new HashMap();
-        PageMaker receiverList = receiverService.getReceiverDeatil(addrGrpId, currIdx);
+        PageMaker receiverList = receiverService.getReceiverDeatil(addrGrpId, currIdx, selected, keyword);
 
         resultData.put("data", ( receiverList != null ) ? receiverList : PageMaker.getInstance()  );
+        return new ResponseEntity(resultData, HttpStatus.OK);
+    }
+
+    @RequestMapping(value={"/mail/receiver/group/detail/checkRow"}, produces=MediaType.APPLICATION_JSON_VALUE, method = {RequestMethod.GET})
+    public ResponseEntity ReceiverDetailCheckRow(Receiver receiver){
+        Map resultData = new HashMap();
+        int cnt = receiverService.getReceivDetCheckRowCnt(receiver);
+        resultData.put("data", (cnt > 0) ? "Y" : "N" );
         return new ResponseEntity(resultData, HttpStatus.OK);
     }
 

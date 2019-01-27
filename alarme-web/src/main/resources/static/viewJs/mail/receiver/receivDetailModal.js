@@ -1,20 +1,21 @@
-var receiverObj = (function($, receivDetailModal){
+(function($, receivDetailModal){
     receivDetailModal.field = {
         addrGrpId : null,
         currIdx : 0,
-        editClickChk : false
+        editField : {
+            editClickChk : false,
+            editAddrMbrId : ''
+        }
     }
-
-    window.pagination = receivDetailModal.pagination;
 
     receivDetailModal.init = function(){
         this.setEvent();
-        console.log('init');
     }
 
     receivDetailModal.setEvent = function(){
         if(receiverObj && receiverObj.dataTable){
             receiverObj.field.dataTable.off('click.receiverDetailModal').on('click.receiverDetailModal','button[name="receiverDetail"]',function(e){
+                receivDetailModal.allReset();
                 receivDetailModal.field.addrGrpId = $(e.currentTarget).data('idx');
                 receivDetailModal.field.currIdx = 1;
                 if ( !receivDetailModal.field.addrGrpId ) { return; }
@@ -23,75 +24,118 @@ var receiverObj = (function($, receivDetailModal){
             });
         }
 
+        $('#receivDetSearch').off('keyup.receiverDetKeyup').on('keyup.receiverDetKeyup', function(e){
+            receivDetailModal.field.currIdx = 1;
+            receivDetailModal.setPaging();
+        });
+
         //테스트 확인
-        $('#receivDetailAdd').off('click.receiverModal').on('click.receiverModal', function(){
-            if( receiverObj.validation() ){
-                console.log('ajax go');
-                
-                //중복체크 확인
-                
+        $('#receivDetailAdd').off('click.receiverDetailModal').on('click.receiverDetailModal', function(e){
+            if( receivDetailModal.validation() ){
                 var params ={};
                 params.address = $('#formEmail').val();
                 params.name = $('#formName').val();
                 params.data1 = $('#formTelnumber').val();
-                var sCallBack = function(){
-                    receivDetailModal.setPaging();
+                params.addrGrpId = receivDetailModal.field.addrGrpId;
+
+                //중복체크 확인 후 add
+                var ssCallBack = function(resultData){
+                    if(resultData && resultData.data === 'N'){
+                        var sCallBack = function(resultData){
+                            if(resultData && resultData.data === 'SUCCESS'){
+                                receivDetailModal.setPaging();
+                            }else{
+                                alert('생성 실패');
+                            }
+                        }
+                        alarmeCommon.ajaxCall('post','/mail/receiver/group/detail',JSON.stringify(params),null,null,sCallBack,null);
+                    }else{
+                        alert('추가하려는 데이터가 존재합니다. \r\n 데이터를 확인해 주시기 바랍니다.');
+                    }
                 }
 
-                alarmeCommon.ajaxCall('post','/mail/receiver/group',JSON.stringify(params),null,null,sCallBack,null);
+                alarmeCommon.ajaxCall('get','/mail/receiver/group/detail/checkRow',params, null,null,ssCallBack,null);
             }
         });
 
         //테스트 확인
-        $('#receivDetailEdit').off('click.receiverModal').on('click.receiverModal', function(){
-            if( receivDetailModal.field.editClickChk ){
+        $('#receivDetailEdit').off('click.receiverDetailModal').on('click.receiverDetailModal', function(e){
+            if( receivDetailModal.field.editField.editClickChk ){
                 if( receivDetailModal.validation() ){
+                    if( !receivDetailModal.field.editField.editAddrMbrId ) {
+                        console.log('is not defined mbrId');
+                        return;
+                    }
+
                     var params ={};
                     params.address = $('#formEmail').val();
                     params.name = $('#formName').val();
                     params.data1 = $('#formTelnumber').val();
-                    var sCallBack = function(){
-                        receivDetailModal.setPaging();
+                    params.addrGrpId = receivDetailModal.field.addrGrpId;
+                    params.addrMbrId = receivDetailModal.field.editField.editAddrMbrId;
+
+                    var ssCallBack = function(resultData){
+                        if(resultData && resultData.data === 'N'){
+                            var sCallBack = function(resultData){
+                                if(resultData && resultData.data === 'SUCCESS'){
+                                    receivDetailModal.setPaging();
+                                }else{
+                                    alert('수정 실패');
+                                }
+                            }
+                            alarmeCommon.ajaxCall('put','/mail/receiver/group/detail',JSON.stringify(params),null,null,sCallBack,null);
+                        }else{
+                            alert('수정하려는 데이터가 존재합니다. \r\n 데이터를 확인해 주시기 바랍니다.');
+                        }
                     }
 
-                    alarmeCommon.ajaxCall('put','/mail/receiver/group/detail',JSON.stringify(params),null,null,sCallBack,null);
+                    alarmeCommon.ajaxCall('get','/mail/receiver/group/detail/checkRow',params, null,null,ssCallBack,null);
                 }
+            }else{
+                alert('리스트중 하나를 선택하여 주시기 바랍니다.');
             }
         });
 
-        $('#receivDetailReset').off('click.receiverModal').on('click.receiverModal', function(){
+        $('#receivDetailReset').off('click.receiverDetailModal').on('click.receiverDetailModal', function(e){
             $('#formEmail').val('');
             $('#formName').val('');
             $('#formTelnumber').val('');
+            receivDetailModal.field.editField.editClickChk = false;
+            receivDetailModal.field.editField.editAddrMbrId = '';
         });
 
         $('#receiverDetailListTable tr td#delTd').off('click.receiverDetailModal').on('click.receiverDetailModal',function(e){
+            e.stopPropagation();
             if( confirm('삭제하시겠습니까?') ){
-                var sCallBack = function(){
-                    var addrMbrId = $(this).data('addrMbrId');
-                    //진행예정
-
-                    var sCallBack = function(){
-                        receivDetailModal.setPaging();
-                    }
-
-                    alarmeCommon.ajaxCall('delete','/mail/receiver/group//detail'+addrMbrId,null,null,null,sCallBack,null);
+                var addrMbrId = $(this).data('addrmbrid');
+                if(!addrMbrId){
+                    return;
                 }
+
+                var sCallBack = function(resultData){
+                    if(resultData && resultData.data === 'SUCCESS'){
+                        receivDetailModal.setPaging();
+                    }else{
+                        alert('삭제 실패');
+                    }
+                }
+
+                alarmeCommon.ajaxCall('delete','/mail/receiver/group/detail/'+addrMbrId,null,null,null,sCallBack,null);
             }
         });
 
-        $('#receiverDetailListTable tr').off('click.receiverDetailModal').on('click.receiverDetailModal',function(e){ssss
-            var params = {};
-            params.addrGrpId = $(this).data('addrgrpid') || null;
-            params.addrMbrId = $(this).data('addrmbrid') || null;
-            params.name = $(this).data('name') || '';
-            params.address = $(this).data('email') || '';
-            params.data1 = $(this).data('telnumber') || '';
+        $('#receiverDetailListTable tr').off('click.receiverDetailModal').on('click.receiverDetailModal',function(e){
+            var elem = $(e.currentTarget);
+            $('#formEmail').val(elem.data('email') || '');
+            $('#formName').val(elem.data('name') || '');
+            $('#formTelnumber').val(elem.data('telnumber') || '');
+            receivDetailModal.field.editField.editClickChk = true;
+            receivDetailModal.field.editField.editAddrMbrId = elem.data('addrmbrid') || '';
+        });
 
-            $('#formEmail').val($(this).data('email'));
-            $('#formName').val($(this).data('name'));
-            $('#formTelnumber').val($(this).data('telnumber'));
-            receivDetailModal.field.editClickChk = true;
+        $('select[name="receiverDetailListTable_length"]').off('change.receivDetailSelected').on('change.receivDetailSelected',function(e){
+            receivDetailModal.field.currIdx = 1;
+            receivDetailModal.setPaging();
         });
 
     }
@@ -143,8 +187,8 @@ var receiverObj = (function($, receivDetailModal){
                     contentList.forEach(function(elem, index){
                         elem.createdDt = (elem.createdDt) ? moment(elem.createdDt).format('YYYY.MM.DD') : '';
                         elem.modifiedDt = (elem.modifiedDt) ? moment(elem.modifiedDt).format('YYYY.MM.DD') : '';
-                        var evenHtml = '<tr role="row" class="even" data-addrGrpId="'+elem.addrGrpId+'" data-addrMbrId="'+elem.addrMbrId+'" data-name="'+elem.name+'" data-email="'+elem.address+'" data-telnumber="'+elem.address+'">';
-                        var oddHtml = '<tr role="row" class="odd" data-addrGrpId="'+elem.addrGrpId+'" data-addrMbrId="'+elem.addrMbrId+'" data-name="'+elem.name+'" data-email="'+elem.address+'" data-telnumber="'+elem.address+'">';
+                        var evenHtml = '<tr role="row" class="even" data-addrGrpId="'+elem.addrGrpId+'" data-addrMbrId="'+elem.addrMbrId+'" data-name="'+elem.name+'" data-email="'+elem.address+'" data-telnumber="'+elem.data1+'">';
+                        var oddHtml = '<tr role="row" class="odd" data-addrGrpId="'+elem.addrGrpId+'" data-addrMbrId="'+elem.addrMbrId+'" data-name="'+elem.name+'" data-email="'+elem.address+'" data-telnumber="'+elem.data1+'">';
 
                         $html += (index%2==0) ? evenHtml:oddHtml;
                         $html += '<td name="rowTd" class="text-center">'+elem.addrGrpName+'</td>';
@@ -162,11 +206,35 @@ var receiverObj = (function($, receivDetailModal){
                 $('#receiverDetailListTable tbody').html($html);
 
                 receivDetailModal.setPagination(resultData.data.totPage, 5, receivDetailModal.field.currIdx );
+                var showTxt = 'showing '+resultData.data.startShowRow+' to '+resultData.data.endShowRow+ ' of '+resultData.data.totCnt;
+                $('#receiverDetailListTable_info').text(showTxt);
                 receivDetailModal.setEvent();
             }
         }
 
-        alarmeCommon.ajaxCall('get','/mail/receiver/group/detail',receivDetailModal.field, null,null,sCallBack,null);
+        var params = {};
+        params.selected = $('select[name="receiverDetailListTable_length"] option:selected').val() || '10';
+        params.addrGrpId = receivDetailModal.field.addrGrpId;
+        params.currIdx = receivDetailModal.field.currIdx;
+        params.keyword = $('#receivDetSearch').val();
+
+        alarmeCommon.ajaxCall('get','/mail/receiver/group/detail',params, null,null,sCallBack,null);
+    }
+
+    receivDetailModal.allReset = function(){
+        this.field = {
+            addrGrpId : null,
+            currIdx : 0,
+            editField : {
+                editClickChk : false,
+                editAddrMbrId : ''
+            }
+        }
+        $('#formEmail').val('');
+        $('#formName').val('');
+        $('#formTelnumber').val('');
+        $('#receivDetSearch').val('');
+        $('select[name="receiverDetailListTable_length"] option').eq(0).prop('selected',true);
     }
 
     receivDetailModal.init();

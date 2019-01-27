@@ -11,9 +11,6 @@
             </div>
             <div class="modal-body">
                 <form class="form-inline">
-                    <!--메일<input class="form-control" type="text" name="receivDetailGrpName" maxlength="10" required>-->
-                    <!--이름<input class="form-control" type="text" name="receivDetailGrpName" maxlength="10" required>-->
-                    <!--전화번호<input class="form-control" type="text" name="receivDetailGrpName" maxlength="10" required>-->
                     <!--메일-->
                         <div class="input-group">
                             <div class="input-group-prepend">
@@ -21,7 +18,7 @@
                                     <i class="tim-icons icon-email-85"></i>
                                 </div>
                             </div>
-                            <input type="email" required="" name="email" class="form-control" placeholder="Email...">
+                            <input type="email" id="formEmail" required="" name="email" class="form-control" placeholder="Email...">
                         </div>
                     <!--이름-->
                          &nbsp;&nbsp;
@@ -31,7 +28,7 @@
                                     <i class="tim-icons icon-caps-small"></i>
                                 </div>
                             </div>
-                            <input type="text" name="lastname" placeholder="Name..." class="form-control">
+                            <input type="text" id="formName" name="lastname" placeholder="Name..." class="form-control">
                         </div>
                     <!--전화번호-->
                         &nbsp;&nbsp;
@@ -41,10 +38,12 @@
                                     <i class="tim-icons icon-mobile"></i>
                                 </div>
                             </div>
-                            <input type="number" name="number" class="form-control" placeholder="TelNumber...">
+                            <input type="number" id="formTelnumber" name="number" class="form-control" placeholder="TelNumber...">
                         </div>
                         &nbsp;&nbsp;
-                    <a href="#" role="button" class="btn btn-primary btn-sm" title="add" >추가</a>
+                    <a href="#" role="button" class="btn btn-primary btn-sm" title="add" id="receivDetailAdd">추가</a>
+                    <a href="#" role="button" class="btn btn-primary btn-sm" title="edit" id="receivDetailEdit">수정</a>
+                    <a href="#" role="button" class="btn btn-primary btn-sm" title="del" id="receivDetailReset">초기화</a>
                 </form>
 
                 <div id="receiverDetailListTable_wrapper" class="dataTables_wrapper dt-bootstrap4 no-footer">
@@ -52,7 +51,7 @@
                         <div class="col-sm-12 col-md-6">
                             <div class="dataTables_length" id="receiverListTable_length">
                                 <label>Show
-                                    <select name="receiverListTable_length" aria-controls="receiverListTable" class="custom-select custom-select-sm form-control form-control-sm">
+                                    <select name="receiverDetailListTable_length" aria-controls="receiverListTable" class="custom-select custom-select-sm form-control form-control-sm">
                                         <option value="10">10</option>
                                         <option value="25">25</option>
                                         <option value="50">50</option>
@@ -62,7 +61,7 @@
                         </div>
                         <div class="col-sm-12 col-md-6">
                             <div id="receiverListTable_filter" class="dataTables_filter">
-                                <label><input type="search" class="form-control" placeholder="Search records" aria-controls="receiverListTable"></label>
+                                <label><input type="search" id="receivDetSearch" class="form-control" placeholder="Search records" aria-controls="receiverListTable"></label>
                             </div>
                         </div>
                     </div>
@@ -106,39 +105,8 @@
                         </div>
                     </div>
                 </div>
-
-
-
-                <!--<nav aria-label="Page navigation example" style="text-align: center;">-->
-                    <!--<ul class="pagination-sm" id="pagination"></ul></nav>-->
-                <!--<div class="card-body">-->
-                    <!--<div class="col-sm-12">-->
-                        <!--<table id="receiverDetailListTable" class="table" role="grid" aria-describedby="datatable_info"-->
-                               <!--style="width:100%">-->
-                            <!--<thead>-->
-                            <!--<tr role="row">-->
-                                <!--<th class="text-center" tabindex="0" aria-controls="datatable" style="width:20%">그룹이름-->
-                                <!--</th>-->
-                                <!--<th class="text-center" tabindex="0" aria-controls="datatable" style="width:15%">메일-->
-                                <!--</th>-->
-                                <!--<th class="text-center" tabindex="0" aria-controls="datatable" style="width:15%">이름-->
-                                <!--</th>-->
-                                <!--<th class="text-center" tabindex="0" aria-controls="datatable" style="width:10%">등록일자-->
-                                <!--</th>-->
-                                <!--<th class="text-center" tabindex="0" aria-controls="datatable" style="width:10%">수정일자-->
-                                <!--</th>-->
-                                <!--<th class="text-center" tabindex="0" aria-controls="datatable" style="width:9%">삭제</th>-->
-                            <!--</tr>-->
-                            <!--</thead>-->
-                            <!--<tbody>-->
-
-                            <!--</tbody>-->
-                        <!--</table>-->
-                    <!--</div>-->
-                <!--</div>-->
             <div class="modal-footer">
-                <!--<button type="button" class="btn btn-secondary" data-dismiss="modal">취소</button>-->
-                <!--<button type="button" id="receivModEditButt" class="btn btn-primary">수정</button>-->
+            </div>
             </div>
         </div>
     </div>
