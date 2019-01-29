@@ -3,10 +3,12 @@ package com.project.alarmeweb.controller.mail;
 import com.project.alarmeweb.controller.BaseController;
 import com.project.alarmeweb.dto.Realtime;
 import com.project.alarmeweb.service.RealtimeService;
+import org.apache.commons.lang3.StringUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -15,9 +17,7 @@ import org.springframework.web.servlet.ModelAndView;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 @Controller
 public class RealtimeController extends BaseController {
@@ -114,4 +114,20 @@ public class RealtimeController extends BaseController {
 
         return result.toString();
     }
+
+    @RequestMapping(value={"/mail/send/realtime/setting/activeYn"}, produces= MediaType.APPLICATION_JSON_VALUE, method = {RequestMethod.PUT})
+    @ResponseBody
+    public Map realtimeActiveYn(@RequestBody Realtime realtime){
+        Map resultData = new HashMap<>();
+        Realtime reaTime = Optional.ofNullable(realtime).filter(row->StringUtils.isNotEmpty(row.getActiveYn())).filter(row->row.getSchdlId() > 0).orElse(null);
+        if( Objects.isNull(reaTime) ){
+            resultData.put("data","FAIL");
+            return resultData;
+        }
+        int cnt = realtimeService.updateActiveYn(realtime);
+        resultData.put("data", (cnt > 0) ? "SUCCESS" : "FAIL"  );
+
+        return resultData;
+    }
+
 }

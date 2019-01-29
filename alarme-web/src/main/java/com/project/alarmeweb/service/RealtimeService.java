@@ -7,4 +7,5 @@ import java.util.List;
 public interface RealtimeService {
     int insertRealtimeSchdl(Realtime realtime);
     List<Realtime> selectRealtimeMasterList();
+    int updateActiveYn(Realtime realtime);
 }

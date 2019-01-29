@@ -1,12 +1,40 @@
 (function($, realtimeSetting){
 
     realtimeSetting.init = function(){
-        CKEDITOR.replace( 'contents');
-
         this.setEvent();
+        console.log('setEvent go');
+        // CKEDITOR.replace('contents');
     };
 
     realtimeSetting.setEvent = function(){
+        $(function() {
+            $('.bootstrap-switch-handle-on, .bootstrap-switch-handle-off, .bootstrap-switch-label').on('click',function(){
+                console.log($(this).siblings().filter('input').is(':checked'));
+                var chkbox = $(this).siblings().filter('input');
+                console.log(chkbox);
+                if( chkbox[0] ){
+                    var $schdlId = chkbox.data('schdlid') || '';
+                    var $activeYn = chkbox.is(':checked') ? 'Y' : 'N';
+                    var params = { schdlId : $schdlId, activeYn : $activeYn };
+
+                    if( !$schdlId ){
+                        return;
+                    }
+
+                    var sCallBack = function(resultData){
+                        if( resultData && resultData.data ){
+                            if( resultData.data === 'SUCCESS'){
+                                console.log('성공');
+                            }
+                        }
+                        console.log('테스트');
+                    }
+
+                    alarmeCommon.ajaxCall('put','/mail/send/realtime/setting/activeYn',JSON.stringify(params), null,null,sCallBack,null);
+                }
+            });
+        });
+
         $('button[name="realtimeSave"]').on('click.setting', function(){
             var data = {
                 "title" : $('#title').val(),

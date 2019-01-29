@@ -31,6 +31,13 @@
                 #{realtime.sendGubun}, #{realtime.sendType}, #{realtime.sendFlag}, SYSDATE(), SYSDATE())
     </insert>
 
+    <update id="updateActiveYn">
+        UPDATE GS_SEND_SCHDL
+        SET ACTIVE_YN = #{realtime.activeYn}
+        WHERE SCHDL_ID = #{realtime.schdlId}
+    </update>
+
+
 
 </mapper>
 

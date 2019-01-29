@@ -22,4 +22,7 @@ public class RealtimeServiceImpl implements RealtimeService {
     public List<Realtime> selectRealtimeMasterList() {
         return realtimeMapper.selectRealtimeMasterList();
     }
+
+    @Override
+    public int updateActiveYn(Realtime realtime) { return realtimeMapper.updateActiveYn(realtime); }
 }

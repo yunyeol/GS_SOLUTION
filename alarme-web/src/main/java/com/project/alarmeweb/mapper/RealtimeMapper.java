@@ -10,4 +10,5 @@ import java.util.List;
 public interface RealtimeMapper {
     int insertRealtimeSchdl(@Param("realtime") Realtime realtime);
     List<Realtime> selectRealtimeMasterList();
+    int updateActiveYn(@Param("realtime") Realtime realtime);
 }

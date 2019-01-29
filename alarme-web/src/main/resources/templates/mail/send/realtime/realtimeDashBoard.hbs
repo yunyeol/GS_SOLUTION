@@ -2,7 +2,7 @@
 <div class="card" style="border:1px solid #e14eca">
     <div class="card-header row">
         <h4 class="card-title col-sm-10">{{schdlName}} </h4>
-        <input type="checkbox" {{activeYn}} checked name="checkbox" class="bootstrap-switch col-sm-2" data-on-label="ON" data-off-label="OFF">
+        <input type="checkbox" name="checkbox" class="bootstrap-switch col-sm-2" data-on-label="ON" data-off-label="OFF" data-schdlId="{{schdlId}}" {{#if activeYn 'Y'}}checked{{/if}}>
     </div>
     <div class="card-body">
         <div class="row">
