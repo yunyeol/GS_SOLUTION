@@ -7,9 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.springframework.batch.core.*;
-import org.springframework.batch.core.launch.JobOperator;
-import org.springframework.batch.core.launch.support.SimpleJobLauncher;
-import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Map;
@@ -18,10 +15,6 @@ import java.util.Map;
 @Slf4j
 public class RealtimeSendExecutor extends JobParameterContents implements Job {
 
-    @Autowired private JobOperator jobOperator;
-    @Autowired private JobRepository jobRepository;
-    @Autowired private SimpleJobLauncher simpleJobLauncher;
-
     @Autowired private RealtimeSendJob realtimeSendJob;
     @Autowired private RealtimeSendService realtimeSendService;
 
@@ -29,6 +22,7 @@ public class RealtimeSendExecutor extends JobParameterContents implements Job {
     public void execute(JobExecutionContext context) {
         try {
             Map<String, Object> jobDataMap = context.getMergedJobDataMap();
+            String jobName = (String) jobDataMap.get(JOB_NAME);
 
             for (Realtime realtime : realtimeSendService.selectRealtimeSchdlList()){
                 jobDataMap.put("jobName", "RealtimeMailSend");
@@ -37,7 +31,13 @@ public class RealtimeSendExecutor extends JobParameterContents implements Job {
 
                 JobParameters jobParameters = getJobParametersFromJobMap(jobDataMap);
 
-                JobExecution jobExecution = simpleJobLauncher.run(realtimeSendJob.realtimeSendJobDetail(), jobParameters);
+                boolean isStarted = jobRepository.isJobInstanceExists(jobName, jobParameters);
+
+                if(!isStarted && !realtimeSendService.isRunningChk(realtime.getSchdlId()) && realtime.getQueId() > 0){
+                    simpleJobLauncher.run(realtimeSendJob.realtimeSendJobDetail(), jobParameters);
+                }else{
+                    log.info("{} job is already running ", jobName);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();

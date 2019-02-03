@@ -6,18 +6,22 @@
 
     <select id="selectRealtimeSchdl" resultType="Realtime">
         SELECT
-            SCHDL_ID schdlId,
-            SCHDL_NAME schdlName,
-            SENDER sender,
-            FILE_PATH filePath,
-            SEND_GUBUN sendGubun,
-            SEND_TYPE sendType,
-            ACTIVE_YN activeYn
-        FROM GS_SEND_SCHDL
-        WHERE MASTER_SCHDL_ID = 0
-        AND SEND_GUBUN = 'M'
-        AND SEND_TYPE = 'R_M'
-        AND ACTIVE_YN = 'Y'
+            GSS.SCHDL_ID schdlId,
+            GSS.SCHDL_NAME schdlName,
+            GSS.SENDER sender,
+            GSS.FILE_PATH filePath,
+            GSS.SEND_GUBUN sendGubun,
+            GSS.SEND_TYPE sendType,
+            GSS.ACTIVE_YN activeYn,
+
+            GMQ.ID queId
+        FROM GS_SEND_SCHDL GSS, GS_MAIL_QUEUE GMQ
+        WHERE GSS.MASTER_SCHDL_ID = 0
+        AND GSS.SCHDL_ID = GMQ.SCHDL_ID
+        AND GSS.SEND_GUBUN = 'M'
+        AND GSS.SEND_TYPE = 'R_M'
+        AND GSS.ACTIVE_YN = 'Y'
+        LIMIT 1
     </select>
 
     <select id="selectRealtimeTodaySchdl" resultType="Realtime">

@@ -9,7 +9,6 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.launch.support.SimpleJobLauncher;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Map;
@@ -17,7 +16,6 @@ import java.util.Map;
 @Slf4j
 public class RealtimeResultExecutor extends JobParameterContents implements Job {
 
-    @Autowired private SimpleJobLauncher simpleJobLauncher;
     @Autowired private RealtimeResultJob realtimeResultJob;
     @Autowired private RealtimeSendService realtimeSendService;
 

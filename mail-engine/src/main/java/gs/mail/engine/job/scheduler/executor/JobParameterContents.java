@@ -3,12 +3,21 @@ package gs.mail.engine.job.scheduler.executor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
+import org.springframework.batch.core.configuration.JobLocator;
+import org.springframework.batch.core.launch.JobOperator;
+import org.springframework.batch.core.launch.support.SimpleJobLauncher;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Date;
 import java.util.Map;
 
 @Slf4j
 public class JobParameterContents {
+    @Autowired protected JobOperator jobOperator;
+    @Autowired protected JobRepository jobRepository;
+    @Autowired protected SimpleJobLauncher simpleJobLauncher;
+
     protected static final String JOB_NAME = "jobName";
 
     protected JobParameters getJobParametersFromJobMap(Map<String, Object> jobDataMap) {
