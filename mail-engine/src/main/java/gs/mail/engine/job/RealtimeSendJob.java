@@ -26,10 +26,12 @@ import org.springframework.core.task.TaskExecutor;
 import java.io.*;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
 import java.util.*;
+import java.util.concurrent.Future;
 
 @Slf4j
 @Configuration
@@ -47,7 +49,8 @@ public class RealtimeSendJob extends SmtpSocket{
     @Autowired private RealtimeSendService realtimeSendService;
 
     @Value("${mail.smtp.send.log.path}") String dirPath;
-    @Value("${batch.commit.interval}") private int commitInterval;
+    //@Value("${batch.commit.interval}") private int commitInterval;
+    private int commitInterval = 5000;
     @Value("${batch.slave.cnt}") private int slaveCnt;
 
     @Bean
@@ -220,7 +223,7 @@ public class RealtimeSendJob extends SmtpSocket{
 
 
                             /** nio socket*/
-                            //SocketChannel socketChannel = SocketChannel.open(new InetSocketAddress(getMxDomain(domain), port));
+//                            SocketChannel socketChannel = SocketChannel.open(new InetSocketAddress(getMxDomain(domain), port));
                             SocketChannel socketChannel = SocketChannel.open(new InetSocketAddress("119.207.76.55", port));
                             socketChannel.configureBlocking(false);
 
@@ -229,6 +232,17 @@ public class RealtimeSendJob extends SmtpSocket{
 ////                            if(socketChannel !=null){
 ////                                socketChannel.close();
 ////                            }
+
+                            /** nio2 socket */
+//                            AsynchronousSocketChannel asyncSocketChannel = AsynchronousSocketChannel.open();
+//                            //InetSocketAddress addr = new InetSocketAddress(getMxDomain(domain), port);
+////                            InetSocketAddress addr = new InetSocketAddress("119.207.76.55", port);
+////                            Future<Void> conn = asycSocketChannel.connect(addr);
+//                            //conn.get();
+//
+//                            //if(!conn.isDone()){
+//                                socketSendNio2(asyncSocketChannel, "R", dirPath, realtime);
+//                            //}
 
                             cnt++;
                         }

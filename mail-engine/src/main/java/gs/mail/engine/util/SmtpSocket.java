@@ -9,17 +9,17 @@ import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.*;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.nio.ByteBuffer;
-import java.nio.channels.SelectionKey;
-import java.nio.channels.Selector;
-import java.nio.channels.SocketChannel;
+import java.nio.channels.*;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.Future;
 
 @Slf4j
 public class SmtpSocket {
@@ -197,6 +197,164 @@ public class SmtpSocket {
                 byteBuffer.put(charset.encode("QUIT"+carriageReturn));
                 byteBuffer.flip();
                 socketChannel.write(byteBuffer);
+
+                //socketChannel.close();
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    protected void socketSendNio2(AsynchronousSocketChannel asyncSocketChannel, String gubun, String dirPath, Send send){
+        ByteBuffer byteBuffer = ByteBuffer.allocate(1024);
+        ByteBuffer readBuffer = ByteBuffer.allocate(1024);
+
+        String carriageReturn = "\r\n";
+        //PrintStream ps = null;
+        //BufferedReader br = null;
+        //PrintWriter sendLog = null;
+        Charset charset = Charset.forName("euc-kr");
+
+        try{
+            InetSocketAddress addr = new InetSocketAddress("119.207.76.55", port);
+            Future<Void> conn = asyncSocketChannel.connect(addr);
+            conn.get();
+
+            synchronized( this ) {
+                //ps = new PrintStream(socket.getOutputStream(), true, "euc-kr");
+                //br = new BufferedReader(new InputStreamReader(socketChannel.socket().getInputStream(), "euc-kr"));
+
+//                String fileDir = dirPath;
+//                if (gubun.equals("C")) {
+//                    fileDir = fileDir + "campaign/";
+//                } else if (gubun.equals("R")) {
+//                    fileDir = fileDir + "realtime/";
+//                }
+
+//                Date today = new Date();
+//                SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHH");
+//
+//                File dir = new File(fileDir);
+//                if (!dir.exists()) {
+//                    dir.mkdirs();
+//                }
+
+//                File file = new File(fileDir + "sendLog_"+send.getSchdlId()+"_" + sdf.format(today) + ".log");
+//                sendLog = new PrintWriter(new BufferedWriter(new FileWriter(file, true)), true);
+//
+//                sendLog.print("SOCKET_CONN:"+subStringResult(br.readLine())+"||");
+//                sendLog.print("UUID:"+send.getUuid()+"||");
+
+                log.info("#### 1");
+                byteBuffer.clear();
+                byteBuffer.put(charset.encode("HELO "+send.getReceiver().substring(send.getReceiver().indexOf("@")+1)+carriageReturn));
+                byteBuffer.flip();
+                asyncSocketChannel.write(byteBuffer);
+//                asyncSocketChannel.read(readBuffer, null, new CompletionHandler<Integer, Object>() {
+//                    @Override
+//                    public void completed(Integer result, Object attachment) {
+//                        readBuffer.flip();
+//                        log.info("response from server "+result+" "
+//                                +Charset.defaultCharset()
+//                                .decode(readBuffer).toString());
+//                    }
+//
+//                    @Override
+//                    public void failed(Throwable exc, Object attachment) {
+//                        log.info("## failed ##");
+//
+//                    }
+//                });
+
+                byteBuffer.clear();
+                byteBuffer.put(charset.encode("MAIL FROM: <"+send.getSender()+">"+carriageReturn));
+                byteBuffer.flip();
+                asyncSocketChannel.write(byteBuffer);
+//                asyncSocketChannel.read(readBuffer, null, new CompletionHandler<Integer, Object>() {
+//                    @Override
+//                    public void completed(Integer result, Object attachment) {
+//                        readBuffer.flip();
+//                        log.info("response from server "+result+" "
+//                                +Charset.defaultCharset()
+//                                .decode(readBuffer).toString());
+//                    }
+//
+//                    @Override
+//                    public void failed(Throwable exc, Object attachment) {
+//                        log.info("## failed ##");
+//
+//                    }
+//                });
+
+                byteBuffer.clear();
+                byteBuffer.put(charset.encode("RCPT TO:<"+send.getReceiver()+">"+carriageReturn));
+                byteBuffer.flip();
+                asyncSocketChannel.write(byteBuffer);
+//                asyncSocketChannel.read(readBuffer, null, new CompletionHandler<Integer, Object>() {
+//                    @Override
+//                    public void completed(Integer result, Object attachment) {
+//                        readBuffer.flip();
+//                        log.info("response from server "+result+" "
+//                                +Charset.defaultCharset()
+//                                .decode(readBuffer).toString());
+//                    }
+//
+//                    @Override
+//                    public void failed(Throwable exc, Object attachment) {
+//                        log.info("## failed ##");
+//
+//                    }
+//                });
+
+                byteBuffer.clear();
+                byteBuffer.put(charset.encode("DATA "+carriageReturn));
+                byteBuffer.flip();
+                asyncSocketChannel.write(byteBuffer);
+//                asyncSocketChannel.read(readBuffer, null, new CompletionHandler<Integer, Object>() {
+//                    @Override
+//                    public void completed(Integer result, Object attachment) {
+//                        readBuffer.flip();
+//                        log.info("response from server "+result+" "
+//                                +Charset.defaultCharset()
+//                                .decode(readBuffer).toString());
+//                    }
+//
+//                    @Override
+//                    public void failed(Throwable exc, Object attachment) {
+//                        log.info("## failed ##");
+//
+//                    }
+//                });
+
+                byteBuffer.clear();
+                byteBuffer.put(charset.encode("Mime-Version: 1.0"+carriageReturn));
+                byteBuffer.put(charset.encode("Content-Type:text/html;charset=euc-kr"+carriageReturn));
+                byteBuffer.put(charset.encode("Content-Transfer-Encoding:8bit"+carriageReturn));
+                byteBuffer.put(charset.encode("Subject:"+send.getTitle()+carriageReturn));
+                byteBuffer.put(charset.encode("From:"+send.getSender()+carriageReturn));
+                byteBuffer.put(charset.encode("To:"+send.getReceiver()+carriageReturn));
+                byteBuffer.put(charset.encode("Date: "+new Date()+carriageReturn));
+                byteBuffer.put(charset.encode(carriageReturn));
+                byteBuffer.put(charset.encode(send.getContents()+carriageReturn));
+                byteBuffer.put(charset.encode("."+carriageReturn));
+                byteBuffer.put(charset.encode("QUIT"+carriageReturn));
+                byteBuffer.flip();
+                asyncSocketChannel.write(byteBuffer);
+//                asyncSocketChannel.read(readBuffer, null, new CompletionHandler<Integer, Object>() {
+//                    @Override
+//                    public void completed(Integer result, Object attachment) {
+//                        readBuffer.flip();
+//                        log.info("response from server "+result+" "
+//                                +Charset.defaultCharset()
+//                                .decode(readBuffer).toString());
+//                    }
+//
+//                    @Override
+//                    public void failed(Throwable exc, Object attachment) {
+//                        log.info("## failed ##");
+//
+//                    }
+//                });
 
                 //socketChannel.close();
             }
