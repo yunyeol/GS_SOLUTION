@@ -135,7 +135,8 @@ public class Config {
     public JobRepository jobRepository() throws Exception {
         JobRepositoryFactoryBean jobRepositoryFactoryBean = new JobRepositoryFactoryBean();
         jobRepositoryFactoryBean.setTransactionManager(transactionManager());
-        jobRepositoryFactoryBean.setIsolationLevelForCreate("ISOLATION_REPEATABLE_READ");
+        //jobRepositoryFactoryBean.setIsolationLevelForCreate("ISOLATION_REPEATABLE_READ");
+        jobRepositoryFactoryBean.setIsolationLevelForCreate("ISOLATION_READ_COMMITTED");
         jobRepositoryFactoryBean.setDataSource(dataSource());
         jobRepositoryFactoryBean.setDatabaseType("mysql");
         return jobRepositoryFactoryBean.getObject();

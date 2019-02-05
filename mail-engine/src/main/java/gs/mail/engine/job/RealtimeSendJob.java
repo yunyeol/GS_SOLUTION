@@ -24,18 +24,13 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.TaskExecutor;
 
 import java.io.*;
-import java.net.InetSocketAddress;
-import java.net.Socket;
 import java.nio.channels.AsynchronousSocketChannel;
-import java.nio.channels.SelectionKey;
-import java.nio.channels.Selector;
-import java.nio.channels.SocketChannel;
 import java.util.*;
-import java.util.concurrent.Future;
 
 @Slf4j
 @Configuration
-public class RealtimeSendJob extends SmtpSocket{
+public class RealtimeSendJob extends SmtpSocket
+{
 
     @Autowired private JobBuilderFactory jobBuilderFactory;
     @Autowired private StepBuilderFactory stepBuilderFactory;
@@ -203,6 +198,8 @@ public class RealtimeSendJob extends SmtpSocket{
 
                         String htmlContents = sb.toString();
 
+
+
                         int cnt = 0;
                         for(Realtime realtime : items){
                             realtime.setContents(htmlContents.replace("${CONTENTS}", new String(realtime.getContents().getBytes("UTF-8"))));
@@ -223,26 +220,22 @@ public class RealtimeSendJob extends SmtpSocket{
 
 
                             /** nio socket*/
-//                            SocketChannel socketChannel = SocketChannel.open(new InetSocketAddress(getMxDomain(domain), port));
-                            SocketChannel socketChannel = SocketChannel.open(new InetSocketAddress("119.207.76.55", port));
-                            socketChannel.configureBlocking(false);
-
-                            socketSendByte(socketChannel, "R", dirPath, realtime);
-
+                            //Selector selector = Selector.open();
+                            //SocketChannel socketChannel = SocketChannel.open(new InetSocketAddress(getMxDomain(domain), port));
+//                            SocketChannel socketChannel = SocketChannel.open(new InetSocketAddress("119.207.76.55", port));
+//                            socketChannel.configureBlocking(false);
+////                            socketChannel.register(selector, SelectionKey.OP_ACCEPT);
+//
+//                            socketSendByte(socketChannel, "R", dirPath, realtime);
+//
 ////                            if(socketChannel !=null){
 ////                                socketChannel.close();
 ////                            }
 
                             /** nio2 socket */
-//                            AsynchronousSocketChannel asyncSocketChannel = AsynchronousSocketChannel.open();
-//                            //InetSocketAddress addr = new InetSocketAddress(getMxDomain(domain), port);
-////                            InetSocketAddress addr = new InetSocketAddress("119.207.76.55", port);
-////                            Future<Void> conn = asycSocketChannel.connect(addr);
-//                            //conn.get();
-//
-//                            //if(!conn.isDone()){
-//                                socketSendNio2(asyncSocketChannel, "R", dirPath, realtime);
-//                            //}
+                            //AsynchronousSocketChannel asyncSocketChannel = AsynchronousSocketChannel.open();
+                            socketSendNio2(realtime);
+
 
                             cnt++;
                         }
