@@ -11,6 +11,7 @@ public class Realtime {
     private String schdlName;
     private String sender;
     private String filePath;
+    private String filePathHtml;
     private String sendGubun;
     private String sendType;
     private String sendFlag;

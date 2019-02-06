@@ -75,7 +75,15 @@
     <input type="hidden" id="loginId" value="{{loginId}}">
 
     {{> footer }}
-
+    <script>
+        var entryData = '{{entryData.[0]}}';
+        var realTiScdlId, realTiSetTitle, realTiSetHtml;
+        if(entryData){
+            realTiScdlId = '{{entryData.[0].schdlId}}';
+            realTiSetTitle = '{{entryData.[0].schdlName}}';
+            realTiSetHtml = '{{entryData.[0].filePathHtml}}';
+        }
+    </script>
     <script type="text/javascript" src="/viewJs/mail/send/realtime/realtimeSetting.js"></script>
 </body>
 </html>

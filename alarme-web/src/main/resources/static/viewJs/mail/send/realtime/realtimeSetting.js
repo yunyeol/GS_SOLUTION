@@ -1,41 +1,18 @@
 (function($, realtimeSetting){
 
     realtimeSetting.init = function(){
+        CKEDITOR.replace('contents');
         this.setEvent();
-        console.log('setEvent go');
-        // CKEDITOR.replace('contents');
+        this.detailInit();
     };
 
     realtimeSetting.setEvent = function(){
-        $(function() {
-            $('.bootstrap-switch-handle-on, .bootstrap-switch-handle-off, .bootstrap-switch-label').on('click',function(){
-                console.log($(this).siblings().filter('input').is(':checked'));
-                var chkbox = $(this).siblings().filter('input');
-                console.log(chkbox);
-                if( chkbox[0] ){
-                    var $schdlId = chkbox.data('schdlid') || '';
-                    var $activeYn = chkbox.is(':checked') ? 'Y' : 'N';
-                    var params = { schdlId : $schdlId, activeYn : $activeYn };
-
-                    if( !$schdlId ){
-                        return;
-                    }
-
-                    var sCallBack = function(resultData){
-                        if( resultData && resultData.data ){
-                            if( resultData.data === 'SUCCESS'){
-                                console.log('성공');
-                            }
-                        }
-                        console.log('테스트');
-                    }
-
-                    alarmeCommon.ajaxCall('put','/mail/send/realtime/setting/activeYn',JSON.stringify(params), null,null,sCallBack,null);
-                }
-            });
-        });
-
         $('button[name="realtimeSave"]').on('click.setting', function(){
+            if( entryData ){
+                realtimeSetting.edit();
+                return;
+            }
+
             var data = {
                 "title" : $('#title').val(),
                 "contents" : CKEDITOR.instances.contents.getData(),
@@ -67,6 +44,49 @@
             }
         });
     };
+
+    realtimeSetting.ConvertSystemSourcetoHtml = function(str){
+        str = str.replace(/&lt;/g, "<");
+        str = str.replace(/&gt;/g, ">");
+        str = str.replace(/\n/g,"<br />");
+        str = str.replace(/&nbsp;/g," ");
+        str = str.replace(/&amp;/g,"&");
+        return str;
+    };
+
+    realtimeSetting.detailInit = function(){
+        if( entryData && realTiScdlId ){
+            $(function() {
+                $('#title').val(realTiSetTitle);
+                $('button[name="realtimeSave"]').data('schdlId',realTiScdlId);
+                if( realTiSetHtml ){
+                    setTimeout(function() {
+                        CKEDITOR.instances.contents.setData(realtimeSetting.ConvertSystemSourcetoHtml(realTiSetHtml.substring(realTiSetHtml.search('&lt;p&gt;'), realTiSetHtml.search('&lt;/body'))));
+                        // $('iframe').contents().find('body').html(realtimeSetting.ConvertSystemSourcetoHtml(realTiSetHtml.substring(realTiSetHtml.search('&lt;p&gt;'), realTiSetHtml.search('&lt;/body'))));
+                    }, 1000);
+                }
+            });
+        }
+    };
+
+    realtimeSetting.edit = function(){
+        if( !realTiScdlId ){
+            return;
+        }
+        var params = { schdlId : realTiScdlId, filePathHtml : CKEDITOR.instances.contents.getData(),
+                       schdlName :  $('#title').val()};
+
+        var sCallBack = function(resultData){
+            if( resultData && resultData.data ){
+                if( resultData.data === 'SUCCESS'){
+                    console.log('성공');
+                    location.href='/mail/send/realtime';
+                }
+            }
+        }
+
+        alarmeCommon.ajaxCall('put','/mail/send/realtime/setting/save',JSON.stringify(params), null,null,sCallBack,null);
+    }
 
     realtimeSetting.init();
 })(jQuery, {});

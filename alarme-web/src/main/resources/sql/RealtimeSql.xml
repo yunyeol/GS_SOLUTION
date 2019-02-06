@@ -22,13 +22,16 @@
         AND MASTER_SCHDL_ID = 0
         AND SEND_TYPE = 'R_M'
     ]]>
+        <if test=" schdlId != null and schdlId != '' ">
+            AND SCHDL_ID = #{schdlId}
+        </if>
     </select>
 
     <insert id="insertRealtimeSchdl">
         INSERT INTO GS_SEND_SCHDL(MASTER_SCHDL_ID, SCHDL_NAME, SENDER, FILE_PATH,
-                                    SEND_GUBUN, SEND_TYPE, SEND_FLAG, RESERVE_DATE, REG_DATE)
+                                    SEND_GUBUN, SEND_TYPE, SEND_FLAG, SUBJECT, RESERVE_DATE, REG_DATE)
         VALUES(#{realtime.masterSchdlId}, #{realtime.schdlName}, #{realtime.sender}, #{realtime.filePath},
-                #{realtime.sendGubun}, #{realtime.sendType}, #{realtime.sendFlag}, SYSDATE(), SYSDATE())
+                #{realtime.sendGubun}, #{realtime.sendType}, #{realtime.sendFlag}, '', SYSDATE(), SYSDATE())
     </insert>
 
     <update id="updateActiveYn">
@@ -37,7 +40,18 @@
         WHERE SCHDL_ID = #{realtime.schdlId}
     </update>
 
+    <update id="updateRealtimeSetting">
+        UPDATE GS_SEND_SCHDL
+        SET SCHDL_NAME = #{realtime.schdlName}
+        WHERE MASTER_SCHDL_ID = 0
+        AND SEND_TYPE = 'R_M'
+        AND SCHDL_ID = #{realtime.schdlId}
+    </update>
 
+    <delete id="removeRealtime">
+        DELETE FROM GS_SEND_SCHDL
+        WHERE SCHDL_ID = #{schdlId}
+    </delete>
 
 </mapper>
 

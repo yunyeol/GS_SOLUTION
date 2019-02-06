@@ -1,20 +1,20 @@
 {{#realtimeMasterList}}
 <div class="card" style="border:1px solid #e14eca">
     <div class="card-header row">
-        <h4 class="card-title col-sm-10">{{schdlName}} </h4>
-        <input type="checkbox" name="checkbox" class="bootstrap-switch col-sm-2" data-on-label="ON" data-off-label="OFF" data-schdlId="{{schdlId}}" {{#if activeYn 'Y'}}checked{{/if}}>
+        <h4 class="card-title col-sm-10">{{schdlName}}</h4>
+        <input type="checkbox" name="checkbox" class="bootstrap-switch col-sm-2" data-on-label="ON" data-off-label="OFF" data-schdlId="{{schdlId}}" {{#if activeYn}}checked{{/if}}>
     </div>
     <div class="card-body">
         <div class="row">
             <div class="col-md-1">
                 <ul class="nav nav-pills nav-pills-primary flex-column">
                     <li class="nav-item">
-                        <button type="button" name="realtimeSetting" class="btn btn-primary btn-icon btn-simple btn-sm" >
+                        <button type="button" name="realtimeDettaSetting" class="btn btn-primary btn-icon btn-simple btn-sm" data-schdlId="{{schdlId}}">
                             <i class="tim-icons icon-settings"></i>
                         </button>
                     </li>
                     <li class="nav-item">
-                        <button type="button" name="realtimeSetting" class="btn btn-primary btn-icon btn-simple btn-sm" >
+                        <button type="button" name="realTimeDelSetting" class="btn btn-primary btn-icon btn-simple btn-sm" data-schdlId="{{schdlId}}">
                             <i class="tim-icons icon-trash-simple"></i>
                         </button>
                     </li>

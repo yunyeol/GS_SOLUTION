@@ -11,13 +11,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.ModelAndView;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Controller
 public class RealtimeController extends BaseController {
@@ -30,7 +29,7 @@ public class RealtimeController extends BaseController {
 
     @RequestMapping(value={"/mail/send/realtime"}, produces="text/html; charset=UTF-8", method = RequestMethod.GET)
     public String realtime(Model model){
-        List<Realtime> realtimeMasterList = realtimeService.selectRealtimeMasterList();
+        List<Realtime> realtimeMasterList = realtimeService.selectRealtimeMasterList(new HashMap<>());
 
         String sendFlagStr = "";
         for (Realtime realtime : realtimeMasterList){
@@ -59,7 +58,41 @@ public class RealtimeController extends BaseController {
     }
 
     @RequestMapping(value={"/mail/send/realtime/setting"}, produces="text/html; charset=UTF-8", method = RequestMethod.GET)
-    public String realtimeSetting(){
+    public String realtimeSetting(@RequestParam(value = "viewType", defaultValue = "",required = false) String viewType,
+                                  @RequestParam(value = "schdlId", defaultValue = "-1",required = false) long schdlId, Model model) throws Exception {
+        if( StringUtils.isNotEmpty(viewType) && "DETAIL".equals(viewType) ){
+            if( schdlId < 0 ){
+                throw new Exception("schdlId is null");
+            }
+            Map<String, Object> params = new HashMap<>();
+            params.put("schdlId",schdlId);
+            List<Realtime> realtimeList = realtimeService.selectRealtimeMasterList(params);
+            if( !CollectionUtils.isEmpty(realtimeList) ){
+                realtimeList = realtimeList.stream().filter(r->StringUtils.isNotEmpty(r.getFilePath())).map(r->{
+                  File file = new File(r.getFilePath());
+                  if( file.isFile() ){
+                      try{
+                          BufferedReader bufferedReader =  new BufferedReader(new FileReader(r.getFilePath()));
+                          StringBuilder stringBuilder = new StringBuilder();
+                          String line = "";
+                          while((line = bufferedReader.readLine()) != null){
+                              stringBuilder.append(line);
+                          }
+                          r.setFilePathHtml(stringBuilder.toString());
+                          bufferedReader.close();
+                      }catch (FileNotFoundException e) {
+                          logger.info("e :",e);
+                      }catch(IOException e){
+                          logger.info("e :",e);
+                      }
+                  }
+                  return  r;
+                }).limit(1).collect(Collectors.toList());
+            }
+
+            model.addAttribute("entryData",Optional.ofNullable(realtimeList).orElse(null));
+        }
+
         return "mail/send/realtime/realtimeSetting";
     }
 
@@ -87,11 +120,9 @@ public class RealtimeController extends BaseController {
         File file = null;
         try {
             file = new File(htmlPath+"/"+fileName);
-            FileWriter fw = new FileWriter(file, true);
-
+            BufferedWriter fw = new BufferedWriter(new FileWriter(file, true));
             fw.write(htmlContents);
             fw.flush();
-
             fw.close();
         } catch (IOException e) {
             e.printStackTrace();
@@ -115,11 +146,26 @@ public class RealtimeController extends BaseController {
         return result.toString();
     }
 
+    @RequestMapping(value={"/mail/send/realtime/setting/save"}, produces=MediaType.APPLICATION_JSON_VALUE, method = {RequestMethod.PUT})
+    @ResponseBody
+    public Map<String,String> realtimeSettingModify(@RequestBody Realtime realtime){
+        Map<String,String> resultData = new HashMap<>();
+        realtime = Optional.ofNullable(realtime).filter(r->r.getSchdlId() > 0).orElse(null);
+        if( Objects.isNull(realtime) ){
+            resultData.put("data","FAIL");
+            return resultData;
+        }
+        int cnt = realtimeService.updateRealtimeSetting(realtime);
+        resultData.put("data", (cnt > 0) ? "SUCCESS" : "FAIL"  );
+
+        return resultData;
+    }
+
     @RequestMapping(value={"/mail/send/realtime/setting/activeYn"}, produces= MediaType.APPLICATION_JSON_VALUE, method = {RequestMethod.PUT})
     @ResponseBody
-    public Map realtimeActiveYn(@RequestBody Realtime realtime){
-        Map resultData = new HashMap<>();
-        Realtime reaTime = Optional.ofNullable(realtime).filter(row->StringUtils.isNotEmpty(row.getActiveYn())).filter(row->row.getSchdlId() > 0).orElse(null);
+    public Map<String,String> realtimeActiveYn(@RequestBody Realtime realtime){
+        Map<String,String> resultData = new HashMap<>();
+        Realtime reaTime = Optional.ofNullable(realtime).filter(r->StringUtils.isNotEmpty(r.getActiveYn())).filter(r->r.getSchdlId() > 0).orElse(null);
         if( Objects.isNull(reaTime) ){
             resultData.put("data","FAIL");
             return resultData;
@@ -127,6 +173,15 @@ public class RealtimeController extends BaseController {
         int cnt = realtimeService.updateActiveYn(realtime);
         resultData.put("data", (cnt > 0) ? "SUCCESS" : "FAIL"  );
 
+        return resultData;
+    }
+
+    @RequestMapping(value={"/mail/send/realtime/{schdlId}"}, produces=MediaType.APPLICATION_JSON_VALUE, method = {RequestMethod.DELETE})
+    @ResponseBody
+    public Map<String,String> removeRealtime(@PathVariable Long schdlId){
+        Map<String,String> resultData = new HashMap<>();
+        int cnt = realtimeService.removeRealtime(schdlId);
+        resultData.put("data", (cnt > 0) ? "SUCCESS" : "FAIL"  );
         return resultData;
     }
 
