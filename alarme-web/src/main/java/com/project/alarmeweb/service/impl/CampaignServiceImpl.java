@@ -59,5 +59,20 @@ public class CampaignServiceImpl implements CampaignService {
 	public int updateSchdlSendFlag(Campaign campaign) {
 		return campaignMapper.updateSchdlSendFlag(campaign);
 	}
+
+	@Override
+	public int updateTargetStatus(Campaign campaign) {
+		return campaignMapper.updateTargetStatus(campaign);
+	}
+
+	@Override
+	public Campaign selectTargetStatus(int schdlId) {
+		return campaignMapper.selectTargetStatus(schdlId);
+	}
+
+	@Override
+	public int deleteCampaign(int schdlId) {
+		return campaignMapper.deleteCampaign(schdlId);
+	}
     
 }

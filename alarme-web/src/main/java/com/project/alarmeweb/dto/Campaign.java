@@ -14,6 +14,7 @@ public class Campaign {
     private String sender;
     private String senderName;
     private String filePath;
+    private String mailContent;         // 실제 메일 본문(String)
     private String targetFilePath;
     private String sendGubun;
     private String sendType = "C_F";

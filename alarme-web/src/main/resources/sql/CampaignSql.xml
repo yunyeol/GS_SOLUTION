@@ -27,6 +27,7 @@
         	GS_SEND_SCHDL
         WHERE
         	SEND_TYPE LIKE 'C%'
+        	AND DEL_YN = 'N'
 	]]>
 	</select>
 	
@@ -45,7 +46,7 @@
 			TARGET_CNT targetCnt,
 			DIVIDE_CNT divideCnt,
 			DATE_FORMAT(RESERVE_DATE, '%Y/%m/%d') reserveDate,
-			DATE_FORMAT(RESERVE_DATE, '%H:%m') reserveTime
+			DATE_FORMAT(RESERVE_DATE, '%H:%i') reserveTime
 		FROM
 			GS_SEND_SCHDL
 		WHERE
@@ -171,6 +172,39 @@
 	<![CDATA[
 		WHERE
 			SCHDL_ID = #{campaign.schdlId}
+	]]>
+	</update>
+
+	<update id="updateTargetStatus" parameterType="Campaign">
+		UPDATE
+			GS_SEND_SCHDL
+		SET
+			SEND_TYPE = #{campaign.sendType},
+			SEND_FLAG = #{campaign.sendFlag}
+			<if test='campaign.sendType != null and campaign.sendType == "C_D"'>
+				, ADDRESS_GRP_ID = #{campaign.addressGrpId}
+			</if>
+		WHERE
+			SCHDL_ID = #{campaign.schdlId}
+	</update>
+
+	<select id="selectTargetStatus" parameterType="int" resultType="Campaign">
+		SELECT
+			SEND_FLAG sendFlag
+		FROM
+			GS_SEND_SCHDL
+		WHERE
+			SCHDL_ID = #{schdlId}
+	</select>
+
+	<update id="deleteCampaign" parameterType="int">
+		<![CDATA[
+		UPDATE
+			GS_SEND_SCHDL
+		SET
+			DEL_YN = 'Y'
+		WHERE
+			SCHDL_ID = #{schdlId}
 	]]>
 	</update>
     

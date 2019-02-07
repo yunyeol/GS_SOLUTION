@@ -28,5 +28,11 @@ public interface CampaignMapper {
     int updateTargetFilePath(@Param("campaign") Campaign campaign);
     
     int updateSchdlSendFlag(@Param("campaign") Campaign campaign);
-    
+
+    int updateTargetStatus(@Param("campaign") Campaign campaign);
+
+    Campaign selectTargetStatus(@Param("schdlId") int schdlId);
+
+    int deleteCampaign(@Param("schdlId") int schdlId);
+
 }

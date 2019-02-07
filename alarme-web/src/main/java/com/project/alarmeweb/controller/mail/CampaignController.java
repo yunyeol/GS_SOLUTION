@@ -1,8 +1,12 @@
 package com.project.alarmeweb.controller.mail;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -77,11 +81,33 @@ public class CampaignController extends BaseController {
 		
 		List<AddressGrp> addressGrpList = campaignService.selectAddressGrpList(loginId());
 		
-		Campaign campaignInfo = new Campaign();
+		Campaign campaignInfo;
 		
 		if (schdlId > 0) {
 			// 기존 캠페인 수정
 			campaignInfo = campaignService.selectCampaignInfo(schdlId);
+
+			// 메일 본문 내용 가져옴
+            String filePath = campaignInfo.getFilePath();
+
+            Path contentPath = Paths.get(filePath);
+            Charset charset = StandardCharsets.UTF_8;
+
+            List<String> contentLines = new ArrayList<>();
+
+            try {
+                contentLines = Files.readAllLines(contentPath, charset);
+            } catch (IOException ioe) {
+                ioe.getStackTrace();
+            }
+
+            String mailContent = "";
+            for (String singleLine : contentLines) {
+                mailContent += singleLine;
+            }
+
+            campaignInfo.setMailContent(mailContent);
+
 		} else {
 			// 신규 캠페인 등록 : 현재 DB 시간 기본 세팅
 			campaignInfo = campaignService.getCurrentDBDatetime();
@@ -95,6 +121,20 @@ public class CampaignController extends BaseController {
 		
 		return "mail/send/campaign/campaignSetting";
     }
+
+	@ResponseBody
+	@RequestMapping(value = {"/mail/send/campaign/setting"}, method = {RequestMethod.DELETE})
+	public String campaignDelete(@RequestParam Map<String, String> params) {
+		// 캠페인 삭제 - UPDATE DEL_YN = Y
+
+		int schdlId = Integer.parseInt(StringUtils.defaultIfEmpty(params.get("schdlId"), "0"));
+
+		if (campaignService.deleteCampaign(schdlId) > 0) {
+            return makeResultStr("success", "");
+		} else {
+            return makeResultStr("fail", "");
+		}
+	}
     
     @ResponseBody
     @RequestMapping(value= {"/mail/send/campaign/setting/save"}, produces="text/html; charset=UTF-8", method = {RequestMethod.POST})
@@ -111,7 +151,7 @@ public class CampaignController extends BaseController {
     	campaign.setSendType(StringUtils.defaultIfEmpty(params.get("sendType"), "C_N"));
     	campaign.setSendFlag("00");
     	campaign.setFilePath("PROCESSING");
-    	
+
     	int schdlId = Integer.parseInt(StringUtils.defaultIfEmpty(params.get("schdlId"), "0"));
     	
     	// Exist schedule?
@@ -123,7 +163,6 @@ public class CampaignController extends BaseController {
     	} else {
     		// Generate schedule id
     		if (campaignService.insertCampaignSchdl(campaign) < 1) {
-    			System.out.println("fail - create schedule");
 				result.put("result", "fail");
 				result.put("desc", "create schedule fail");
 				return result.toString();
@@ -162,6 +201,7 @@ public class CampaignController extends BaseController {
     	}
     	
     	result.put("result", "success");
+    	result.put("desc", campaign.getSchdlId());
     	
     	return result.toString();
     }
@@ -171,56 +211,64 @@ public class CampaignController extends BaseController {
     public String uploadTargetFile(@RequestParam("schdlId") String schdlIdStr, @RequestParam("targetFile") MultipartFile targetFile) {
     	int schdlId = Integer.parseInt(StringUtils.defaultIfEmpty(schdlIdStr, "0"));
     	if (schdlId < 1) {
-    		return "fail";
+            return makeResultStr("fail", "Not exist schedule id");
     	}
-    	
+
     	String originalFilenameExtension = FilenameUtils.getExtension(targetFile.getOriginalFilename());
     	String generateFileName = schdlId + "_" + loginId() + "_" + System.currentTimeMillis() + "." + originalFilenameExtension;
-    	
+
     	try {
     		targetFile.transferTo(new File(targetFilePath + "/"+ generateFileName));
-    		
+
     		// 파일 업로드 후 업로드 파일명 업데이트
     		Campaign campaign = new Campaign();
     		campaign.setSchdlId(schdlId);
     		campaign.setTargetFilePath(generateFileName);
-    		
+
     		campaignService.updateTargetFilePath(campaign);
     	} catch (Exception e) {
     		e.printStackTrace();
-    		return "fail";
+            return makeResultStr("fail", "Create file error");
     	}
-    	
-    	return "success";
+
+        return makeResultStr("success", "");
     }
-    
+
     @ResponseBody
     @RequestMapping(value = {"/mail/send/campaign/setting/tgt/start"}, method = {RequestMethod.POST})
-    public String startTargeting(@RequestParam Map<String, String> params) {
+    public String startTargeting(@RequestBody Map<String, String> params) {
     	// 타겟팅 예약 - SEND_FLAG : 10
     	int schdlId = Integer.parseInt(StringUtils.defaultIfEmpty(params.get("schdlId"), "0"));
     	if (schdlId < 1) {
-    		return "fail";
+            return makeResultStr("fail", "Not exist schedule id");
     	}
+
+    	if (StringUtils.isEmpty(params.get("sendType"))
+                || ("C_D".equals(params.get("sendType")) && StringUtils.isEmpty(params.get("addressGrpId")) )) {
+            return makeResultStr("fail", "Parameter not exist");
+        }
     	
     	Campaign campaign = new Campaign();
     	campaign.setSchdlId(schdlId);
-    	campaign.setSendFlag("T1");
+    	campaign.setSendType(params.get("sendType"));
+    	if ("C_D".equals(campaign.getSendType())) {
+    	    campaign.setAddressGrpId(Integer.parseInt(params.get("addressGrpId")));
+        }
+    	campaign.setSendFlag("10");
     	
-    	if (campaignService.updateSchdlSendFlag(campaign) > 0)
-    		return "success";
+    	if (campaignService.updateTargetStatus(campaign) > 0)
+            return makeResultStr("success", "");
     	else
-    		return "fail";
-    	
+            return makeResultStr("fail", "DB update error");
 	}
     
 	@ResponseBody
 	@RequestMapping(value = {"/mail/send/campaign/setting/resvSend"}, method = {RequestMethod.POST})
-	public String resvSend(@RequestParam Map<String, String> params) {
+	public String resvSend(@RequestBody Map<String, String> params) {
 		// 발송 예약 - SEND_FLAG : 20
 		int schdlId = Integer.parseInt(StringUtils.defaultIfEmpty(params.get("schdlId"), "0"));
 		if (schdlId < 1) {
-			return "fail";
+			return makeResultStr("fail", "Not exist schedule id");
 		}
 		
 		// TO-DO : 발송 예약 전 작성 내용 다시 저장
@@ -231,9 +279,34 @@ public class CampaignController extends BaseController {
 		campaign.setReserveDate(params.get("resvDate"));
 		
 		if (campaignService.updateSchdlSendFlag(campaign) > 0)
-			return "success";
+			return makeResultStr("success", "");
 		else
-			return "fail";
-		
+			return makeResultStr("fail", "DB update error");
 	}
+
+    @ResponseBody
+    @RequestMapping(value = {"/mail/send/campaign/tgt/status"}, method = {RequestMethod.POST})
+    public String checkTargetingStatus(@RequestBody Map<String, String> params) {
+        // 타겟팅 상태 체크
+        int schdlId = Integer.parseInt(StringUtils.defaultIfEmpty(params.get("schdlId"), "0"));
+        if (schdlId < 1) {
+            return makeResultStr("fail", "Not exist schedule id");
+        }
+
+        Campaign campaign = campaignService.selectTargetStatus(schdlId);
+
+        if (campaign != null && campaign.getSendFlag() != null && !"".equals(campaign.getSendFlag()))
+            return makeResultStr("success", campaign.getSendFlag()+"");
+        else
+            return makeResultStr("fail", "Get target status flag error");
+    }
+
+	private String makeResultStr(String result, String resultDesc) {
+        JSONObject resultJson = new JSONObject();
+        resultJson.put("result", StringUtils.defaultIfEmpty(result, "fail"));
+        resultJson.put("desc", StringUtils.defaultIfEmpty(resultDesc, "(empty)"));
+
+        return resultJson.toString();
+    }
+
 }

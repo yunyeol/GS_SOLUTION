@@ -24,5 +24,11 @@ public interface CampaignService {
     int updateTargetFilePath(Campaign campaign);
     
     int updateSchdlSendFlag(Campaign campaign);
+
+    int updateTargetStatus(Campaign campaign);
+
+    Campaign selectTargetStatus(int schdlId);
+
+    int deleteCampaign(int schdlId);
 	
 }
