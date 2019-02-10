@@ -47,7 +47,7 @@
             AND TARGET_YN = 'N'
             AND RESERVE_DATE < NOW()
             ORDER BY ID ASC
-			LIMIT 5000
+			LIMIT 100
         ) A
     ]]>
     </select>

@@ -18,6 +18,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.Executors;
 
 @Slf4j
 public class SmtpSocket {
@@ -213,13 +214,14 @@ public class SmtpSocket {
         Charset charset = Charset.forName("euc-kr");
 
         try {
-            //AsynchronousChannelGroup asynchronousChannelGroup
-            final AsynchronousSocketChannel asynchronousSocketChannel = AsynchronousSocketChannel.open();
+            AsynchronousChannelGroup asynchronousChannelGroup = AsynchronousChannelGroup.withThreadPool(Executors.newSingleThreadExecutor());
+            final AsynchronousSocketChannel asynchronousSocketChannel = AsynchronousSocketChannel.open(asynchronousChannelGroup);
 
             if (asynchronousSocketChannel.isOpen()) {
                 asynchronousSocketChannel.setOption(StandardSocketOptions.SO_RCVBUF, 128 * 1024);
                 asynchronousSocketChannel.setOption(StandardSocketOptions.SO_SNDBUF, 128 * 1024);
                 asynchronousSocketChannel.setOption(StandardSocketOptions.SO_KEEPALIVE, true);
+                asynchronousSocketChannel.setOption(StandardSocketOptions.IP_MULTICAST_LOOP, true);
 
                 //asynchronousSocketChannel.connect(new InetSocketAddress(, port), null, new CompletionHandler<Void, Void>() {
                 asynchronousSocketChannel.connect(new InetSocketAddress("119.207.76.55", port), null, new CompletionHandler<Void, Void>() {
@@ -275,9 +277,10 @@ public class SmtpSocket {
                                     readBuffer.clear();
                                 }
                             }
-
                             log.info("### stringbulider : {}",sb.substring(0, sb.lastIndexOf("||")));
-                            
+
+                            asynchronousSocketChannel.shutdownInput();
+                            asynchronousSocketChannel.shutdownInput();
                             asynchronousSocketChannel.close();
 
                         }catch (Exception e){
@@ -290,6 +293,7 @@ public class SmtpSocket {
                     public void failed(Throwable exc, Void attachment) {
                         try{
                             asynchronousSocketChannel.close();
+                            log.info("#### fail ###");
                         }catch (Exception e){
                             e.printStackTrace();
                         }

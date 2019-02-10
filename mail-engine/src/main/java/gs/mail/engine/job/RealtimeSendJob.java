@@ -24,13 +24,14 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.TaskExecutor;
 
 import java.io.*;
+import java.nio.channels.AsynchronousChannelGroup;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.util.*;
+import java.util.concurrent.Executors;
 
 @Slf4j
 @Configuration
-public class RealtimeSendJob extends SmtpSocket
-{
+public class RealtimeSendJob extends SmtpSocket {
 
     @Autowired private JobBuilderFactory jobBuilderFactory;
     @Autowired private StepBuilderFactory stepBuilderFactory;
@@ -44,8 +45,7 @@ public class RealtimeSendJob extends SmtpSocket
     @Autowired private RealtimeSendService realtimeSendService;
 
     @Value("${mail.smtp.send.log.path}") String dirPath;
-    //@Value("${batch.commit.interval}") private int commitInterval;
-    private int commitInterval = 5000;
+    @Value("${batch.commit.interval}") private int commitInterval;
     @Value("${batch.slave.cnt}") private int slaveCnt;
 
     @Bean
@@ -198,44 +198,18 @@ public class RealtimeSendJob extends SmtpSocket
 
                         String htmlContents = sb.toString();
 
-
+//                        AsynchronousChannelGroup asynchronousChannelGroup = AsynchronousChannelGroup.withThreadPool(Executors.newSingleThreadExecutor());
+//                        final AsynchronousSocketChannel asynchronousSocketChannel = AsynchronousSocketChannel.open(asynchronousChannelGroup);
 
                         int cnt = 0;
                         for(Realtime realtime : items){
                             realtime.setContents(htmlContents.replace("${CONTENTS}", new String(realtime.getContents().getBytes("UTF-8"))));
-
                             log.info("{}, {}, {}, {}, {}",
                                     realtime.toString(), realtime.getContents(), realtime.getTitle(), realtime.getReceiver(), realtime.getSender());
-                            String domain = realtime.getReceiver().substring(realtime.getReceiver().indexOf("@")+1);
-
-                            /** socket */
-//                            //Socket socket = new Socket(getMxDomain(domain), port);
-//                            Socket socket = new Socket("119.207.76.55", port); //humuson
-//                            //Socket socket = new Socket("125.209.249.6", port); //naver
-//                            socketSend(socket,"R", dirPath, realtime);
-//
-//                            if(socket != null) {
-//                                socket.close();
-//                            }
-
-
-                            /** nio socket*/
-                            //Selector selector = Selector.open();
-                            //SocketChannel socketChannel = SocketChannel.open(new InetSocketAddress(getMxDomain(domain), port));
-//                            SocketChannel socketChannel = SocketChannel.open(new InetSocketAddress("119.207.76.55", port));
-//                            socketChannel.configureBlocking(false);
-////                            socketChannel.register(selector, SelectionKey.OP_ACCEPT);
-//
-//                            socketSendByte(socketChannel, "R", dirPath, realtime);
-//
-////                            if(socketChannel !=null){
-////                                socketChannel.close();
-////                            }
+                           //String domain = realtime.getReceiver().substring(realtime.getReceiver().indexOf("@")+1);
 
                             /** nio2 socket */
-                            //AsynchronousSocketChannel asyncSocketChannel = AsynchronousSocketChannel.open();
                             socketSendNio2(realtime);
-
 
                             cnt++;
                         }
