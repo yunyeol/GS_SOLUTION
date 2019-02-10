@@ -124,6 +124,9 @@
 					RESERVE_DATE = DATE_ADD(NOW(), INTERVAL 1 MINUTE)
 				</otherwise>
 			</choose>
+            <if test='campaign.sendFlag != null and campaign.sendFlag == "20"'>
+                , SEND_FLAG = '20'
+            </if>
 	<![CDATA[
 		WHERE
 			SCHDL_ID = #{campaign.schdlId}

@@ -110,7 +110,8 @@ public class CampaignController extends BaseController {
 
 		} else {
 			// 신규 캠페인 등록 : 현재 DB 시간 기본 세팅
-			campaignInfo = campaignService.getCurrentDBDatetime();
+			//campaignInfo = campaignService.getCurrentDBDatetime();    // 스크립트에서 세팅하도록 수정
+			campaignInfo = new Campaign();
 			campaignInfo.setSchdlId(0);
 			campaignInfo.setSendType("C_F");
 			campaignInfo.setSendFlag("00");
@@ -149,7 +150,6 @@ public class CampaignController extends BaseController {
     	campaign.setReserveDate(params.get("reserveDate"));
     	campaign.setReserveTime(params.get("reserveTime"));
     	campaign.setSendType(StringUtils.defaultIfEmpty(params.get("sendType"), "C_N"));
-    	campaign.setSendFlag("00");
     	campaign.setFilePath("PROCESSING");
 
     	int schdlId = Integer.parseInt(StringUtils.defaultIfEmpty(params.get("schdlId"), "0"));
@@ -170,35 +170,19 @@ public class CampaignController extends BaseController {
     	}
     	
     	String contents = params.get("contents");
-    	String htmlContents = htmlHeader + contents + htmlFooter;
-    	
-    	String fileName = "C_CONTENT_" + campaign.getSchdlId() + ".html";
-    	String filePath = htmlPath + "/" + fileName;
-    	
-    	File file = null;
-    	
+    	String filePath = "";
     	try {
-    		// 파일은 기존 파일명에 새로운 파일 내용을 덮어씀
-    		file = new File(filePath);
-    		FileWriter fw = new FileWriter(file);
-    		
-    		fw.write(htmlContents);
-    		fw.flush();
-    		fw.close();
-    	} catch (IOException ioe) {
-    		System.out.println("fail - file io");
-    		ioe.printStackTrace();
-    	}
-    	
-    	if (file.isFile()) {
-    		// 파일 생성 후 파일명만 업데이트
-    		campaign.setFilePath(filePath);
-    		campaignService.updateSchdlFilePath(campaign);
-    	} else {
-    		result.put("result", "fail");
-			result.put("desc", "create mail content file fail");
-			return result.toString();
-    	}
+            filePath = saveMailContent(contents, campaign.getSchdlId());
+        } catch(Exception e) {
+    	    // 파일 생성 실패(파일 생성 중 에러 발생)
+            result.put("result", "fail");
+            result.put("desc", "create mail content file fail");
+            return result.toString();
+        }
+
+        // 파일 생성 후 파일명만 업데이트
+        campaign.setFilePath(filePath);
+        campaignService.updateSchdlFilePath(campaign);
     	
     	result.put("result", "success");
     	result.put("desc", campaign.getSchdlId());
@@ -261,28 +245,62 @@ public class CampaignController extends BaseController {
     	else
             return makeResultStr("fail", "DB update error");
 	}
-    
+
+	// 발송 예약
 	@ResponseBody
-	@RequestMapping(value = {"/mail/send/campaign/setting/resvSend"}, method = {RequestMethod.POST})
-	public String resvSend(@RequestBody Map<String, String> params) {
-		// 발송 예약 - SEND_FLAG : 20
+	@RequestMapping(value = {"/mail/send/campaign/setting/send"}, method = {RequestMethod.POST})
+	public String campaignSend(@RequestBody Map<String, String> params) {
 		int schdlId = Integer.parseInt(StringUtils.defaultIfEmpty(params.get("schdlId"), "0"));
 		if (schdlId < 1) {
 			return makeResultStr("fail", "Not exist schedule id");
 		}
 		
-		// TO-DO : 발송 예약 전 작성 내용 다시 저장
-		
-		Campaign campaign = new Campaign();
+		// 발송 전 다시 캠페인 내용을 저장하면서 SEND_FLAG를 20으로 업데이트
+        Campaign campaign = new Campaign();
 		campaign.setSchdlId(schdlId);
-		campaign.setSendFlag("T2");
-		campaign.setReserveDate(params.get("resvDate"));
+
+        String contents = params.get("contents");
+        String filePath = "";
+        try {
+            filePath = saveMailContent(contents, campaign.getSchdlId());
+        } catch(Exception e) {
+            // 파일 생성 실패(파일 생성 중 에러 발생)
+            return makeResultStr("fail", "create mail content file fail");
+        }
+
+        campaign.setSchdlName(params.get("schdlName"));
+        campaign.setSubject(params.get("subject"));
+        campaign.setSender(StringUtils.defaultString(params.get("sender"), ""));
+        campaign.setSenderName(params.get("senderName"));
+        campaign.setReserveDate(params.get("reserveDate"));
+        campaign.setReserveTime(params.get("reserveTime"));
+        campaign.setFilePath(filePath);
+        campaign.setSendFlag("20");
 		
 		if (campaignService.updateSchdlSendFlag(campaign) > 0)
 			return makeResultStr("success", "");
 		else
 			return makeResultStr("fail", "DB update error");
 	}
+
+    // 발송 예약 취소
+    @ResponseBody
+    @RequestMapping(value = {"/mail/send/campaign/setting/send"}, method = {RequestMethod.DELETE})
+    public String campaignSendCancel(@RequestBody Map<String, String> params) {
+        int schdlId = Integer.parseInt(StringUtils.defaultIfEmpty(params.get("schdlId"), "0"));
+        if (schdlId < 1) {
+            return makeResultStr("fail", "Not exist schedule id");
+        }
+
+        Campaign campaign = new Campaign();
+        campaign.setSchdlId(schdlId);
+        campaign.setSendFlag("12");
+
+        if (campaignService.updateSchdlSendFlag(campaign) > 0)
+            return makeResultStr("success", "");
+        else
+            return makeResultStr("fail", "DB update error");
+    }
 
     @ResponseBody
     @RequestMapping(value = {"/mail/send/campaign/tgt/status"}, method = {RequestMethod.POST})
@@ -307,6 +325,30 @@ public class CampaignController extends BaseController {
         resultJson.put("desc", StringUtils.defaultIfEmpty(resultDesc, "(empty)"));
 
         return resultJson.toString();
+    }
+
+    private String saveMailContent(String contents, int schdlId) throws Exception{
+        String htmlContents = htmlHeader + contents + htmlFooter;
+
+        String fileName = "C_CONTENT_" + schdlId + ".html";
+        String filePath = htmlPath + "/" + fileName;
+
+        File file = null;
+
+        try {
+            // 파일은 기존 파일명에 새로운 파일 내용을 덮어씀
+            file = new File(filePath);
+            FileWriter fw = new FileWriter(file);
+
+            fw.write(htmlContents);
+            fw.flush();
+            fw.close();
+        } catch (IOException ioe) {
+            logger.error("fail - file io");
+            ioe.printStackTrace();
+        }
+
+        return filePath;
     }
 
 }

@@ -89,34 +89,38 @@
                                     </div>
                                     <div class="timeline-body">
                                     	<div class="card-body">
-                                    		<ul class="nav nav-pills nav-pills-primary">
-                                    			<li class="nav-item">
-                                    				<a class="nav-link active" data-toggle="tab" name="tgtTab" type="C_F" href="#fileTgt">File</a>
-                                    			</li>
-                                    			<li class="nav-item">
-                                    				<a class="nav-link" data-toggle="tab" name="tgtTab" type="C_D" href="#dbTgt">DB</a>
-                                    			</li>
-                                    		</ul>
-                                    		<div class="tab-content tab-space">
-                                    			<div class="tab-pane active" id="fileTgt">
-                                    				타겟팅 파일을 업로드 하세요.
-                                    				<br>
-                                    				<form method="POST" enctype="multipart/form-data" id="targetFileForm" action="fileUpload">
-	                                    				<input type="file" id="targetFile" name="targetFile">
-	                                    				<!-- <button class="btn btn-primary btn-sm" id="uploadTgtFile">업로드</button> -->
-	                                    				<input type="button" value="업로드" class="btn btn-primary btn-sm" id="uploadTgtFile">
-	                                    			</form>
-                                    			</div>
-                                    			<div class="tab-pane" id="dbTgt">
-                                    				타겟팅 할 주소록을 선택하세요.
-                                    				<br>
-                                    				<select class="selectpicker" data-style="btn btn-info" id="addressGrpList">
-                                    					{{#addressGrpList}}
-                                    						<option value="{{addressGrpId}}">{{addressGrpName}}</option>
-                                    					{{/addressGrpList}}
-                                    				</select>
-                                    			</div>
-                                    		</div>
+                                            <div id="targetingSettingDiv">
+                                                <ul class="nav nav-pills nav-pills-primary">
+                                                    <li class="nav-item">
+                                                        <a class="nav-link active" data-toggle="tab" name="tgtTab" type="C_F" href="#fileTgt">File</a>
+                                                    </li>
+                                                    <li class="nav-item">
+                                                        <a class="nav-link" data-toggle="tab" name="tgtTab" type="C_D" href="#dbTgt">DB</a>
+                                                    </li>
+                                                </ul>
+                                                <div class="tab-content tab-space">
+                                                    <div class="tab-pane active" id="fileTgt">
+                                                        타겟팅 파일을 업로드 하세요.
+                                                        <br>
+                                                        <form method="POST" enctype="multipart/form-data" id="targetFileForm" action="fileUpload">
+                                                            <input type="file" id="targetFile" name="targetFile">
+                                                            <!--<input type="button" value="업로드" class="btn btn-primary btn-sm" id="uploadTgtFile">-->
+                                                        </form>
+                                                    </div>
+                                                    <div class="tab-pane" id="dbTgt">
+                                                        타겟팅 할 주소록을 선택하세요.
+                                                        <br>
+                                                        <select class="selectpicker" data-style="btn btn-info" id="addressGrpList">
+                                                            {{#addressGrpList}}
+                                                                <option value="{{addressGrpId}}">{{addressGrpName}}</option>
+                                                            {{/addressGrpList}}
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div id="targetingStatusDiv" style="color: #FFF; text-align: center; display: none;">
+
+                                            </div>
                                     		<button class="btn btn-primary btn-sm float-right" id="startTgt">타겟팅 시작</button>
                                     	</div>
                                     </div>
@@ -154,7 +158,9 @@
                             <div class="row">
                                 <div class="col-sm-10"></div>
                                 <div class="col-sm-2" >
-                                    <button type="button" style="float:right;" name="campaignSave" class="btn btn-primary " >저장</button>
+                                    <button type="button" style="float:right; display: none;" id="campaignSendCancel" name="campaignSendCancel" class="btn btn-primary " >발송 예약 취소</button>
+                                    <button type="button" style="float:right;" id="campaignSend" name="campaignSend" class="btn btn-primary " >발송</button>
+                                    <button type="button" style="float:right; margin-right: 10px;" id="campaignSave" name="campaignSave" class="btn btn-primary " >저장</button>
                                 </div>
                             </div>
                         </ul>
