@@ -265,11 +265,11 @@ public class TargetJob {
                         param.put("map8", target.getMap8());
                         param.put("map9", target.getMap9());
                         param.put("map10", target.getMap10());
+                        param.put("sendFlag", "12");
 
                         if(sendType.equals("C_D")){
                             sqlSessionTemplate.insert("SQL.Target.insertSendRaw", param);
                         }else if(sendType.equals("C_F")){
-                            param.put("sendFlag", "12");
                             param.put("rawId", target.getRawId());
                             sqlSessionTemplate.update("SQL.Target.updateSendRawFlag", param);
                         }
@@ -298,7 +298,9 @@ public class TargetJob {
                     Map<String, Object> param = new HashMap<>();
                     param.put("schdlId", schdlId);
                     param.put("addressGrpId", addressGrpId);
-                    param.put("sendFlag", "10");
+                    param.put("sendFlag", "12");
+
+                    sqlSessionTemplate.update("SQL.Target.updateSendSchldFlag", param);
 
                     redisTemplate.opsForValue().set(String.valueOf(schdlId)+"_"+items.get(0).getMbrAddress()+"_"+items.get(0).getRawId()
                                                     ,jsonArray.toString());
