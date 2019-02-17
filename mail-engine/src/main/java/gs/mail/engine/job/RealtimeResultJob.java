@@ -14,8 +14,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.nio.channels.AsynchronousSocketChannel;
-
 @Slf4j
 @Configuration
 public class RealtimeResultJob extends SmtpSocket {
@@ -48,10 +46,7 @@ public class RealtimeResultJob extends SmtpSocket {
                     .tasklet((contribution, chunkContext) -> {
                         final long  schdlId = chunkContext.getStepContext().getStepExecution().getJobParameters().getLong("schdlId");
 
-                        //socketResult("R", dirPath, schdlId);
-                        //AsynchronousSocketChannel asyncSocketChannel = AsynchronousSocketChannel.open();
-                        //socketResultNio2(asyncSocketChannel);
-
+                        socketResult("R", dirPath, schdlId);
                         return RepeatStatus.FINISHED;
                     })
                     .build();

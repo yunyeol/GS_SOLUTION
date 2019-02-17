@@ -26,6 +26,7 @@ import org.springframework.core.task.TaskExecutor;
 import java.io.*;
 import java.nio.channels.AsynchronousChannelGroup;
 import java.nio.channels.AsynchronousSocketChannel;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.Executors;
 
@@ -198,18 +199,14 @@ public class RealtimeSendJob extends SmtpSocket {
 
                         String htmlContents = sb.toString();
 
-//                        AsynchronousChannelGroup asynchronousChannelGroup = AsynchronousChannelGroup.withThreadPool(Executors.newSingleThreadExecutor());
-//                        final AsynchronousSocketChannel asynchronousSocketChannel = AsynchronousSocketChannel.open(asynchronousChannelGroup);
-
                         int cnt = 0;
                         for(Realtime realtime : items){
                             realtime.setContents(htmlContents.replace("${CONTENTS}", new String(realtime.getContents().getBytes("UTF-8"))));
                             log.info("{}, {}, {}, {}, {}",
                                     realtime.toString(), realtime.getContents(), realtime.getTitle(), realtime.getReceiver(), realtime.getSender());
-                           //String domain = realtime.getReceiver().substring(realtime.getReceiver().indexOf("@")+1);
 
                             /** nio2 socket */
-                            socketSendNio2(realtime);
+                            socketSendNio2(realtime, "R", dirPath);
 
                             cnt++;
                         }

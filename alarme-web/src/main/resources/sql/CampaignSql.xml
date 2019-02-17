@@ -149,7 +149,7 @@
     	UPDATE
     		GS_SEND_SCHDL
     	SET
-    		TARGET_FILE_PATH = #{campaign.targetFilePath}
+    		TARGET_FILE = #{campaign.targetFilePath}
     	WHERE
     		SCHDL_ID = #{campaign.schdlId}
     ]]>

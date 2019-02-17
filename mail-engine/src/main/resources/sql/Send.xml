@@ -6,6 +6,7 @@
     <select id="selectResultFileInfo" parameterType="Long" resultType="Send">
     <![CDATA[
         SELECT
+            LOG_FILE logFile,
             LINE_NUMBER lineNumber
         FROM GS_SEND_SCHDL
         WHERE MASTER_SCHDL_ID = ${schdlId}
@@ -30,10 +31,16 @@
 
     <update id="updateSendSchdlFileNumber">
         UPDATE GS_SEND_SCHDL
-        SET LOG_FILE_NAME = #{logFileName}, LINE_NUMBER = ${lineNumber}
+        SET LOG_FILE = #{logFileName}, LINE_NUMBER = ${lineNumber}
         WHERE MASTER_SCHDL_ID = ${schdlId}
         AND SEND_TYPE='R_S'
         AND DATE_FORMAT(RESERVE_DATE, '%Y%m%d') = DATE_FORMAT(NOW(), '%Y%m%d')
+    </update>
+
+    <update id="updateSendSchdlLogFile">
+        UPDATE GS_SEND_SCHDL
+        SET LOG_FILE = #{logFile}, LINE_NUMBER = ${lineNumber}, UPT_DATE = NOW()
+        WHERE SCHDL_ID = ${schdlId}
     </update>
 
 </mapper>

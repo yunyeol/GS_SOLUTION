@@ -24,14 +24,14 @@ public class RealtimeResultExecutor extends JobParameterContents implements Job 
         try{
             Map<String, Object> jobDataMap = context.getMergedJobDataMap();
 
-            for (Realtime realtime : realtimeSendService.selectRealtimeSchdlList()){
+            for (Realtime realtime : realtimeSendService.selectRealtimeSchdlResultList()){
                 jobDataMap.put("jobName", "RealtimeResult");
                 jobDataMap.put("schdlId", realtime.getSchdlId());
                 jobDataMap.put("time", System.currentTimeMillis());
 
                 JobParameters jobParameters = getJobParametersFromJobMap(jobDataMap);
 
-                JobExecution jobExecution = simpleJobLauncher.run(realtimeResultJob.realtimeResultJobDetail(), jobParameters);
+                simpleJobLauncher.run(realtimeResultJob.realtimeResultJobDetail(), jobParameters);
             }
 
         }catch (Exception e){

@@ -14,6 +14,6 @@ public class Send {
     private String contents;
     private String uuid;
 
-    private String logFileName;
+    private String logFile;
     private String lineNumber;
 }

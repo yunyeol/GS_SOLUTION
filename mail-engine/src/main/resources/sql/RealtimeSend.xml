@@ -24,6 +24,22 @@
         LIMIT 1
     </select>
 
+    <select id="selectRealtimeSchdlResult" resultType="Realtime">
+        SELECT
+            GSS.SCHDL_ID schdlId,
+            GSS.SCHDL_NAME schdlName,
+            GSS.SENDER sender,
+            GSS.FILE_PATH filePath,
+            GSS.SEND_GUBUN sendGubun,
+            GSS.SEND_TYPE sendType,
+            GSS.ACTIVE_YN activeYn
+        FROM GS_SEND_SCHDL GSS
+        WHERE GSS.MASTER_SCHDL_ID = 0
+        AND GSS.SEND_GUBUN = 'M'
+        AND GSS.SEND_TYPE = 'R_M'
+        AND GSS.ACTIVE_YN = 'Y'
+    </select>
+
     <select id="selectRealtimeTodaySchdl" resultType="Realtime">
         SELECT
             SCHDL_ID schdlId
@@ -66,6 +82,7 @@
                 GSS.SEND_FLAG sendFlag,
                 GSS.ACTIVE_YN activeYn,
                 GSS.SENDER sender,
+                GSS.LOG_FILE logFile,
 
                 GMQ.RECEIVER receiver,
                 GMQ.UUID uuid,

@@ -114,7 +114,7 @@ public class TargetJob {
 
             if(targetFile != null){
                 //flatFileItemReader.setLinesToSkip(1);
-                flatFileItemReader.setResource(new FileUrlResource(targetFilePath+targetFile));
+                flatFileItemReader.setResource(new FileUrlResource(targetFilePath+"/"+targetFile));
 
                 tokenizer.setDelimiter("|");
                 tokenizer.setNames(new String[]{
@@ -145,7 +145,7 @@ public class TargetJob {
                 try{
                     Map<String, Object> param = new HashMap<>();
                     param.put("schdlId", schdlId);
-                    param.put("sendFlag", "11");
+                    param.put("sendFlag", "12");
 
                     sqlSessionTemplate.update("SQL.Target.updateSendSchldFlag", param);
 
@@ -269,7 +269,7 @@ public class TargetJob {
                         if(sendType.equals("C_D")){
                             sqlSessionTemplate.insert("SQL.Target.insertSendRaw", param);
                         }else if(sendType.equals("C_F")){
-                            param.put("sendFlag", "11");
+                            param.put("sendFlag", "12");
                             param.put("rawId", target.getRawId());
                             sqlSessionTemplate.update("SQL.Target.updateSendRawFlag", param);
                         }

@@ -25,6 +25,12 @@ public class RealtimeSendServiceImpl implements RealtimeSendService {
     }
 
     @Override
+    public List<Realtime> selectRealtimeSchdlResultList() {
+        List<Realtime> selectRealtimeSendList = sqlSessionTemplate.selectList("SQL.RealitmeSend.selectRealtimeSchdlResult");
+        return selectRealtimeSendList;
+    }
+
+    @Override
     public boolean isRunningChk(long schdlId) {
         Boolean isRun = realtimeHashMap.get(schdlId);
 
