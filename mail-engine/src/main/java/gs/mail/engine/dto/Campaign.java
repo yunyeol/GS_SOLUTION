@@ -5,7 +5,7 @@ import org.apache.ibatis.type.Alias;
 
 @Data
 @Alias("Campaign")
-public class Campaign {
+public class Campaign extends Send  {
     private long schdlId;
     private String schdlName;
     private long addressGrpId;
@@ -15,4 +15,6 @@ public class Campaign {
     private String sendType;
     private String sendFlag;
     private String regDate;
+    private String subject;
+    private String senderName;
 }

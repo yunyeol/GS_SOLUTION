@@ -44,14 +44,18 @@ public class QuartzJobScheduler {
                                             .withSchedule(CronScheduleBuilder.cronSchedule(realtimeReultCron)).build();
 
         //타게팅
-        JobDetail targetJob = JobBuilder.newJob(TargetExecutor.class).withIdentity("TargetExecutor")
-                            .storeDurably(true).build();
+        JobDataMap targetMap = new JobDataMap();
+        targetMap.put("jobName","target");
+        JobDetail targetJob = JobBuilder.newJob(TargetExecutor.class).setJobData(targetMap)
+                                .withIdentity("TargetExecutor").storeDurably(true).build();
         CronTrigger targetTrigger = TriggerBuilder.newTrigger().forJob("TargetExecutor").withIdentity("TargetTrigger")
                                     .withSchedule(CronScheduleBuilder.cronSchedule(targetCron)).build();
 
         //캠페인발송
-        JobDetail campaignJob = JobBuilder.newJob(CampaignSendExecutor.class).withIdentity("CampaignSendExecutor")
-                .storeDurably(true).build();
+        JobDataMap campaignSendMap = new JobDataMap();
+        campaignSendMap.put("jobName","campaignSend");
+        JobDetail campaignJob = JobBuilder.newJob(CampaignSendExecutor.class).setJobData(campaignSendMap)
+                                .withIdentity("CampaignSendExecutor").storeDurably(true).build();
         CronTrigger campaignTrigger = TriggerBuilder.newTrigger().forJob("CampaignSendExecutor").withIdentity("CampaignSendTrigger")
                 .withSchedule(CronScheduleBuilder.cronSchedule(campaignCron)).build();
 

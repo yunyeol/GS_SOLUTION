@@ -33,6 +33,7 @@ public class TargetExecutor extends JobParameterContents implements Job {
     public void execute(JobExecutionContext context) {
         try {
             Map<String, Object> jobDataMap = context.getMergedJobDataMap();
+            String jobName = (String) jobDataMap.get(JOB_NAME);
 
             for (Target target : targetService.selectTargetList()){
                 jobDataMap.put("jobName", "MailTarget");
@@ -45,7 +46,13 @@ public class TargetExecutor extends JobParameterContents implements Job {
 
                 JobParameters jobParameters = getJobParametersFromJobMap(jobDataMap);
 
-                JobExecution jobExecution = simpleJobLauncher.run(targetJob.targetJobDetail(), jobParameters);
+                boolean isStarted = jobRepository.isJobInstanceExists(jobName, jobParameters);
+
+                if(!isStarted && !targetService.isRunningChk(target.getSchdlId()) && target.getSchdlId() > 0){
+                    simpleJobLauncher.run(targetJob.targetJobDetail(), jobParameters);
+                }else{
+                    log.info("{} job is already running ", jobName);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();

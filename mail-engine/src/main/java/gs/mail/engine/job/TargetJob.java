@@ -2,6 +2,7 @@ package gs.mail.engine.job;
 
 import gs.mail.engine.dto.Target;
 import gs.mail.engine.mapper.TargetFileMapper;
+import gs.mail.engine.service.TargetService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.session.ExecutorType;
 import org.apache.ibatis.session.SqlSession;
@@ -10,10 +11,7 @@ import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.mybatis.spring.batch.MyBatisCursorItemReader;
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.Step;
-import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.*;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.JobScope;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
@@ -57,6 +55,7 @@ public class TargetJob {
     @Value("${file.target.path}") private String targetFilePath;
 
     @Autowired private RedisTemplate<String, String> redisTemplate;
+    @Autowired private TargetService targetService;
 
     @Bean
     public Job targetJobDetail() {
@@ -82,6 +81,7 @@ public class TargetJob {
                     .incrementer(simpleIncrementer)
                     .start(flow)
                     .end()
+                    .listener(targetListener())
                     .build();
 
         }catch(Exception e){
@@ -427,5 +427,25 @@ public class TargetJob {
         reader.setParameterValues(paramMap);
         reader.setQueryId("SQL.Target.selectFileTargetList");
         return reader;
+    }
+
+    @Bean
+    @JobScope
+    public JobExecutionListener targetListener() throws Exception{
+        JobExecutionListener jobExecutionListener = new JobExecutionListener() {
+            @Override
+            public void beforeJob(JobExecution jobExecution) {
+                long schdlId = jobExecution.getJobParameters().getLong("schdlId");
+                targetService.setRunnging(schdlId, true);
+            }
+
+            @Override
+            public void afterJob(JobExecution jobExecution) {
+                long schdlId = jobExecution.getJobParameters().getLong("schdlId");
+                targetService.setRunnging(schdlId, false);
+            }
+        };
+
+        return jobExecutionListener;
     }
 }

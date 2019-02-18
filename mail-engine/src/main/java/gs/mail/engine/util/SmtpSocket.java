@@ -299,6 +299,9 @@ public class SmtpSocket {
                             }
 
                             Path path = Paths.get(fileDir + fileName);
+                            if(!Files.exists(path)){
+                                Files.createFile(path);
+                            }
                             Files.write(path, (sb.substring(0, sb.lastIndexOf("||"))+carriageReturn).getBytes(), StandardOpenOption.APPEND);
 
                             asynchronousSocketChannel.shutdownInput();
