@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.project.alarmeweb.mapper.DashboardMapper">
+	
+	<select id="getChart2w" parameterType="Dashboard" resultType="Dashboard">
+	<![CDATA[
+		SELECT
+			A.WORKDAY workday,
+			SUM(A.SEND_CNT) sendCnt,
+			SUM(A.SUCCESS_CNT) successCnt,
+			SUM(A.FAIL_CNT) failCnt,
+			SUM(A.OPEN_CNT) openCnt,
+			SUM(A.CLICK_CNT) clickCnt
+		FROM (
+			SELECT
+				DATE_FORMAT(RESERVE_DATE, '%Y/%m/%d') WORKDAY,
+				SEND_CNT,
+				SUCCESS_CNT,
+				FAIL_CNT,
+				OPEN_CNT,
+				CLICK_CNT
+			FROM
+				GS_SEND_SCHDL
+			WHERE
+				SEND_FLAG = '40'
+				AND RESERVE_DATE >= STR_TO_DATE(CONCAT(#{dashboard.startDate}, ' 00:00:00'), '%Y/%m/%d %H:%i:%s')
+				AND RESERVE_DATE <= STR_TO_DATE(CONCAT(#{dashboard.endDate}, ' 23:59:59'), '%Y/%m/%d %H:%i:%s')
+	]]>
+	  	<choose>
+		  	<when test='dashboard.chartType != null and dashboard.chartType == "C"'>
+				AND SEND_TYPE LIKE 'C%'
+		  	</when>
+		  	<when test='dashboard.chartType != null and dashboard.chartType == "R"'>
+				AND SEND_TYPE LIKE 'R%'
+		  	</when>
+	  	</choose>
+	<![CDATA[
+		  ) A
+		  GROUP BY
+		  	  A.WORKDAY
+	]]>
+	</select>
+    
+</mapper>
