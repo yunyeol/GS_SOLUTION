@@ -1,5 +1,6 @@
 package com.project.alarmeweb.service.impl;
 
+import com.project.alarmeweb.dto.PageMaker;
 import com.project.alarmeweb.dto.Realtime;
 import com.project.alarmeweb.mapper.RealtimeMapper;
 import com.project.alarmeweb.service.RealtimeService;
@@ -17,6 +18,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @Slf4j
 @Service
@@ -30,6 +32,21 @@ public class RealtimeServiceImpl implements RealtimeService {
     @Override
     public int insertRealtimeSchdl(Realtime realtime) {
         return realtimeMapper.insertRealtimeSchdl(realtime);
+    }
+
+    @Override
+    public PageMaker selectRealtimeMasterPagingList(Map<String,Object> params, int currIdx) {
+        params = (Objects.isNull(params)) ? new HashMap<>() : params;
+        PageMaker pageMaker = PageMaker.getInstance();
+        pageMaker.setPaging(currIdx, 10);
+        params.put("isPaging", "Y");
+        params.put("startRow",pageMaker.getStartRow());
+        params.put("limitRow",pageMaker.getLimitRow());
+
+        pageMaker.setContentList( realtimeMapper.selectRealtimeMasterList(params) );
+        pageMaker.setTotCnt( realtimeMapper.selectRealtimeMasterListCnt(params) );
+
+        return pageMaker;
     }
 
     @Override

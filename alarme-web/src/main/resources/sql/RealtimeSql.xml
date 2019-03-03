@@ -22,10 +22,18 @@
         AND MASTER_SCHDL_ID = 0
         AND SEND_TYPE = 'R_M'
     ]]>
-        <if test=" schdlId != null and schdlId != '' ">
-            AND SCHDL_ID = #{schdlId}
-        </if>
+        <include refid="condition" />
     </select>
+
+    <select id="selectRealtimeMasterListCnt" resultType="int">
+        SELECT
+            COUNT(1)
+        FROM GS_SEND_SCHDL
+        WHERE 1=1
+        AND MASTER_SCHDL_ID = 0
+        AND SEND_TYPE = 'R_M'
+    </select>
+
 
     <insert id="insertRealtimeSchdl">
         INSERT INTO GS_SEND_SCHDL(MASTER_SCHDL_ID, SCHDL_NAME, SENDER, FILE_PATH,
@@ -52,6 +60,15 @@
         DELETE FROM GS_SEND_SCHDL
         WHERE SCHDL_ID = #{schdlId}
     </delete>
+
+    <sql id="condition">
+        <if test=" schdlId != null and schdlId != '' ">
+            AND SCHDL_ID = #{schdlId}
+        </if>
+        <if test='isPaging != null and isPaging == "Y"'>
+            LIMIT #{startRow},#{limitRow}
+        </if>
+    </sql>
 
 </mapper>
 

@@ -1,6 +1,7 @@
 package com.project.alarmeweb.controller.mail;
 
 import com.project.alarmeweb.controller.BaseController;
+import com.project.alarmeweb.dto.PageMaker;
 import com.project.alarmeweb.dto.Realtime;
 import com.project.alarmeweb.service.RealtimeService;
 import org.apache.commons.lang3.StringUtils;
@@ -28,33 +29,38 @@ public class RealtimeController extends BaseController {
     @Autowired private RealtimeService realtimeService;
 
     @RequestMapping(value={"/mail/send/realtime"}, produces="text/html; charset=UTF-8", method = RequestMethod.GET)
-    public String realtime(Model model){
-        List<Realtime> realtimeMasterList = realtimeService.selectRealtimeMasterList(new HashMap<>());
+    public String realtime(Model model, @RequestParam(value = "currIdx", required = false, defaultValue = "1") int currIdx
+                          ,@RequestParam(value = "isAjax", required = false, defaultValue = "false") boolean isAjax){
+        PageMaker pageMaker = realtimeService.selectRealtimeMasterPagingList(new HashMap<>(), currIdx);
 
-        String sendFlagStr = "";
-        for (Realtime realtime : realtimeMasterList){
-            if(realtime.getSendFlag().equals("00")){
-                sendFlagStr = "준비";
-            }else if(realtime.getSendFlag().equals("10")){
-                sendFlagStr = "타게팅 - 진행";
-            }else if(realtime.getSendFlag().equals("11")){
-                sendFlagStr = "타게팅 - 완료";
-            }else if(realtime.getSendFlag().equals("12")){
-                sendFlagStr = "타게팅 - 실패";
-            }else if(realtime.getSendFlag().equals("20")){
-                sendFlagStr = "발송예약";
-            }else if(realtime.getSendFlag().equals("30")){
-                sendFlagStr = "발송중";
-            }else if(realtime.getSendFlag().equals("40")){
-                sendFlagStr = "발송완료";
-            }else if(realtime.getSendFlag().equals("50")){
-                sendFlagStr = "발송실패";
-            }
-            realtime.setSendFlagStr(sendFlagStr);
+        if( !CollectionUtils.isEmpty( pageMaker.getContentList() ) ){
+            pageMaker.getContentList().stream().filter(r->{
+                Realtime realtime = (Realtime)r;
+                return StringUtils.isNotEmpty(realtime.getSendFlag());
+            }).map(r->{
+                Realtime realtime = (Realtime)r;
+                String sendFlagStr = "";
+                switch(realtime.getSendFlag()){
+                    case "00": sendFlagStr = "준비"; break;
+                    case "10": sendFlagStr = "타게팅 - 진행"; break;
+                    case "11": sendFlagStr = "타게팅 - 완료"; break;
+                    case "12": sendFlagStr = "타게팅 - 실패"; break;
+                    case "20": sendFlagStr = "발송예약"; break;
+                    case "30": sendFlagStr = "발송중"; break;
+                    case "40": sendFlagStr = "발송완료"; break;
+                    case "50": sendFlagStr = "발송실패"; break;
+                    default:   sendFlagStr = ""; break;
+                }
+                realtime.setSendFlagStr(sendFlagStr);
+                return realtime;
+            }).collect(Collectors.toList());
         }
 
-        model.addAttribute("realtimeMasterList", realtimeMasterList);
-        return "mail/send/realtime/realtime";
+        model.addAttribute("realtimeMasterList", pageMaker.getContentList() );
+        model.addAttribute("realtimeMasterTotCnt", pageMaker.getTotCnt() );
+
+//        return "mail/send/realtime/realtime";
+        return ( !isAjax ) ? "mail/send/realtime/realtime" : "mail/send/realtime/realtimeDashBoard";
     }
 
     @RequestMapping(value={"/mail/send/realtime/setting"}, produces="text/html; charset=UTF-8", method = RequestMethod.GET)

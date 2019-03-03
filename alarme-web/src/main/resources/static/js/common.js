@@ -145,5 +145,14 @@
         return "0";
     }
 
+    alarmeCommon.checkPaging = function(currIdx, totalCnt, pageSize){
+        if( currIdx && totalCnt &&  pageSize ){
+            if( typeof currIdx === 'number' && typeof totalCnt === 'number' && typeof totalCnt === 'number' ){
+                return currIdx < Math.ceil(totalCnt/pageSize) ? true : false;
+            }
+        }
+        return false;
+    }
+
     window.alarmeCommon = alarmeCommon;
 })(jQuery, {});
