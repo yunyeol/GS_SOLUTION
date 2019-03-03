@@ -4,7 +4,7 @@
 
     dashboard.init = function(){
 	    getChartData("INIT", "ALL");
-
+        this.getCampSending();
         this.setEvent();
     };
 
@@ -26,6 +26,38 @@
             getChartData("UPDATE", "R");
         });
     };
+
+    dashboard.getCampSending = function(){
+        var params = {};
+        params.sendFlag = 30;
+        params.orderType = 'regDt';
+        params.limit = 6;
+
+        var sCallBack = function(resultData){
+            var $html = '';
+            if( resultData.data && resultData.data.length > 0){
+                resultData.data.forEach(function(elem, index){
+                    console.log(elem);
+                    var calc = ( elem.sendCnt == 0 ) ? 0 : Math.floor( (elem.sendCnt / elem.successCnt) * 100 )
+                    $html += '<tr>';
+                    $html += '<td class="text-center"><div class="photo">img</div></td>';
+                    $html += '<td class="text-center">'+elem.schdlId+'</td>';
+                    $html += '<td class="text-center">진행</td>';
+                    $html += '<td class="text-center"><div class="progress-container progress-sm"><div class="progress"><span class="progress-value">'+calc+'%</span><div class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: '+calc+'%;"></div></div></div></td>';
+                    $html += '</tr>';
+                });
+            }else{
+                $html = '<tr><td class="text-center" colspan="4">발송 데이터가 존재하지 않습니다.</td></tr>'
+            }
+            $('div#campSending tbody').html($html);
+        }
+
+        alarmeCommon.ajaxCall('get','/mail/dashboard/campaSending',params, null,null,sCallBack,null);
+        // 대기
+        // setInterval(function(){
+        //     alarmeCommon.ajaxCall('get','/mail/dashboard/campaSending',params, null,null,sCallBack,null);
+        // }, 5000);
+    }
 
     // 차트 데이터 조회
     function getChartData(drawType, chartType) {

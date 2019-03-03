@@ -1,10 +1,9 @@
 package com.project.alarmeweb.mapper;
 
 import java.util.List;
-
+import java.util.Map;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
-
 import com.project.alarmeweb.dto.AddressGrp;
 import com.project.alarmeweb.dto.Campaign;
 
@@ -13,7 +12,7 @@ public interface CampaignMapper {
 	
 	Campaign getCurrentDBDatetime();
 	
-    List<Campaign> selectCampaignList();
+    List<Campaign> selectCampaignList(Map<String, Object> params);
     
     Campaign selectCampaignInfo(@Param("schdlId") int schdlId);
     

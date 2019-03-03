@@ -6,11 +6,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-
+import java.util.*;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONObject;
@@ -24,13 +20,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
-
 import com.project.alarmeweb.controller.BaseController;
 import com.project.alarmeweb.dto.AddressGrp;
 import com.project.alarmeweb.dto.Campaign;
 import com.project.alarmeweb.service.CampaignService;
-
-
 
 @Controller
 public class CampaignController extends BaseController {
@@ -45,7 +38,7 @@ public class CampaignController extends BaseController {
 
     @RequestMapping(value={"/mail/send/campaign"}, produces="text/html; charset=UTF-8", method=RequestMethod.GET)
     public String campaign(Locale locale, Model model){
-    	List<Campaign> campaignList = campaignService.selectCampaignList();
+    	List<Campaign> campaignList = campaignService.selectCampaignList(new HashMap<>());
 
         String sendFlagStr = "";
         for (Campaign campaign : campaignList){
@@ -139,7 +132,7 @@ public class CampaignController extends BaseController {
     
     @ResponseBody
     @RequestMapping(value= {"/mail/send/campaign/setting/save"}, produces="text/html; charset=UTF-8", method = {RequestMethod.POST})
-    public String campaignSettingSave(@RequestBody Map<String, String> params) {
+        public String campaignSettingSave(@RequestBody Map<String, String> params) {
     	JSONObject result = new JSONObject();
     	
     	Campaign campaign = new Campaign();

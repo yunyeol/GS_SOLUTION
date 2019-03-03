@@ -91,6 +91,7 @@
             data : JsonParam || '',
             dataType : dataType || 'json',
             contentType: contentType || 'application/json;charset=utf-8',
+            timeout:3000,
             success: function(reusultData) {
                 if(jQuery.isFunction(sCallback)){
                     sCallback(reusultData);

@@ -22,13 +22,29 @@
             SEND_GUBUN sendGubun,
             SEND_TYPE sendType,
             SEND_FLAG sendFlag,
+            SEND_CNT sendCnt,
+            SUCCESS_CNT successCnt,
+            FAIL_CNT failCnt,
+            OPEN_CNT openCnt,
+            CLICK_CNT clickCnt,
+            DIVIDE_CNT divideCnt,
             REG_DATE regDate
         FROM
         	GS_SEND_SCHDL
         WHERE
         	SEND_TYPE LIKE 'C%'
         	AND DEL_YN = 'N'
-	]]>
+       ]]>
+        <if test=" sendFlag != null and sendFlag != ''">
+            AND SEND_FLAG = #{sendFlag}
+        </if>
+        <if test=" orderType != null and orderType == 'regDt' ">
+            ORDER BY reg_date desc
+        </if>
+        <if test=" limit != null and limit != ''">
+            LIMIT #{limit}
+        </if>
+
 	</select>
 	
 	<select id="selectCampaignInfo" resultType="Campaign">

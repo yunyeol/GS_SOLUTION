@@ -1,16 +1,16 @@
 package com.project.alarmeweb.controller.mail;
 
+import com.google.common.collect.Lists;
 import com.project.alarmeweb.controller.BaseController;
-import com.project.alarmeweb.dto.Campaign;
 import com.project.alarmeweb.dto.Dashboard;
+import com.project.alarmeweb.service.CampaignService;
 import com.project.alarmeweb.service.DashboardService;
-import org.apache.commons.lang3.StringUtils;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -19,6 +19,8 @@ public class DashBoardController extends BaseController {
 
     @Autowired
     DashboardService dashboardService;
+    @Autowired
+    CampaignService campaignService;
 
     @GetMapping(value={"/mail/dashboard"}, produces="text/html; charset=UTF-8")
     public String dashboard(Locale locale, Model model){
@@ -96,6 +98,16 @@ public class DashBoardController extends BaseController {
         result.put("clickCntList", clickCntList);
 
         return result.toString();
+    }
+
+    @RequestMapping(value= {"/mail/dashboard/campaSending"}, produces= MediaType.APPLICATION_JSON_VALUE, method = {RequestMethod.GET})
+    @ResponseBody
+    public Map<String, Object> getCampaSending(@RequestParam Map<String, Object> params) {
+        params.put("sendFlag", Integer.parseInt((String)params.get("sendFlag")));
+        params.put("limit", Integer.parseInt((String)params.get("limit")));
+        Map<String, Object> resultData = new HashMap<>();
+        resultData.put("data", Optional.ofNullable(campaignService.selectCampaignList(params)).orElse(Lists.newArrayList()) );
+        return resultData;
     }
 
 }

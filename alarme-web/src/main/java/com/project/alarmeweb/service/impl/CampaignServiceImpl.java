@@ -1,10 +1,11 @@
 package com.project.alarmeweb.service.impl;
 
+import java.util.HashMap;
 import java.util.List;
-
+import java.util.Map;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import com.project.alarmeweb.dto.AddressGrp;
 import com.project.alarmeweb.dto.Campaign;
 import com.project.alarmeweb.mapper.CampaignMapper;
@@ -21,8 +22,8 @@ public class CampaignServiceImpl implements CampaignService {
 	}
 	
 	@Override
-	public List<Campaign> selectCampaignList() {
-	    return campaignMapper.selectCampaignList();
+	public List<Campaign> selectCampaignList(Map<String, Object> params) {
+	    return campaignMapper.selectCampaignList(Optional.ofNullable(params).orElse(new HashMap<>()));
 	}
 	
 	@Override
