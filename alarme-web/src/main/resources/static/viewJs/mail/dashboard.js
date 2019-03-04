@@ -6,6 +6,7 @@
 	    getChartData("INIT", "ALL");
         this.getCampSending();
         this.setEvent();
+        getTableData();
     };
 
     dashboard.setEvent = function(){
@@ -183,6 +184,23 @@
             myChart.update();
         }
 
+    }
+
+    // 금일 발송/예약 내역 테이블 데이터 조회
+    function getTableData() {
+        $.ajax({
+            method: "get",
+            url: "/mail/dashboard/getTodayListData",
+            contentType: "application/json; charset=utf-8",
+            success: function(data) {
+                var jData = JSON.parse(data);
+
+                // TO-DO : 테이블 그리기
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                console.log(jqXHR);
+            }
+        });
     }
 
     dashboard.init();

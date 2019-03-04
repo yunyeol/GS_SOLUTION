@@ -7,5 +7,9 @@ import java.util.List;
 public interface DashboardService {
 
 	List<Dashboard> getChart2w(Dashboard dashboard);
+
+	List<Dashboard> getTodaySendList();
+
+	List<Dashboard> getTodayReqList();
 	
 }

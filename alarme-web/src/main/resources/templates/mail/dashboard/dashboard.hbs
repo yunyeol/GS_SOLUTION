@@ -7,7 +7,7 @@
 <body class="sidebar-mini">
     <div class="wrapper">
         {{> left mailActive="active" menuExpand="true" mailDashboardMenuActive="active" mailMenuShow="show"}}
-        <div class="main-panel ps ps--active-y">
+        <div class="main-panel">
             {{> top title="DashBoard"}}
 
             <div class="content">
@@ -54,6 +54,91 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="row">
+                    <div class="col-lg-7">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="text-left">
+                                    금일 발송 내역
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table">
+                                        <thead class="text-primary">
+                                            <tr>
+                                                <th class="text-center">
+                                                    유형
+                                                </th>
+                                                <th class="text-center">
+                                                    캠페인명
+                                                </th>
+                                                <th class="text-center">
+                                                    발송
+                                                </th>
+                                                <th class="text-center">
+                                                    성공
+                                                </th>
+                                                <th class="text-center">
+                                                    실패
+                                                </th>
+                                                <th class="text-center">
+                                                    오픈
+                                                </th>
+                                                <th class="text-center">
+                                                    실패
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="todaySendListBody">
+                                            <tr>
+                                                <td class="text-center" colspan="7">
+                                                    발송 내역이 없습니다.
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-5">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="text-left">
+                                    금일 예약 내역
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table">
+                                        <thead class="text-primary">
+                                            <tr>
+                                                <th class="text-center">
+                                                    캠페인명
+                                                </th>
+                                                <th class="text-center">
+                                                    예약시각
+                                                </th>
+                                                <th class="text-center">
+                                                    상태
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="reqListBody">
+                                            <tr>
+                                                <td class="text-center" colspan="3">
+                                                    예약 내역이 없습니다.
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                <div/>
 
                 <!-- 발송 진행-->
                 <div class="row" id="campSending">

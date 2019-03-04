@@ -17,4 +17,14 @@ public class DashboardServiceImpl implements DashboardService {
 	public List<Dashboard> getChart2w(Dashboard dashboard) {
 	    return dashboardMapper.getChart2w(dashboard);
 	}
+
+	@Override
+	public List<Dashboard> getTodaySendList() {
+		return dashboardMapper.getTodaySendList();
+	}
+
+	@Override
+	public List<Dashboard> getTodayReqList() {
+		return dashboardMapper.getTodayReqList();
+	}
 }

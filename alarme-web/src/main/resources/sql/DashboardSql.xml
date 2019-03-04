@@ -42,5 +42,38 @@
 		  	  A.WORKDAY
 	]]>
 	</select>
+
+    <select id="getTodaySendList" resultType="Dashboard">
+    <![CDATA[
+        SELECT
+            CASE WHEN SEND_TYPE LIKE 'C%' THEN '대량' ELSE '실시간' END sendType,
+            SCHDL_NAME schdlName,
+            SEND_CNT sendCnt,
+            SUCCESS_CNT successCnt,
+            FAIL_CNT failCnt,
+            OPEN_CNT openCnt,
+            CLICK_CNT clickCnt
+        FROM
+            GS_SEND_SCHDL
+        WHERE
+            SEND_FLAG = '40'
+            AND RESERVE_DATE LIKE CONCAT(DATE_FORMAT(NOW(), '%Y-%m-%d'), '%')
+	]]>
+    </select>
+
+    <select id="getTodayReqList" resultType="Dashboard">
+    <![CDATA[
+        SELECT
+            SCHDL_NAME schdlName,
+            RESERVE_DATE reserveDate,
+            CASE WHEN SEND_FLAG = '30' THEN '발송중' ELSE '예약' END status
+        FROM
+            GS_SEND_SCHDL
+        WHERE
+            SEND_FLAG IN ('20', '30')
+            AND SEND_TYPE LIKE 'C%'
+            AND RESERVE_DATE LIKE CONCAT(DATE_FORMAT(NOW(), '%Y-%m-%d'), '%')
+	]]>
+    </select>
     
 </mapper>

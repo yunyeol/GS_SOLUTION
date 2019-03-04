@@ -15,4 +15,8 @@ public class Dashboard {
     private long failCnt = 0;
     private long clickCnt = 0;
     private long openCnt = 0;
+    private String sendType;
+    private String schdlName;
+    private String reserveDate;
+    private String status;
 }

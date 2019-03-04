@@ -11,4 +11,8 @@ public interface DashboardMapper {
 
     List<Dashboard> getChart2w(@Param("dashboard") Dashboard dashboard);
 
+    List<Dashboard> getTodaySendList();
+
+    List<Dashboard> getTodayReqList();
+
 }

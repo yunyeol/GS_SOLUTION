@@ -100,6 +100,22 @@ public class DashBoardController extends BaseController {
         return result.toString();
     }
 
+    // 금일 발송 내역 및 예약 내역 테이블 통합 데이터
+    @ResponseBody
+    @RequestMapping(value= {"/mail/dashboard/getTodayListData"}, produces="text/html; charset=UTF-8", method = {RequestMethod.GET})
+    public String getTodayListData() {
+
+        JSONObject result = new JSONObject();
+
+        List<Dashboard> todaySendList = dashboardService.getTodaySendList();
+        List<Dashboard> todayReqList = dashboardService.getTodayReqList();
+
+        result.put("todaySendList", todaySendList);
+        result.put("todayReqList", todayReqList);
+
+        return result.toString();
+    }
+
     @RequestMapping(value= {"/mail/dashboard/campaSending"}, produces= MediaType.APPLICATION_JSON_VALUE, method = {RequestMethod.GET})
     @ResponseBody
     public Map<String, Object> getCampaSending(@RequestParam Map<String, Object> params) {
