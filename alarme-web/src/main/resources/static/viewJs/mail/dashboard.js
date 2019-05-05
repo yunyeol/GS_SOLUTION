@@ -6,7 +6,9 @@
 	    getChartData("INIT", "ALL");
         this.getCampSending();
         this.setEvent();
-        getTableData();
+
+        getTodaySendListData();
+        getTodayReqListData();
     };
 
     dashboard.setEvent = function(){
@@ -186,19 +188,68 @@
 
     }
 
-    // 금일 발송/예약 내역 테이블 데이터 조회
-    function getTableData() {
-        $.ajax({
-            method: "get",
-            url: "/mail/dashboard/getTodayListData",
-            contentType: "application/json; charset=utf-8",
-            success: function(data) {
-                var jData = JSON.parse(data);
-
-                // TO-DO : 테이블 그리기
+    function getTodaySendListData() {
+        $('#todaySendListTable').DataTable({
+            destroy: true,
+            ajax: {
+                url:'/mail/dashboard/getTodaySendListData',
+                type:'GET'
             },
-            error: function(jqXHR, textStatus, errorThrown) {
-                console.log(jqXHR);
+            order: [[ 0, "asc" ]],
+            searching: true,
+            ordering:  true,
+            paging:  true,
+            pagingType: "full_numbers",
+            language: {
+                search: "_INPUT_",
+                searchPlaceholder: "Search records",
+            },
+            bLengthChange: false,
+            columns:[
+                {"data" : "sendType"},
+                {"data" : "schdlName"},
+                {"data" : "sendCnt"},
+                {"data" : "successCnt"},
+                {"data" : "failCnt"},
+                {"data" : "openCnt"},
+                {"data" : "clickCnt"}
+            ],
+            columnDefs:[
+                {className:'text-center', targets:[0,1,2,3,4,5,6]}
+            ],
+            initComplete: function () {
+                $('.dataTables_filter input[type="search"]').removeClass().addClass('form-control');
+            }
+        });
+    }
+
+    function getTodayReqListData() {
+        $('#todayReqListTable').DataTable({
+            destroy: true,
+            ajax: {
+                url:'/mail/dashboard/getTodayReqListData',
+                type:'GET'
+            },
+            order: [[ 0, "asc" ]],
+            searching: true,
+            ordering:  true,
+            paging:  true,
+            pagingType: "full_numbers",
+            language: {
+                search: "_INPUT_",
+                searchPlaceholder: "Search records",
+            },
+            bLengthChange: false,
+            columns:[
+                {"data" : "schdlName"},
+                {"data" : "reserveDate"},
+                {"data" : "status"}
+            ],
+            columnDefs:[
+                {className:'text-center', targets:[0,1,2]}
+            ],
+            initComplete: function () {
+                $('.dataTables_filter input[type="search"]').removeClass().addClass('form-control');
             }
         });
     }

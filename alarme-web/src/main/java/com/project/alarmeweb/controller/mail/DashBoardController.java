@@ -11,6 +11,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -35,7 +36,7 @@ public class DashBoardController extends BaseController {
         JSONObject result = new JSONObject();
 
         // TO-DO : 로그인 기능 구현 후 로그인 사용자 ID 조건 추가 필요
-        int intv = 90;  // 기획상 2주간 데이터를 조회해야 하나 데이터가 많지 않아 임시로 3개월 분 데이터 조회
+        int intv = 14;
         Dashboard dashboard = new Dashboard();
 
         dashboard.setChartType(params.get("chartType"));
@@ -100,18 +101,30 @@ public class DashBoardController extends BaseController {
         return result.toString();
     }
 
-    // 금일 발송 내역 및 예약 내역 테이블 통합 데이터
+    // 금일 발송 내역 데이터
     @ResponseBody
-    @RequestMapping(value= {"/mail/dashboard/getTodayListData"}, produces="text/html; charset=UTF-8", method = {RequestMethod.GET})
-    public String getTodayListData() {
+    @RequestMapping(value= {"/mail/dashboard/getTodaySendListData"}, produces="text/html; charset=UTF-8", method = {RequestMethod.GET})
+    public String getTodaySendListData() {
 
         JSONObject result = new JSONObject();
 
         List<Dashboard> todaySendList = dashboardService.getTodaySendList();
+
+        result.put("data", todaySendList);
+
+        return result.toString();
+    }
+
+    // 금일 예약 내역 데이터
+    @ResponseBody
+    @RequestMapping(value= {"/mail/dashboard/getTodayReqListData"}, produces="text/html; charset=UTF-8", method = {RequestMethod.GET})
+    public String getTodayReqListData() {
+
+        JSONObject result = new JSONObject();
+
         List<Dashboard> todayReqList = dashboardService.getTodayReqList();
 
-        result.put("todaySendList", todaySendList);
-        result.put("todayReqList", todayReqList);
+        result.put("data", todayReqList);
 
         return result.toString();
     }
